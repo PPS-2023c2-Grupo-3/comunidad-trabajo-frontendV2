@@ -25,7 +25,7 @@ import IconButton from '@mui/material/IconButton';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import Stack from '@mui/material/Stack'
 import axios from "axios";
-
+import {config} from '../../config/config'
 
 
 const validationSchema = yup.object({
@@ -73,7 +73,7 @@ export default function WithMaterialUI() {
     if (llamadoTipoDocumento === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/tiposDocumento`
+          `${config.apiUrl}/tiposDocumento`
         );
         const datos = await api.json();
         setTiposDocumentos(datos.tipos_documentos);
@@ -92,7 +92,7 @@ export default function WithMaterialUI() {
     if (llamadoListaCarreras === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/carreras/`
+          `${config.apiUrl}/carreras/`
         );
         const datos = await api.json();
         setListaCarreras(datos.carreras);
@@ -111,7 +111,7 @@ export default function WithMaterialUI() {
     if (llamadoTipoDocumento === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/estudios/`
+          `${config.apiUrl}/estudios/`
         );
         const datos = await api.json();
         setListaEstudios(datos.estudios);
@@ -130,7 +130,7 @@ export default function WithMaterialUI() {
     if (llamadoProvincias === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/provincias`
+          `${config.apiUrl}/provincias`
         );
         const datos = await api.json();
         setListaProvincias(datos.provincias);
@@ -150,7 +150,7 @@ export default function WithMaterialUI() {
     if (provinciaActual != provincia) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/ciudades/?idProvincia=${provincia}`
+          `${config.apiUrl}/ciudades/?idProvincia=${provincia}`
         );
         const datos = await api.json();
         console.log(datos)
@@ -169,7 +169,7 @@ export default function WithMaterialUI() {
     if (llamadoIdiomas === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/idiomas`
+          `${config.apiUrl}/idiomas`
         );
         const datos = await api.json();
         console.log(datos.idiomas)
@@ -188,7 +188,7 @@ export default function WithMaterialUI() {
     if (llamadoNiveles === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/nivelesIdiomas`
+          `${config.apiUrl}/nivelesIdiomas`
         );
         const datos = await api.json();
         setListaNiveles(datos.niveles_idiomas);

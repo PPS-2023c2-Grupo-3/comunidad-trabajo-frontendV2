@@ -7,7 +7,7 @@ import { Box, Typography } from '@mui/material';
 
 import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
-
+import {config} from '../../config/config'
 import axios from "axios";
 
 const Root = styled('div')(({ theme }) => ({
@@ -26,7 +26,7 @@ export default function DividerText() {
   var grupo =  sessionStorage.getItem('grupo')
   var estaLogeado = sessionStorage.getItem('estaLogeado')
 
-  axios.get(`https://comunidad-backend-v3.herokuapp.com/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
+  axios.get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
             .then(({data}) => {
                     cambiarDatosUsuario(data)
                     console.log(data)

@@ -13,6 +13,7 @@ import Grid from "@mui/material/Grid";
 import Header from "../Header";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {config} from '../../config/config'
 import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
 import Swal from "sweetalert2";
@@ -79,7 +80,7 @@ const CustomizedDialogs = () => {
   const [idEmpresa, setIdEmpresa] = useState();
   const [estado, setEstado] = useState();
   const [fechaPublicacion, setFechaPublicacion] = useState();
-  const API_URL = `https://comunidad-backend-v3.herokuapp.com/ofertas/idOferta/${id}?`;
+  const API_URL = `${config.apiUrl}/ofertas/idOferta/${id}?`;
 
   const descripcionAPI = async () => {
 
@@ -133,7 +134,7 @@ const CustomizedDialogs = () => {
     let idsOfertas
     if (estaLogeado && datosUsuario.id != null) {
       try {
-        const api = await fetch(`https://comunidad-backend-v3.herokuapp.com/postulacionesId/postulante/?&id=${datosUsuario.id}&`);
+        const api = await fetch(`${config.apiUrl}/postulacionesId/postulante/?&id=${datosUsuario.id}&`);
         const datos = await api.json();
         console.log(datos)
         idsOfertas = datos.postulaciones.rows.map(postulacion => postulacion.fk_id_oferta)
@@ -172,7 +173,7 @@ const CustomizedDialogs = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const api = await fetch(`https://comunidad-backend-v3.herokuapp.com/postulaciones/?authorization=${token}`, {
+          const api = await fetch(`${config.apiUrl}/postulaciones/?authorization=${token}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -209,7 +210,7 @@ const CustomizedDialogs = () => {
     var data = {
       idEstado: 1
     };
-    await fetch(`https://comunidad-backend-v3.herokuapp.com/ofertas/idOferta/${idOferta}?authorization=${token}`, {
+    await fetch(`${config.apiUrl}/ofertas/idOferta/${idOferta}?authorization=${token}`, {
       method: "PUT", // or 'PUT'
       body: JSON.stringify(data), // data can be `string` or {object}!
       headers: {

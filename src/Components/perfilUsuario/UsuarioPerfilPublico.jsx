@@ -9,6 +9,7 @@ import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from "axios";
+import { config } from '../../config/config';
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -28,7 +29,7 @@ export default function DividerText() {
   const [provinciaPostulante, setProvinciaPostulante] = useState()
   const [ciudadPostulante, setCiudadPostulante] = useState()
   const [fechaNacPostulante, setFechaNacPostulante] = useState()
-  axios.get(`https://comunidad-backend-v3.herokuapp.com/postulantes/dni/${id}`)
+  axios.get(`${config.apiUrl}/postulantes/dni/${id}`)
     .then(({ data }) => {
       setNombrePostulante(data.nombre)
       setApellidoPostulante(data.apellido)

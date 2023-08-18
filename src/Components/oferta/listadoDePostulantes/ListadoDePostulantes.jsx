@@ -11,6 +11,7 @@ import DatosUsuarioContextProvider from '../../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import NotFound from '../../NotFound';
+import {config} from '../../../config/config'
 
 const ListadoPostulantes = () => {
 
@@ -25,7 +26,7 @@ const ListadoPostulantes = () => {
     const [postulantes, setPostulantes] = useState([]);
     const [ofertaActual, setOfertaActual] = useState([]);
     const { id } = useParams();
-    const API_URL = `https://comunidad-backend-v3.herokuapp.com/postulacionesId/oferta/?pagina=0&limite=10&id=${id}`
+    const API_URL = `${config.apiUrl}/postulacionesId/oferta/?pagina=0&limite=10&id=${id}`
 
     const primerLlamado = async () => {
         if(llamado === false){
@@ -44,7 +45,7 @@ const ListadoPostulantes = () => {
 
 
 
-    const API_OFERTA = `https://comunidad-backend-v3.herokuapp.com/ofertas/idOferta/${id}`;
+    const API_OFERTA = `${config.apiUrl}/ofertas/idOferta/${id}`;
     const [idEmpresa, setIdEmpresa] = useState('')
     const traerIdEmpresa = async () => {
       try {

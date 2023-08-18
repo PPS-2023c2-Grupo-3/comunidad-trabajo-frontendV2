@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useState, useEffect } from 'react';
 import { useRef } from 'react';
-
+import {config} from '../../../config/config';
 
 
 export default function ListaPostulantes({ postulantes }) {
@@ -44,7 +44,7 @@ export default function ListaPostulantes({ postulantes }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await fetch(`https://comunidad-backend-v3.herokuapp.com/postulaciones/${idPostulacion}?authorization=${token}`, {
+          await fetch(`${config.apiUrl}/postulaciones/${idPostulacion}?authorization=${token}`, {
             method: "PUT", // or 'PUT'
             body: JSON.stringify(data), // data can be `string` or {object}!
             headers: {
@@ -76,7 +76,7 @@ export default function ListaPostulantes({ postulantes }) {
 
   const traerPdf = async (cvPostulante) => {
     const fetchedData = await axios.get(
-      `https://comunidad-backend-v3.herokuapp.com/files`,
+      `${config.apiUrl}/files`,
       {
         headers: {
           "Content-Type": "application/json",

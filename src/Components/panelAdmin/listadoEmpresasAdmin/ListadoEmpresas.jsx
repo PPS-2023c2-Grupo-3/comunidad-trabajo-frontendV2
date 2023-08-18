@@ -8,6 +8,7 @@ import BarraBusquedaEmpresas from './BarraBusquedaEmpresas';
 import ListaEmpresas from './ListaEmpresas';
 import BusquedaNoEncontrada from './BusquedaNoEncontrada';
 import { Link } from "react-router-dom";
+import {config} from '../../../config/config'
 
 const ListadoEmpresas = () => {
 
@@ -18,8 +19,8 @@ const ListadoEmpresas = () => {
     const [pagina, setPagina] = useState(1);
     const [busquedaActual, setBusquedaActual] = useState('');
     const [cantEmpresasPendientes, setCantEmpresasPendientes] = useState(0);
-    const API_URL = `https://comunidad-backend-v3.herokuapp.com/empresas/?pagina=0&limite=5&idEstado=1&ordenar=id`;
-    const API_EMPRESAS_PENDIENTES = `https://comunidad-backend-v3.herokuapp.com/empresas/?pagina=0&idEstado=2`;
+    const API_URL = `${config.apiUrl}/empresas/?pagina=0&limite=5&idEstado=1&ordenar=id`;
+    const API_EMPRESAS_PENDIENTES = `${config.apiUrl}/empresas/?pagina=0&idEstado=2`;
 
     const primerLlamado = async () => {
         if (llamado === false) {
@@ -43,7 +44,7 @@ const ListadoEmpresas = () => {
             const { empresa } = e.target.elements;
             const empresaValue = empresa.value;
             setBusquedaActual(empresaValue);
-            const api = await fetch(`https://comunidad-backend-v3.herokuapp.com/empresas/?pagina=0&limite=5&ordenar=id&idEstado=1&nombreEmpresa=${empresaValue}`);
+            const api = await fetch(`${config.apiUrl}/empresas/?pagina=0&limite=5&ordenar=id&idEstado=1&nombreEmpresa=${empresaValue}`);
             const datos = await api.json();
             console.log(datos)
             setPagina(1)
@@ -72,7 +73,7 @@ const ListadoEmpresas = () => {
 
     const cambiarPagina = async (e, p) => {
 
-        const api = await fetch(`https://comunidad-backend-v3.herokuapp.com/empresas/?pagina=${p - 1}&ordenar=id&limite=5&idEstado=1&nombreEmpresa=${busquedaActual}`);;
+        const api = await fetch(`${config.apiUrl}/empresas/?pagina=${p - 1}&ordenar=id&limite=5&idEstado=1&nombreEmpresa=${busquedaActual}`);;
         const datos = await api.json();
         setEmpresas(datos.empresas.rows);
         setPagina(p)

@@ -9,6 +9,7 @@ import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
 import Swal from 'sweetalert2';
 import { CopyAll } from '@mui/icons-material';
+import { config } from '../../config/config';
 
 const Login = () => {
 
@@ -31,7 +32,7 @@ const Login = () => {
     }
     const history = useHistory()
     const handleSubmit = async () => {
-        await axios.post('https://comunidad-backend-v3.herokuapp.com/usuarios/signin', body)
+        await axios.post(`${config.apiUrl}/usuarios/signin`, body)
         .then(({data}) => {
             console.log(data)
             cambiarToken(data.token)
@@ -49,7 +50,7 @@ const Login = () => {
               })
         }
         else if (data.grupo == 1){
-            axios.get(`https://comunidad-backend-v3.herokuapp.com/postulantes/idUsuario/${data.id}`)
+            axios.get(`${config.apiUrl}/postulantes/idUsuario/${data.id}`)
             .then(({data}) => {
                 cambiarEstadoLogeado(true)
                 cambiarDatosUsuario(data)
@@ -58,7 +59,7 @@ const Login = () => {
             })
         }
         else if (data.grupo == 2){
-            axios.get(`https://comunidad-backend-v3.herokuapp.com/empresas/idUsuario/${data.id}`)
+            axios.get(`${config.apiUrl}/empresas/idUsuario/${data.id}`)
             .then(({data}) => {
                     cambiarEstadoLogeado(true)
                     cambiarDatosUsuario(data)

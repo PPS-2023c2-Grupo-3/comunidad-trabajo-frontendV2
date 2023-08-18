@@ -9,6 +9,7 @@ import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
+import { config } from '../../config/config';
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -28,7 +29,7 @@ export default function DividerText() {
   
   
   async function traerDatos() {
-    await axios.get(`https://comunidad-backend-v3.herokuapp.com/postulantes/idUsuario/${datosUsuario.Usuario.id}?`)
+    await axios.get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}?`)
     .then(({data}) => {
       cambiarDatosUsuario(data)
     }

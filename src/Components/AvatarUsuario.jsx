@@ -8,6 +8,7 @@ import { Fragment } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect } from 'react';
+import {config} from '../config/config'
 
 
 const AvatarUsuario = () => {
@@ -96,7 +97,7 @@ const AvatarUsuario = () => {
     useEffect(() => {
       const traerFoto = async () => {
         const fetchedData = await axios.get(
-          `https://comunidad-backend-v3.herokuapp.com/files`,
+          `${config.apiUrl}/files`,
           {
             headers: {
               "type": "image/jpeg",

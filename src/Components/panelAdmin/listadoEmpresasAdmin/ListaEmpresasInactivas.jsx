@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 import { Button, Typography } from '@mui/material';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
+import {config } from '../../../config/config';
 
 export default function ListaEmpresas({ empresas }) {
 
@@ -31,7 +32,7 @@ export default function ListaEmpresas({ empresas }) {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-            await fetch(`https://comunidad-backend-v3.herokuapp.com/empresas/cuit/${idEmpresa}?authorization=${token}`, {
+            await fetch(`${config.apiUrl}/empresas/cuit/${idEmpresa}?authorization=${token}`, {
               method: "PUT", // or 'PUT'
               body: JSON.stringify(data), // data can be `string` or {object}!
               headers: {

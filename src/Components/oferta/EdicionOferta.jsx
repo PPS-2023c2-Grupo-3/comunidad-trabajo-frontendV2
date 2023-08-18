@@ -6,6 +6,7 @@ import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Header from "../Header";
+import {config} from '../../config/config'
 import {
   Box,
   MenuItem,
@@ -111,7 +112,7 @@ export default function WithMaterialUI()  {
   var estaLogeado = sessionStorage.getItem('estaLogeado')
 
   const { id } = useParams();
-  const API_URL = `https://comunidad-backend-v3.herokuapp.com/ofertas/idOferta/${id}?`;
+  const API_URL = `${config.apiUrl}/ofertas/idOferta/${id}?`;
 
   const [llamadoOferta, setLlamadoOferta] = useState(false);
   const  descripcionAPI = async () => {
@@ -136,7 +137,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
     if (llamadolistaEstudio === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/estudios/?`
+          `${config.apiUrl}/estudios/?`
         );
         const datos = await api.json();
         setlistaEstudio(datos.estudios);
@@ -155,7 +156,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
     if (llamadolistaCarrera === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/carreras/?`
+          `${config.apiUrl}/carreras/?`
         );
         const datos = await api.json();
         setlistaCarrera(datos.carreras);
@@ -251,7 +252,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
         idEstado: 2
       };
       console.log(values);
-        await fetch(`https://comunidad-backend-v3.herokuapp.com/ofertas/idOferta/${datosOferta.id}?authorization=${token}`, {
+        await fetch(`${config.apiUrl}/ofertas/idOferta/${datosOferta.id}?authorization=${token}`, {
         method: "PUT", // or 'PUT'
         body: JSON.stringify(data), // data can be `string` or {object}!
         headers: {

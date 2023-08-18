@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import CircleIcon from '@mui/icons-material/Circle';
+import { config } from '../../../config/config';
 
 export default function ListaOfertas({ Ofertas }) {
 
@@ -27,7 +28,7 @@ export default function ListaOfertas({ Ofertas }) {
       denyButtonText: `Cancelar`,
     }).then((res) => {
       if (res.isConfirmed) {
-        axios.delete(`https://comunidad-backend-v3.herokuapp.com/postulaciones/${id}?authorization=${token}`)
+        axios.delete(`${config.apiUrl}/postulaciones/${id}?authorization=${token}`)
           .then(res => {
             console.log(res);
             console.log(res.data);

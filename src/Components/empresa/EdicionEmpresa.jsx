@@ -6,6 +6,7 @@ import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Header from "../Header";
+import { config } from "../../config/config";
 import {
   Box,
   MenuItem,
@@ -116,7 +117,7 @@ export default function WithMaterialUI() {
     if (llamadoProvincias === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/provincias/?`
+          `${config.apiUrl}/provincias/?`
         );
         const datos = await api.json();
         setListaProvincias(datos.provincias);
@@ -134,7 +135,7 @@ export default function WithMaterialUI() {
     if (provinciaActual != provincia) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/ciudades/?idProvincia=${provincia}&`
+          `${config.apiUrl}/ciudades/?idProvincia=${provincia}&`
         );
         const datos = await api.json();
         console.log(datos)
@@ -191,7 +192,7 @@ export default function WithMaterialUI() {
         emailRepresentante: values.emailRepresentante,
       };
       console.log(data);
-      await fetch(`https://comunidad-backend-v3.herokuapp.com/empresas/cuit/${datosUsuario.id}?authorization=${token}`, 
+      await fetch(`${config.apiUrl}/empresas/cuit/${datosUsuario.id}?authorization=${token}`, 
         {
         method: 'PUT', // or 'PUT'
         body: JSON.stringify(data), // data can be `string` or {object}!
@@ -209,7 +210,7 @@ export default function WithMaterialUI() {
         })
         .then(function (result) {
           if (result.value) {
-            axios.get(`https://comunidad-backend-v3.herokuapp.com/empresas/idUsuario/${idUsuario}&`)
+            axios.get(`${config.apiUrl}/empresas/idUsuario/${idUsuario}&`)
             .then(({data}) => {
               sessionStorage.setItem('datosUsuario', JSON.stringify(data));
             })

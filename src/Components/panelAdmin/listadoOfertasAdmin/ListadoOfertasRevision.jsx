@@ -6,6 +6,7 @@ import BarraBusquedaOfertas from './BarraBusquedaOfertas';
 import BusquedaNoEncontrada from './BusquedaNoEncontrada';
 import { Link } from 'react-router-dom';
 import ListaOfertasRevision from './ListaOfertasRevision';
+import {config} from '../../../config/config'
 
 const ListadoOfertas = () => {
 
@@ -16,7 +17,7 @@ const ListadoOfertas = () => {
     const [pagina, setPagina] = useState(1);
     const [busquedaActual, setBusquedaActual] = useState('');
 
-    const API_URL = `https://comunidad-backend-v3.herokuapp.com/ofertas/?pagina=0&limite=6&idEstado=4&ordenar=id`;
+    const API_URL = `${config.apiUrl}/ofertas/?pagina=0&limite=6&idEstado=4&ordenar=id`;
 
     const primerLlamado = async () => {
         if (llamado === false) {
@@ -39,7 +40,7 @@ const ListadoOfertas = () => {
             const { oferta } = e.target.elements;
             const ofertaValue = oferta.value;
             setBusquedaActual(ofertaValue);
-            const api = await fetch(`https://comunidad-backend-v3.herokuapp.com/ofertas/?pagina=0&limite=6&idEstado=4&ordenar=id&buscarTitulo=${ofertaValue}`);
+            const api = await fetch(`${config.apiUrl}/ofertas/?pagina=0&limite=6&idEstado=4&ordenar=id&buscarTitulo=${ofertaValue}`);
             const datos = await api.json();
             console.log(datos)
             setPagina(1)
@@ -54,7 +55,7 @@ const ListadoOfertas = () => {
 
     const cambiarPagina = async (e, p) => {
 
-        const api = await fetch(`https://comunidad-backend-v3.herokuapp.com/ofertas/?pagina=${p - 1}&limite=6&ordenar=id&buscarTitulo=${busquedaActual}&idEstado=4`);
+        const api = await fetch(`${config.apiUrl}/ofertas/?pagina=${p - 1}&limite=6&ordenar=id&buscarTitulo=${busquedaActual}&idEstado=4`);
         const datos = await api.json();
         setOfertas(datos.ofertas.rows);
         setPagina(p)

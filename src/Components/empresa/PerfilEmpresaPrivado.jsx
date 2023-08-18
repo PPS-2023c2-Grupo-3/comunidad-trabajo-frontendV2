@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import { AddAPhoto } from '@mui/icons-material';
-
+import {config } from '../../config/config';
 
 
 export default function PerfilEmpresa() {
@@ -34,7 +34,7 @@ export default function PerfilEmpresa() {
   async function actualizarDatos() {
     if (llamado == false) {
 
-      await axios.get(`https://comunidad-backend-v3.herokuapp.com/empresas/idUsuario/${idUsuario}?`)
+      await axios.get(`${config.apiUrl}/empresas/idUsuario/${idUsuario}?`)
         .then(({ data }) => {
           cambiarDatosUsuario(data)
         })
@@ -53,7 +53,7 @@ export default function PerfilEmpresa() {
     try {
       const res = await axios({
         method: "post",
-        url: `https://comunidad-backend-v3.herokuapp.com/files/logo/?authorization=${token}`,
+        url: `${config.apiUrl}/files/logo/?authorization=${token}`,
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -69,7 +69,7 @@ export default function PerfilEmpresa() {
       })
         .then(async function (result) {
           if (result.value) {
-            await axios.get(`https://comunidad-backend-v3.herokuapp.com/empresas/cuit/${datosUsuario.id}?`)
+            await axios.get(`${config.apiUrl}/empresas/cuit/${datosUsuario.id}?`)
               .then(({ data }) => {
                 console.log(data)
                 sessionStorage.setItem('datosUsuario', JSON.stringify(data));
@@ -97,7 +97,7 @@ export default function PerfilEmpresa() {
   useEffect(() => {
     const traerLogo = async () => {
       const fetchedData = await axios.get(
-        `https://comunidad-backend-v3.herokuapp.com/files`,
+        `${config.apiUrl}/files`,
         {
           headers: {
             "type": "image/png",

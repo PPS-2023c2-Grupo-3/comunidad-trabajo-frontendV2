@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
+import { config } from '../../../config/config';
 
 const MiCV = () => {
     var datosUsuario = JSON.parse(sessionStorage.getItem('datosUsuario'))
@@ -26,7 +27,7 @@ const MiCV = () => {
         try {
             const res = await axios({
               method: "post",
-              url: `https://comunidad-backend-v3.herokuapp.com/files/cv/?authorization=${token}`,
+              url: `${config.apiUrl}/files/cv/?authorization=${token}`,
               data: formData,
               headers: { 
                 "Content-Type": "multipart/form-data",
@@ -43,7 +44,7 @@ const MiCV = () => {
               })
                 .then(async function (result) {
                   if (result.value) {
-                    await axios.get(`https://comunidad-backend-v3.herokuapp.com/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
+                    await axios.get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
                       .then(({ data }) => {
                         console.log(data)
                         sessionStorage.setItem('datosUsuario', JSON.stringify(data));
@@ -67,7 +68,7 @@ const MiCV = () => {
     useEffect(() => {
         const traerPdf = async () => {
             const fetchedData = await axios.get(
-                `https://comunidad-backend-v3.herokuapp.com/files/`,
+                `${config.apiUrl}/files/`,
                 {
                     headers: {
                         "Content-Type": "application/json",

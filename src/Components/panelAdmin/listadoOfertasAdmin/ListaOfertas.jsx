@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import CircleIcon from '@mui/icons-material/Circle';
 import { Box } from '@mui/system';
-
+import {config} from '../../../config/config';
 
 
 export default function ListaOfertas({ ofertas }) {
@@ -36,7 +36,7 @@ export default function ListaOfertas({ ofertas }) {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-            await fetch(`https://comunidad-backend-v3.herokuapp.com/ofertas/idOferta/${idOferta}?authorization=${token}`, {
+            await fetch(`${config.apiUrl}/ofertas/idOferta/${idOferta}?authorization=${token}`, {
               method: "PUT", // or 'PUT'
               body: JSON.stringify(data), // data can be `string` or {object}!
               headers: {

@@ -23,7 +23,7 @@ import { MenuList } from "@material-ui/core";
 import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
 import { useHistory } from "react-router-dom";
-
+import {config} from '../../config/config'
 
 const validationSchema = yup.object({
   tituloOferta: yup
@@ -117,7 +117,7 @@ export default function WithMaterialUI() {
     if (llamadolistaEstudio === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/estudios/?`
+          `${config.apiUrl}/estudios/?`
         );
         const datos = await api.json();
         setlistaEstudio(datos.estudios);
@@ -136,7 +136,7 @@ export default function WithMaterialUI() {
     if (llamadolistaCarrera === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/carreras/?`
+          `${config.apiUrl}/carreras/?`
         );
         const datos = await api.json();
         setlistaCarrera(datos.carreras);
@@ -231,7 +231,7 @@ export default function WithMaterialUI() {
         remuneracion: values.remuneracion
       };
       console.log(values);
-        fetch(`https://comunidad-backend-v3.herokuapp.com/ofertas/?authorization=${token}`, {
+        fetch(`${config.apiUrl}/ofertas/?authorization=${token}`, {
         method: "POST", // or 'PUT'
         body: JSON.stringify(data), // data can be `string` or {object}!
         headers: {

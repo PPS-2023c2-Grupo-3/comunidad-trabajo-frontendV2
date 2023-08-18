@@ -9,6 +9,7 @@ import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from "axios";
+import {config} from '../../config/config'
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -32,7 +33,7 @@ const Root = styled('div')(({ theme }) => ({
     var token = sessionStorage.getItem('token')
 
     
-    axios.get(`https://comunidad-backend-v3.herokuapp.com/empresas/cuit/${id}?`)
+    axios.get(`${config.apiUrl}/empresas/cuit/${id}?`)
               .then(({data}) => {
                 setNombreEmpresa(data.nombre_empresa)
                 setDescripcionEmpresa(data.descripcion)

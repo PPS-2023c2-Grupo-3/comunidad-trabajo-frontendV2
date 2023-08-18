@@ -9,6 +9,7 @@ import ListaOfertas from './ListaPostulaciones';
 import BusquedaNoEncontrada from './BusquedaNoEncontrada';
 import DatosUsuarioContextProvider from '../../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
+import {config} from '../../../config/config'
 
 const ListadoOfertas = () => {
 
@@ -22,7 +23,7 @@ const ListadoOfertas = () => {
     const [llamado, setLlamado] = useState(false);
     const [Ofertas, setOfertas] = useState([]);
 
-    const API_URL = `https://comunidad-backend-v3.herokuapp.com/postulacionesId/postulante/?pagina=0&limite=10&id=${datosUsuario.id}`
+    const API_URL = `${config.apiUrl}/postulacionesId/postulante/?pagina=0&limite=10&id=${datosUsuario.id}`
 
     const primerLlamado = async () => {
         if(llamado === false){

@@ -23,6 +23,7 @@ import { useContext } from 'react';
 import IdFormContext from '../../Context/IdFormContext';
 import  DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
 import axios from "axios";
+import {config} from '../../config/config'
 
 
 
@@ -80,7 +81,7 @@ export default function WithMaterialUI() {
     if (llamadoTipoDocumento === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/tiposDocumento/`
+          `${config.apiUrl}/tiposDocumento/`
         );
         const datos = await api.json();
         setTiposDocumentos(datos.tipos_documentos);
@@ -99,7 +100,7 @@ export default function WithMaterialUI() {
     if (llamadoListaCarreras === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/carreras/?`
+          `${config.apiUrl}/carreras/?`
         );
         const datos = await api.json();
         setListaCarreras(datos.carreras);
@@ -118,7 +119,7 @@ export default function WithMaterialUI() {
     if (llamadoTipoDocumento === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/estudios/?`
+          `${config.apiUrl}/estudios/?`
         );
         const datos = await api.json();
         setListaEstudios(datos.estudios);
@@ -137,7 +138,7 @@ export default function WithMaterialUI() {
     if (llamadoProvincias === false) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/provincias/?`
+          `${config.apiUrl}/provincias/?`
         );
         const datos = await api.json();
         setListaProvincias(datos.provincias);
@@ -155,7 +156,7 @@ export default function WithMaterialUI() {
     if (provinciaActual != provincia) {
       try {
         const api = await fetch(
-          `https://comunidad-backend-v3.herokuapp.com/ciudades/?idProvincia=${provincia}&`
+          `${config.apiUrl}/ciudades/?idProvincia=${provincia}&`
         );
         const datos = await api.json();
         console.log(datos)
@@ -208,7 +209,7 @@ export default function WithMaterialUI() {
       console.log(values);
       console.log(IdActual);
       
-        fetch(`https://comunidad-backend-v3.herokuapp.com/postulantes/dni/${datosUsuario.id}?authorization=${token}`, {
+        fetch(`${config.apiUrl}/postulantes/dni/${datosUsuario.id}?authorization=${token}`, {
         method: "PUT", // or 'PUT'
         body: JSON.stringify(data), // data can be `string` or {object}!
         headers: {
@@ -227,7 +228,7 @@ export default function WithMaterialUI() {
         })
         .then(function (result) {
           if (result.value) {
-            axios.get(`https://comunidad-backend-v3.herokuapp.com/postulantes/idUsuario/${datosUsuario.Usuario.id}?`)
+            axios.get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}?`)
             .then(({data}) => {
               sessionStorage.setItem('datosUsuario', JSON.stringify(data));
             })

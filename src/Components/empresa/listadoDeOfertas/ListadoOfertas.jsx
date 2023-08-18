@@ -9,6 +9,7 @@ import ListaOfertas from './ListaOfertas';
 import BusquedaNoEncontrada from './BusquedaNoEncontrada';
 import DatosUsuarioContextProvider from '../../../Context/DatosUsuarioContext';
 import { useContext } from 'react';
+import { config } from '../../../config/config'
 
 const ListadoOfertas = () => {
 
@@ -22,7 +23,7 @@ const ListadoOfertas = () => {
     const [llamado, setLlamado] = useState(false);
     const [Ofertas, setOfertas] = useState([]);
 
-    const API_URL = `https://comunidad-backend-v3.herokuapp.com/ofertas/cuit/${datosUsuario.id}/`
+    const API_URL = `${config.apiUrl}/ofertas/cuit/${datosUsuario.id}/`
 
     const primerLlamado = async () => {
         if (llamado === false) {
@@ -45,7 +46,7 @@ const ListadoOfertas = () => {
             e.preventDefault()
             const { usuario } = e.target.elements;
             const usuarioValue = usuario.value;
-            const api = await fetch(`https://comunidad-backend-v3.herokuapp.com/usuariosOfertas/?buscarApellido=${usuarioValue}`);
+            const api = await fetch(`${config.apiUrl}/usuariosOfertas/?buscarApellido=${usuarioValue}`);
             const datos = await api.json();
             console.log(datos.Ofertas.rows)
             setOfertas(datos.Ofertas.rows)

@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useRef } from 'react';
 import CircleIcon from '@mui/icons-material/Circle';
-
+import { config } from '../../../config/config';
 
 export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
 
@@ -41,7 +41,7 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            await fetch(`https://comunidad-backend-v3.herokuapp.com/postulaciones/${idPostulacion}?authorization=${token}`, {
+            await fetch(`${config.apiUrl}/postulaciones/${idPostulacion}?authorization=${token}`, {
               method: "PUT", // or 'PUT'
               body: JSON.stringify(data), // data can be `string` or {object}!
               headers: {
@@ -80,7 +80,7 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
         }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-            await fetch(`https://comunidad-backend-v3.herokuapp.com/postulaciones/${idPostulacion}?authorization=${token}`, {
+            await fetch(`${config.apiUrl}/postulaciones/${idPostulacion}?authorization=${token}`, {
                 method: "PUT", // or 'PUT'
                 body: JSON.stringify(data), // data can be `string` or {object}!
                 headers: {
@@ -112,7 +112,7 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
   
     const traerPdf = async (cvPostulante) => {
       const fetchedData = await axios.get(
-        `https://comunidad-backend-v3.herokuapp.com/files`,
+        `${config.apiUrl}/files`,
         {
           headers: {
             "Content-Type": "application/json",

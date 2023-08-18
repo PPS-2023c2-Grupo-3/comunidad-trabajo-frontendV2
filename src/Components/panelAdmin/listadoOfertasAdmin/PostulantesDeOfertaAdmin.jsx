@@ -6,6 +6,8 @@ import { useParams } from 'react-router-dom'
 import NotFound from '../../NotFound'
 import {Typography} from '@mui/material'
 import ListaPostulantesDeOfertaAdmin from './ListaPostulantesDeOfertaAdmin'
+import {config } from '../../../config/config'
+
 
 export default function PostulantesDeOfertaAdmin() {
 
@@ -21,7 +23,7 @@ export default function PostulantesDeOfertaAdmin() {
     const [postulantes, setPostulantes] = useState([]);
     const [ofertaActual, setOfertaActual] = useState([]);
     const { id } = useParams();
-    const API_URL = `https://comunidad-backend-v3.herokuapp.com/postulacionesId/oferta/?pagina=0&limite=10&id=${id}`
+    const API_URL = `${config.apiUrl}/postulacionesId/oferta/?pagina=0&limite=10&id=${id}`
 
     
     const primerLlamado = async () => {
@@ -39,7 +41,7 @@ export default function PostulantesDeOfertaAdmin() {
         }
     }
 
-    const API_OFERTA = `https://comunidad-backend-v3.herokuapp.com/ofertas/idOferta/${id}`;
+    const API_OFERTA = `${config.apiUrl}/ofertas/idOferta/${id}`;
     const [idEmpresa, setIdEmpresa] = useState('')
     const traerIdEmpresa = async () => {
       try {
