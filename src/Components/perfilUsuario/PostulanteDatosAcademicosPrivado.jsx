@@ -22,12 +22,14 @@ export default function DividerText() {
   const { cambiarDatosUsuario } = useContext(DatosUsuarioContextProvider);
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
 
-  axios
+  React.useEffect(() => {
+    axios
     .get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
     .then(({ data }) => {
       cambiarDatosUsuario(data);
       console.log(data);
     });
+  }, []);
 
   return (
     <React.Fragment>
