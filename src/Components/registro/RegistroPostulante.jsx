@@ -13,20 +13,14 @@ import {
   InputLabel,
   FormControl,
   Typography,
-  alertClasses,
   Popover,
 } from "@mui/material";
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
-import Swal from 'sweetalert2'
-import { useContext } from 'react';
-import IdFormContext from '../../Context/IdFormContext';
-import IconButton from '@mui/material/IconButton';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import Stack from '@mui/material/Stack'
-import axios from "axios";
-import {config} from '../../config/config'
-
+import Swal from "sweetalert2";
+import { useContext } from "react";
+import IdFormContext from "../../Context/IdFormContext";
+import { config } from "../../config/config";
 
 const validationSchema = yup.object({
   nombre: yup
@@ -37,7 +31,9 @@ const validationSchema = yup.object({
     .string("Ingrese su apellido")
     .min(1, "Este campo no puede estar vacio")
     .required("Apellido requerido"),
-  fechaNac: yup.string("Ingrese su fecha de nacimiento").required("Fecha es requerido"),
+  fechaNac: yup
+    .string("Ingrese su fecha de nacimiento")
+    .required("Fecha es requerido"),
   tipoDocumento: yup
     .string("Ingrese su tipo de documento")
     .required("Tipo de documento es requerido"),
@@ -51,17 +47,13 @@ const validationSchema = yup.object({
   universidad: yup.string("Ingrese el nombre de su Universidad").optional(),
   carrera: yup.string("Ingrese su carrera").optional(),
   cantMateriasAprobadas: yup
-    .string("Ingrese la cantidad de materias aprobadas").optional(),
+    .string("Ingrese la cantidad de materias aprobadas")
+    .optional(),
   estudios: yup.string("Ingrese sus estudios").optional(),
-  provincia: yup.string("Ingrese sus estudios").optional(),
-  ciudad: yup.string("Ingrese sus estudios").optional(),
   idioma1: yup.string("Elija idiomas").optional(),
 });
 
-
 export default function WithMaterialUI() {
-  
-
   const listaIDs = ["datosPersonales", "datosAcademicos"];
   const [estadoBoton, setEstadoBoton] = useState(true);
 
@@ -72,9 +64,7 @@ export default function WithMaterialUI() {
   const llamarTipoDocumento = async () => {
     if (llamadoTipoDocumento === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/tiposDocumento`
-        );
+        const api = await fetch(`${config.apiUrl}/tiposDocumento`);
         const datos = await api.json();
         setTiposDocumentos(datos.tipos_documentos);
         setLlamadoTipoDocumento(true);
@@ -91,9 +81,7 @@ export default function WithMaterialUI() {
   const llamarCarreras = async () => {
     if (llamadoListaCarreras === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/carreras/`
-        );
+        const api = await fetch(`${config.apiUrl}/carreras/`);
         const datos = await api.json();
         setListaCarreras(datos.carreras);
         setLlamadoListaCarreras(true);
@@ -110,9 +98,7 @@ export default function WithMaterialUI() {
   const llamarEstudios = async () => {
     if (llamadoTipoDocumento === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/estudios/`
-        );
+        const api = await fetch(`${config.apiUrl}/estudios/`);
         const datos = await api.json();
         setListaEstudios(datos.estudios);
         setLlamadoEstudios(true);
@@ -129,9 +115,7 @@ export default function WithMaterialUI() {
   const llamarProvincias = async () => {
     if (llamadoProvincias === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/provincias`
-        );
+        const api = await fetch(`${config.apiUrl}/provincias`);
         const datos = await api.json();
         setListaProvincias(datos.provincias);
         setLlamadoProvincias(true);
@@ -142,24 +126,22 @@ export default function WithMaterialUI() {
   };
   llamarProvincias();
 
-  
-
   const [listaCiudades, setListaCiudades] = useState([]);
   const [llamadoCiudades, setLlamadoCiudades] = useState(false);
   const llamarCiudades = async (provincia) => {
-    if (provinciaActual != provincia) {
+    if (provinciaActual !== provincia) {
       try {
         const api = await fetch(
           `${config.apiUrl}/ciudades/?idProvincia=${provincia}`
         );
         const datos = await api.json();
-        console.log(datos)
+        console.log(datos);
         setListaCiudades(datos.ciudades);
         setLlamadoCiudades(true);
       } catch (error) {
         console.log(error);
       }
-    setProvinciaActual(provincia)
+      setProvinciaActual(provincia);
     }
   };
 
@@ -168,11 +150,9 @@ export default function WithMaterialUI() {
   const llamarIdiomas = async () => {
     if (llamadoIdiomas === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/idiomas`
-        );
+        const api = await fetch(`${config.apiUrl}/idiomas`);
         const datos = await api.json();
-        console.log(datos.idiomas)
+        console.log(datos.idiomas);
         setListaIdiomas(datos.idiomas);
         setLlamadoIdiomas(true);
       } catch (error) {
@@ -187,9 +167,7 @@ export default function WithMaterialUI() {
   const llamarNiveles = async () => {
     if (llamadoNiveles === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/nivelesIdiomas`
-        );
+        const api = await fetch(`${config.apiUrl}/nivelesIdiomas`);
         const datos = await api.json();
         setListaNiveles(datos.niveles_idiomas);
         setLlamadoNiveles(true);
@@ -214,27 +192,26 @@ export default function WithMaterialUI() {
   function ocultarActual() {
     document.getElementById(listaIDs[IdActual]).style.display = "none";
   }
-  
+
   function siguiente() {
-      ocultarActual();
-      mostrarSiguiente();
-      setIdActual(IdActual + 1);
-      setEstadoBoton(false);
+    ocultarActual();
+    mostrarSiguiente();
+    setIdActual(IdActual + 1);
+    setEstadoBoton(false);
   }
 
   function anterior() {
-    if (IdActual != 0) {
+    if (IdActual !== 0) {
       ocultarActual();
       mostrarAnterior();
       setIdActual(IdActual - 1);
     }
-    if (IdActual == 1){
+    if (IdActual === 1) {
       setEstadoBoton(true);
     }
-    
   }
-  const {id} = useContext(IdFormContext)
-  console.log(id)
+  const { id } = useContext(IdFormContext);
+  console.log(id);
   const formik = useFormik({
     initialValues: {
       nombre: "",
@@ -242,12 +219,12 @@ export default function WithMaterialUI() {
       fechaNac: undefined,
       tipoDocumento: "",
       dni: "",
-      nacionalidad: '',
+      nacionalidad: "",
       provincia: undefined,
       ciudad: undefined,
-      calle: '',
-      nro: '',
-      telefono: '',
+      calle: "",
+      nro: "",
+      telefono: "",
       carrera: undefined,
       cantMateriasAprobadas: undefined,
       idioma1: undefined,
@@ -286,74 +263,65 @@ export default function WithMaterialUI() {
       };
       console.log(values);
       console.log(IdActual);
-      if (IdActual == listaIDs.length - 1){
-        fetch("https://comunidad-backend-v3.herokuapp.com/postulantes/", {
-        method: "POST", // or 'PUT'
-        body: JSON.stringify(data), // data can be `string` or {object}!
-        headers: {
-          "Content-Type": "application/json",
-        },
-        
+      if (IdActual === listaIDs.length - 1) {
+        fetch(`${config.apiUrl}/postulantes/?`, {
+          method: "POST", // or 'PUT'
+          body: JSON.stringify(data), // data can be `string` or {object}!
+          headers: {
+            "Content-Type": "application/json",
+          },
         })
-        .then((res) => res.json())
-        .then((response) => console.log("Success:", response,
-        Swal.fire({
-          icon: 'success',
-          title: 'Su registro fue realizado correctamente',
-          confirmButtonText: 'Finalizar',
-          text: 'Para continuar pulse el boton',
-          footer: '',
-          showCloseButton: true
-        })
-        .then(function (result) {
-          if (result.value) {
-              window.location = "/";
-          }
-        })))
-        .catch((error) => console.error("Error:", error,
-        Swal.fire({
-          icon: 'error',
-          title: 'Ocurrio un error al registrarse',
-          confirmButtonText: 'Volver',
-          text: 'Verifique sus datos',
-          footer: '',
-          showCloseButton: true
-        })))
-      }else{
-        siguiente()
+          .then((res) => res.json())
+          .then((response) =>
+            console.log(
+              "Success:",
+              response,
+              Swal.fire({
+                icon: "success",
+                title: "Su registro fue realizado correctamente",
+                confirmButtonText: "Finalizar",
+                text: "Para continuar pulse el boton",
+                footer: "",
+                showCloseButton: true,
+              }).then(function (result) {
+                if (result.value) {
+                  window.location = "/";
+                }
+              })
+            )
+          )
+          .catch((error) =>
+            console.error(
+              "Error:",
+              error,
+              Swal.fire({
+                icon: "error",
+                title: "Ocurrio un error al registrarse",
+                confirmButtonText: "Volver",
+                text: "Verifique sus datos",
+                footer: "",
+                showCloseButton: true,
+              })
+            )
+          );
+      } else {
+        siguiente();
       }
     },
   });
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-
-    const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-
-  
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
-  
-    const open = Boolean(anchorEl);
-    const ids = open ? 'simple-popover' : undefined;
-  
-   
-
   return (
-    
     <Fragment>
       <Header />
       <Box sx={{ display: "flex", justifyContent: "center", padding: "2rem" }}>
         <form onSubmit={formik.handleSubmit}>
           <div id="datosPersonales">
-          <Typography
-            variant="h4"
-            sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
-          >
-            Datos personales
-          </Typography>
+            <Typography
+              variant="h4"
+              sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
+            >
+              Datos personales
+            </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6} md={4}>
                 <TextField
@@ -408,29 +376,37 @@ export default function WithMaterialUI() {
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Tipo de documento
-                  </InputLabel>
+                  <InputLabel>Tipo de documento</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="tipoDocumento"
                     variant="outlined"
                     name="tipoDocumento"
                     label="Tipo de documento"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.tipoDocumento}
                     onChange={formik.handleChange}
-                    error={formik.touched.tipoDocumento && Boolean(formik.errors.tipoDocumento)}
+                    error={
+                      formik.touched.tipoDocumento &&
+                      Boolean(formik.errors.tipoDocumento)
+                    }
                   >
-                    {tiposDocumentos.map((documento) => ( 
-                      <MenuList className='selectCss'  value={documento.id} key={documento.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{documento.tipo_documento}</Box>
+                    {tiposDocumentos.map((documento) => (
+                      <MenuList
+                        className="selectCss"
+                        value={documento.id}
+                        key={documento.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {documento.tipo_documento}
+                        </Box>
                       </MenuList>
                     ))}
-                  helperText={formik.touched.tipoDocumento && formik.errors.tipoDocumento}
+                    helperText=
+                    {formik.touched.tipoDocumento &&
+                      formik.errors.tipoDocumento}
                   </Select>
-                  
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -466,66 +442,79 @@ export default function WithMaterialUI() {
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Provincia
-                  </InputLabel>
+                  <InputLabel>Provincia</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="provincia"
                     variant="outlined"
                     name="provincia"
                     label="Provincia"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.provincia}
                     onChange={formik.handleChange}
                   >
-                    {listaProvincias.map((provincia) => ( 
-                      <MenuList className='selectCss'  value={provincia.id} key={provincia.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{provincia.nombre}</Box>
+                    {listaProvincias.map((provincia) => (
+                      <MenuList
+                        className="selectCss"
+                        value={provincia.id}
+                        key={provincia.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {provincia.nombre}
+                        </Box>
                       </MenuList>
                     ))}
-                  
                   </Select>
                 </FormControl>
-                {
-                  formik.values.provincia === undefined ? null 
-                  :
-                    <Popover>
-                      {console.log('aca' + formik.values.provincia)}
-                      {llamarCiudades(formik.values.provincia)}
-                      {listaCiudades.map((ciudad) => ( 
-                      <MenuList className='selectCss'  value={ciudad.id} key={ciudad.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{ciudad.nombre}</Box>
+                {formik.values.provincia === undefined ? null : (
+                  <Popover>
+                    {console.log("aca" + formik.values.provincia)}
+                    {llamarCiudades(formik.values.provincia)}
+                    {listaCiudades.map((ciudad) => (
+                      <MenuList
+                        className="selectCss"
+                        value={ciudad.id}
+                        key={ciudad.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {ciudad.nombre}
+                        </Box>
                       </MenuList>
                     ))}
-                    </Popover>
-                }
+                  </Popover>
+                )}
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Ciudad
-                  </InputLabel>
+                  <InputLabel>Ciudad</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="ciudad"
                     variant="outlined"
                     name="ciudad"
                     label="Ciudad"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.ciudad}
                     onChange={formik.handleChange}
-                    error={formik.touched.tipoDocumento && Boolean(formik.errors.tipoDocumento)}
+                    error={
+                      formik.touched.tipoDocumento &&
+                      Boolean(formik.errors.tipoDocumento)
+                    }
                   >
-                    {listaCiudades.map((ciudad) => ( 
-                      <MenuList className='selectCss'  value={ciudad.id} key={ciudad.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{ciudad.nombre}</Box>
+                    {listaCiudades.map((ciudad) => (
+                      <MenuList
+                        className="selectCss"
+                        value={ciudad.id}
+                        key={ciudad.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {ciudad.nombre}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
-                  
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -577,10 +566,10 @@ export default function WithMaterialUI() {
             >
               Datos academicos
             </Typography>
-              <Grid container spacing={2}>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
-                  <Box>
-                    <FormControl fullWidth>
+            <Grid container spacing={2}>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
+                <Box>
+                  <FormControl fullWidth>
                     <InputLabel>Estudios</InputLabel>
                     <Select
                       id="estudios"
@@ -591,20 +580,30 @@ export default function WithMaterialUI() {
                       value={formik.values.estudios}
                       onChange={formik.handleChange}
                       error={
-                        formik.touched.estudios && Boolean(formik.errors.estudios)
+                        formik.touched.estudios &&
+                        Boolean(formik.errors.estudios)
                       }
                     >
                       {listaEstudios.map((estudios) => (
-                        <MenuList className="selectCss" value={estudios.id} key={estudios.id}>
-                          <Box sx={{display:'flex', justifyContent:'center'}}>{estudios.id}: {estudios.nombre_estudio} - {estudios.estado_estudio}</Box> 
+                        <MenuList
+                          className="selectCss"
+                          value={estudios.id}
+                          key={estudios.id}
+                        >
+                          <Box
+                            sx={{ display: "flex", justifyContent: "center" }}
+                          >
+                            {estudios.id}: {estudios.nombre_estudio} -{" "}
+                            {estudios.estado_estudio}
+                          </Box>
                         </MenuList>
                       ))}
                     </Select>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
-                  <Box>
+                  </FormControl>
+                </Box>
+              </Grid>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
+                <Box>
                   <FormControl fullWidth>
                     <InputLabel>Carrera</InputLabel>
                     <Select
@@ -620,26 +619,39 @@ export default function WithMaterialUI() {
                       }
                     >
                       {listaCarreras.map((carrera) => (
-                        <MenuList className="selectCss" value={carrera.id} key={carrera.id}>
-                          <Box sx={{display:'flex', justifyContent:'center'}}> {carrera.id}: {carrera.nombre_carrera}</Box>
+                        <MenuList
+                          className="selectCss"
+                          value={carrera.id}
+                          key={carrera.id}
+                        >
+                          <Box
+                            sx={{ display: "flex", justifyContent: "center" }}
+                          >
+                            {" "}
+                            {carrera.id}: {carrera.nombre_carrera}
+                          </Box>
                         </MenuList>
                       ))}
                     </Select>
                   </FormControl>
-                  </Box>
-                </Grid>
+                </Box>
               </Grid>
+            </Grid>
 
-              <Grid container spacing={2} sx={{display:'flex', justifyContent:'center'}}>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
-                  <Box>
-                  <TextField fullWidth 
+            <Grid
+              container
+              spacing={2}
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
+                <Box>
+                  <TextField
+                    fullWidth
                     id="cantMateriasAprobadas"
                     name="cantMateriasAprobadas"
                     label="Cantidad de materias aprobadas"
                     type="number"
                     variant="outlined"
-                    
                     value={formik.values.cantMateriasAprobadas}
                     onChange={formik.handleChange}
                     error={
@@ -648,198 +660,234 @@ export default function WithMaterialUI() {
                       true
                     }
                   />
-                  </Box>
-                </Grid>
+                </Box>
               </Grid>
-              
-              <Grid container spacing={2}>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
+            </Grid>
+
+            <Grid container spacing={2}>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Idioma 1
-                  </InputLabel>
+                  <InputLabel>Idioma 1</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="idioma1"
                     variant="outlined"
                     name="idioma1"
                     label="Idioma 1"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.idioma1}
                     onChange={formik.handleChange}
-                    error={formik.touched.idioma1 && Boolean(formik.errors.idioma1)}
+                    error={
+                      formik.touched.idioma1 && Boolean(formik.errors.idioma1)
+                    }
                   >
-                    {listaIdiomas.map((idioma1) => ( 
-                      <MenuList className='selectCss'  value={idioma1.id} key={idioma1.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{idioma1.nombre_idioma}</Box>
+                    {listaIdiomas.map((idioma1) => (
+                      <MenuList
+                        className="selectCss"
+                        value={idioma1.id}
+                        key={idioma1.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {idioma1.nombre_idioma}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
-                  
                 </FormControl>
-                </Grid>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
+              </Grid>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Nivel idioma 1
-                  </InputLabel>
+                  <InputLabel>Nivel idioma 1</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="nivelIdioma1"
                     variant="outlined"
                     name="nivelIdioma1"
                     label="Nivel idioma 1"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.nivelIdioma1}
                     onChange={formik.handleChange}
-                    error={formik.touched.nivelIdioma1 && Boolean(formik.errors.nivelIdioma1)}
+                    error={
+                      formik.touched.nivelIdioma1 &&
+                      Boolean(formik.errors.nivelIdioma1)
+                    }
                   >
-                    {listaNiveles.map((nivelIdioma1) => ( 
-                      <MenuList className='selectCss'  value={nivelIdioma1.id} key={nivelIdioma1.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{nivelIdioma1.nivel}</Box>
+                    {listaNiveles.map((nivelIdioma1) => (
+                      <MenuList
+                        className="selectCss"
+                        value={nivelIdioma1.id}
+                        key={nivelIdioma1.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {nivelIdioma1.nivel}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
                 </FormControl>
-                </Grid>
               </Grid>
+            </Grid>
 
-              <Grid container spacing={2}>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
+            <Grid container spacing={2}>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Idioma 2
-                  </InputLabel>
+                  <InputLabel>Idioma 2</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="idioma2"
                     variant="outlined"
                     name="idioma1"
                     label="Idioma 2"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.idioma2}
                     onChange={formik.handleChange}
-                    error={formik.touched.idioma2 && Boolean(formik.errors.idioma2)}
+                    error={
+                      formik.touched.idioma2 && Boolean(formik.errors.idioma2)
+                    }
                   >
-                    {listaIdiomas.map((idioma2) => ( 
-                      <MenuList className='selectCss'  value={idioma2.id} key={idioma2.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{idioma2.nombre_idioma}</Box>
+                    {listaIdiomas.map((idioma2) => (
+                      <MenuList
+                        className="selectCss"
+                        value={idioma2.id}
+                        key={idioma2.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {idioma2.nombre_idioma}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
-                  
                 </FormControl>
-                </Grid>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
+              </Grid>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Nivel idioma 2
-                  </InputLabel>
+                  <InputLabel>Nivel idioma 2</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="nivelIdioma2"
                     variant="outlined"
                     name="nivelIdioma2"
                     label="Nivel idioma 2"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.nivelIdioma2}
                     onChange={formik.handleChange}
-                    error={formik.touched.nivelIdioma2 && Boolean(formik.errors.nivelIdioma2)}
+                    error={
+                      formik.touched.nivelIdioma2 &&
+                      Boolean(formik.errors.nivelIdioma2)
+                    }
                   >
-                    {listaNiveles.map((nivelIdioma2) => ( 
-                      <MenuList className='selectCss'  value={nivelIdioma2.id} key={nivelIdioma2.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{nivelIdioma2.nivel}</Box>
+                    {listaNiveles.map((nivelIdioma2) => (
+                      <MenuList
+                        className="selectCss"
+                        value={nivelIdioma2.id}
+                        key={nivelIdioma2.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {nivelIdioma2.nivel}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
                 </FormControl>
-                </Grid>
               </Grid>
-              <Grid container spacing={2}>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Idioma 3
-                  </InputLabel>
+                  <InputLabel>Idioma 3</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="idioma3"
                     variant="outlined"
                     name="idioma3"
                     label="Idioma 3"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.idioma3}
                     onChange={formik.handleChange}
-                    error={formik.touched.idioma3 && Boolean(formik.errors.idioma3)}
+                    error={
+                      formik.touched.idioma3 && Boolean(formik.errors.idioma3)
+                    }
                   >
-                    {listaIdiomas.map((idioma3) => ( 
-                      <MenuList className='selectCss'  value={idioma3.id} key={idioma3.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{idioma3.nombre_idioma}</Box>
+                    {listaIdiomas.map((idioma3) => (
+                      <MenuList
+                        className="selectCss"
+                        value={idioma3.id}
+                        key={idioma3.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {idioma3.nombre_idioma}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
-                  
                 </FormControl>
-                </Grid>
-                <Grid sx={{width:'500px', margin:'1rem'}}>
+              </Grid>
+              <Grid sx={{ width: "500px", margin: "1rem" }}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Nivel idioma 3
-                  </InputLabel>
+                  <InputLabel>Nivel idioma 3</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="nivelIdioma3"
                     variant="outlined"
                     name="nivelIdioma3"
                     label="Nivel idioma 3"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.nivelIdioma3}
                     onChange={formik.handleChange}
-                    error={formik.touched.nivelIdioma3 && Boolean(formik.errors.nivelIdioma3)}
+                    error={
+                      formik.touched.nivelIdioma3 &&
+                      Boolean(formik.errors.nivelIdioma3)
+                    }
                   >
-                    {listaNiveles.map((nivelIdioma3) => ( 
-                      <MenuList className='selectCss'  value={nivelIdioma3.id} key={nivelIdioma3.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{nivelIdioma3.nivel}</Box>
+                    {listaNiveles.map((nivelIdioma3) => (
+                      <MenuList
+                        className="selectCss"
+                        value={nivelIdioma3.id}
+                        key={nivelIdioma3.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {nivelIdioma3.nivel}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
                 </FormControl>
-                </Grid>
               </Grid>
-         
-              <FormControlLabel
-                sx={{margin:"0.5rem"}}
-                control={<Checkbox defaultChecked />}
-                label="¿Es alumno UNAHUR?"
-                id="alumnoUnahur"
-                name="alumnoUnahur"
-                type="checkbox"
-                value={formik.values.alumnoUnahur}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.alumnoUnahur &&
-                  Boolean(formik.errors.alumnoUnahur)
-                }
-              />
+            </Grid>
+
+            <FormControlLabel
+              sx={{ margin: "0.5rem" }}
+              control={<Checkbox defaultChecked />}
+              label="¿Es alumno UNAHUR?"
+              id="alumnoUnahur"
+              name="alumnoUnahur"
+              type="checkbox"
+              value={formik.values.alumnoUnahur}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.alumnoUnahur &&
+                Boolean(formik.errors.alumnoUnahur)
+              }
+            />
           </div>
           <div id="archivos" style={{ display: "none" }}>
             <Typography
-                variant="h4"
-                sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
-              >
-                Archivos
-              </Typography>
-                <Button variant="contained" component="label">
-                  <input accept="application/pdf" multiple type="file" />
-                </Button>
+              variant="h4"
+              sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
+            >
+              Archivos
+            </Typography>
+            <Button variant="contained" component="label">
+              <input accept="application/pdf" multiple type="file" />
+            </Button>
           </div>
-          {IdActual == listaIDs.length - 1 ? (
+          {IdActual === listaIDs.length - 1 ? (
             <Box
               sx={{
                 display: "flex",
@@ -864,38 +912,35 @@ export default function WithMaterialUI() {
                 Confirmar
               </Button>
             </Box>
-          ) 
-          : 
-          (
+          ) : (
             <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "row",
-            }}
-          >
-            <Button
-              style={{ display: "flex", margin: "1rem" }}
-              color="primary"
-              variant="contained"
-              disabled={estadoBoton}
-              onClick={anterior}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
             >
-              Anterior
-            </Button>
-            <Button
-              style={{ display: "flex", margin: "1rem" }}
-              color="primary"
-              variant="contained"
-              type="submit"
-              //onClick= {}
-              disabled={estadoSiguiente}
-            >
-              Siguiente
-            </Button>
-          </Box>
-          )
-          }
+              <Button
+                style={{ display: "flex", margin: "1rem" }}
+                color="primary"
+                variant="contained"
+                disabled={estadoBoton}
+                onClick={anterior}
+              >
+                Anterior
+              </Button>
+              <Button
+                style={{ display: "flex", margin: "1rem" }}
+                color="primary"
+                variant="contained"
+                type="submit"
+                //onClick= {}
+                disabled={estadoSiguiente}
+              >
+                Siguiente
+              </Button>
+            </Box>
+          )}
         </form>
       </Box>
     </Fragment>

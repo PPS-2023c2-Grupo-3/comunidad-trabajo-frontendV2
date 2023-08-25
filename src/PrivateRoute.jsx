@@ -1,14 +1,8 @@
- import NotFound from "./Components/NotFound"
- 
- var datosUsuario = JSON.parse(sessionStorage.getItem('datosUsuario'))
- var token = sessionStorage.getItem('token')
- var idUsuario = parseInt(sessionStorage.getItem('idUsuario'))
- var grupo =  sessionStorage.getItem('grupo')
- var estaLogeado = sessionStorage.getItem('estaLogeado')
-export function CheckRole({ role, children }) {
-    const loggedUserRole = grupo;
+import NotFound from "./Components/NotFound";
 
-    return role == loggedUserRole
-        ? children
-        : <NotFound />
+var grupo = sessionStorage.getItem("grupo");
+export function CheckRole({ role, children }) {
+  const loggedUserRole = grupo;
+
+  return role.toString() === loggedUserRole ? children : <NotFound />;
 }

@@ -3,8 +3,6 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Header from "../Header";
 import {
   Box,
@@ -13,21 +11,15 @@ import {
   InputLabel,
   FormControl,
   Typography,
-  alertClasses,
   Popover,
 } from "@mui/material";
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
-import Swal from 'sweetalert2'
-import { useContext } from 'react';
-import IdFormContext from '../../Context/IdFormContext';
-import  DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
+import Swal from "sweetalert2";
+import { useContext } from "react";
+import IdFormContext from "../../Context/IdFormContext";
 import axios from "axios";
-import {config} from '../../config/config'
-
-
-
-
+import { config } from "../../config/config";
 
 const validationSchema = yup.object({
   nombre: yup
@@ -50,28 +42,17 @@ const validationSchema = yup.object({
   telefono: yup.string("Ingrese su telefono de contacto").optional(),
 });
 
-
 export default function WithMaterialUI() {
-
-  const {cambiarDatosUsuario, cambiarToken, cambiarIdUsuario, cambiarEstadoLogeado, cambiarGrupo} = useContext(DatosUsuarioContextProvider)
-  var datosUsuario = JSON.parse(sessionStorage.getItem('datosUsuario'))
-  var token = sessionStorage.getItem('token')
-  var idUsuario = sessionStorage.getItem('idUsuario')
-  var grupo =  sessionStorage.getItem('grupo')
-  var estaLogeado = sessionStorage.getItem('estaLogeado')
+  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  var token = sessionStorage.getItem("token");
 
   const formatoFechaNacimiento = (fecha) => {
     var fechaNacimiento = new Date(fecha);
-    var hora = fechaNacimiento.getHours();
     var dia = fechaNacimiento.getDate() + 1;
     var mes = fechaNacimiento.getMonth() + 1;
     var anio = fechaNacimiento.getFullYear();
     return dia + "/" + mes + "/" + anio;
-  }
-  
-
-  const listaIDs = ["datosPersonales", "datosAcademicos"];
-  const [estadoBoton, setEstadoBoton] = useState(true);
+  };
 
   /*Llama a los TIPOS DE DOCUMENTOS para seleccionar en el formulario*/
   const [tiposDocumentos, setTiposDocumentos] = useState([]);
@@ -80,9 +61,7 @@ export default function WithMaterialUI() {
   const llamarTipoDocumento = async () => {
     if (llamadoTipoDocumento === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/tiposDocumento/`
-        );
+        const api = await fetch(`${config.apiUrl}/tiposDocumento/`);
         const datos = await api.json();
         setTiposDocumentos(datos.tipos_documentos);
         setLlamadoTipoDocumento(true);
@@ -99,9 +78,7 @@ export default function WithMaterialUI() {
   const llamarCarreras = async () => {
     if (llamadoListaCarreras === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/carreras/?`
-        );
+        const api = await fetch(`${config.apiUrl}/carreras/?`);
         const datos = await api.json();
         setListaCarreras(datos.carreras);
         setLlamadoListaCarreras(true);
@@ -118,9 +95,7 @@ export default function WithMaterialUI() {
   const llamarEstudios = async () => {
     if (llamadoTipoDocumento === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/estudios/?`
-        );
+        const api = await fetch(`${config.apiUrl}/estudios/?`);
         const datos = await api.json();
         setListaEstudios(datos.estudios);
         setLlamadoEstudios(true);
@@ -137,9 +112,7 @@ export default function WithMaterialUI() {
   const llamarProvincias = async () => {
     if (llamadoProvincias === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/provincias/?`
-        );
+        const api = await fetch(`${config.apiUrl}/provincias/?`);
         const datos = await api.json();
         setListaProvincias(datos.provincias);
         setLlamadoProvincias(true);
@@ -153,34 +126,29 @@ export default function WithMaterialUI() {
   const [listaCiudades, setListaCiudades] = useState([]);
   const [llamadoCiudades, setLlamadoCiudades] = useState(false);
   const llamarCiudades = async (provincia) => {
-    if (provinciaActual != provincia) {
+    if (provinciaActual !== provincia) {
       try {
         const api = await fetch(
           `${config.apiUrl}/ciudades/?idProvincia=${provincia}&`
         );
         const datos = await api.json();
-        console.log(datos)
+        console.log(datos);
         setListaCiudades(datos.ciudades);
         setLlamadoCiudades(true);
       } catch (error) {
         console.log(error);
       }
-    setProvinciaActual(provincia)
+      setProvinciaActual(provincia);
     }
   };
 
-
-  const [IdActual, setIdActual] = useState(0);
-  const [estadoSiguiente, setEstadoSiguiente] = useState(false);
-
- 
-  const {id} = useContext(IdFormContext)
-  console.log(id)
+  const { id } = useContext(IdFormContext);
+  console.log(id);
   const formik = useFormik({
     initialValues: {
       nombre: datosUsuario.nombre,
       apellido: datosUsuario.apellido,
-      
+
       tipoDocumento: datosUsuario.Tipo_documento.id,
       dni: datosUsuario.id,
       nacionalidad: datosUsuario.nacionalidad,
@@ -199,57 +167,62 @@ export default function WithMaterialUI() {
         nombre: values.nombre,
         apellido: values.apellido,
         nacionalidad: values.nacionalidad,
-       
+
         provincia: values.provincia,
         ciudad: values.ciudad,
         calle: values.calle,
         nro: values.nro,
         telefono: values.telefono,
       };
-      console.log(values);
-      console.log(IdActual);
-      
-        fetch(`${config.apiUrl}/postulantes/dni/${datosUsuario.id}?authorization=${token}`, {
-        method: "PUT", // or 'PUT'
-        body: JSON.stringify(data), // data can be `string` or {object}!
-        headers: {
-          "Content-Type": "application/json",
-        },
-        
-        })
-        
-        Swal.fire({
-          icon: 'success',
-          title: 'Sus datos fueron actualizados correctaemente',
-          confirmButtonText: 'Finalizar',
-          text: 'Para continuar pulse el boton',
-          footer: '',
-          showCloseButton: true
-        })
+      fetch(
+        `${config.apiUrl}/postulantes/dni/${datosUsuario.id}?authorization=${token}`,
+        {
+          method: "PUT", // or 'PUT'
+          body: JSON.stringify(data), // data can be `string` or {object}!
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Sus datos fueron actualizados correctaemente",
+        confirmButtonText: "Finalizar",
+        text: "Para continuar pulse el boton",
+        footer: "",
+        showCloseButton: true,
+      })
         .then(function (result) {
           if (result.value) {
-            axios.get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}?`)
-            .then(({data}) => {
-              sessionStorage.setItem('datosUsuario', JSON.stringify(data));
-            })
+            axios
+              .get(
+                `${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}?`
+              )
+              .then(({ data }) => {
+                sessionStorage.setItem("datosUsuario", JSON.stringify(data));
+              });
             window.location.href = "/miPerfil/misDatos";
           }
         })
-        .catch((err) => console.error("Error:", err,
-        Swal.fire({
-          icon: 'error',
-          title: 'Ocurrio un error al registrarse',
-          confirmButtonText: 'Volver',
-          text: 'Verifique sus datos',
-          footer: '',
-          showCloseButton: true
-        })))
-      
+        .catch((err) =>
+          console.error(
+            "Error:",
+            err,
+            Swal.fire({
+              icon: "error",
+              title: "Ocurrio un error al registrarse",
+              confirmButtonText: "Volver",
+              text: "Verifique sus datos",
+              footer: "",
+              showCloseButton: true,
+            })
+          )
+        );
     },
   });
-  
+
   return (
-    
     <Fragment>
       <Header />
       <Typography
@@ -280,7 +253,6 @@ export default function WithMaterialUI() {
                   helperText={formik.touched.nombre && formik.errors.nombre}
                   disabled
                 />
-                
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <TextField
@@ -299,7 +271,6 @@ export default function WithMaterialUI() {
                   }
                   helperText={formik.touched.apellido && formik.errors.apellido}
                 />
-                
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <TextField
@@ -313,30 +284,35 @@ export default function WithMaterialUI() {
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Tipo de documento
-                  </InputLabel>
+                  <InputLabel>Tipo de documento</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="tipoDocumento"
                     variant="outlined"
                     name="tipoDocumento"
                     label="Tipo de documento"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.tipoDocumento}
                     onChange={formik.handleChange}
-                    error={formik.touched.tipoDocumento && Boolean(formik.errors.tipoDocumento)}
+                    error={
+                      formik.touched.tipoDocumento &&
+                      Boolean(formik.errors.tipoDocumento)
+                    }
                     disabled
                   >
-                    {tiposDocumentos.map((documento) => ( 
-                      <MenuList className='selectCss'  value={documento.id} key={documento.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{documento.tipo_documento}</Box>
+                    {tiposDocumentos.map((documento) => (
+                      <MenuList
+                        className="selectCss"
+                        value={documento.id}
+                        key={documento.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {documento.tipo_documento}
+                        </Box>
                       </MenuList>
                     ))}
-                  
                   </Select>
-                  
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -374,68 +350,80 @@ export default function WithMaterialUI() {
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Provincia
-                  </InputLabel>
+                  <InputLabel>Provincia</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="provincia"
                     variant="outlined"
                     name="provincia"
                     label="Provincia"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.provincia}
                     onChange={formik.handleChange}
-                  >        
-                    {listaProvincias.map((provincia) => ( 
-                      <MenuList className='selectCss'  value={provincia.id} key={provincia.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{provincia.nombre}</Box>
+                  >
+                    {listaProvincias.map((provincia) => (
+                      <MenuList
+                        className="selectCss"
+                        value={provincia.id}
+                        key={provincia.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {provincia.nombre}
+                        </Box>
                       </MenuList>
                     ))}
-                  
                   </Select>
                 </FormControl>
-                {
-                  formik.values.provincia === undefined ? null 
-                  :
-                    <Popover>
-                      {console.log('aca' + formik.values.provincia)}
-                      {llamarCiudades(formik.values.provincia)}
-                      {console.log('aaaaaaaaaaaa' + formik.values.provincia)}
-                      {listaCiudades.map((ciudad) => ( 
-                      
-                      <MenuList className='selectCss'  value={ciudad.id} key={ciudad.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{ciudad.nombre}</Box>
+                {formik.values.provincia === undefined ? null : (
+                  <Popover>
+                    {console.log("aca" + formik.values.provincia)}
+                    {llamarCiudades(formik.values.provincia)}
+                    {console.log("aaaaaaaaaaaa" + formik.values.provincia)}
+                    {listaCiudades.map((ciudad) => (
+                      <MenuList
+                        className="selectCss"
+                        value={ciudad.id}
+                        key={ciudad.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {ciudad.nombre}
+                        </Box>
                       </MenuList>
                     ))}
-                    </Popover>
-                }
+                  </Popover>
+                )}
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel>
-                    Ciudad
-                  </InputLabel>
+                  <InputLabel>Ciudad</InputLabel>
                   <Select
                     labelId="demo-simple-select-error-label"
                     id="ciudad"
                     variant="outlined"
                     name="ciudad"
                     label="Ciudad"
-                    type='number'
+                    type="number"
                     fullWidth
                     value={formik.values.ciudad}
                     onChange={formik.handleChange}
-                    error={formik.touched.tipoDocumento && Boolean(formik.errors.tipoDocumento)}
+                    error={
+                      formik.touched.tipoDocumento &&
+                      Boolean(formik.errors.tipoDocumento)
+                    }
                   >
-                    {listaCiudades.map((ciudad) => ( 
-                      <MenuList className='selectCss'  value={ciudad.id} key={ciudad.id} >
-                        <Box sx={{display:'flex', justifyContent:'center'}}>{ciudad.nombre}</Box>
+                    {listaCiudades.map((ciudad) => (
+                      <MenuList
+                        className="selectCss"
+                        value={ciudad.id}
+                        key={ciudad.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {ciudad.nombre}
+                        </Box>
                       </MenuList>
                     ))}
                   </Select>
-                  
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -481,20 +469,14 @@ export default function WithMaterialUI() {
             </Grid>
           </div>
 
-
-
-          
-            
-              <Button
-                style={{ display: "flex", margin: "1rem" }}
-                id="confirmar"
-                variant="contained"
-                type="submit"
-              >
-                Confirmar
-              </Button>
-            
-         
+          <Button
+            style={{ display: "flex", margin: "1rem" }}
+            id="confirmar"
+            variant="contained"
+            type="submit"
+          >
+            Confirmar
+          </Button>
         </form>
       </Box>
     </Fragment>
