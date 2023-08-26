@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment } from "react";
 import Header from "../../Header";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -11,7 +11,7 @@ import { config } from "../../../config/config";
 const MiCV = () => {
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
   var token = sessionStorage.getItem("token");
-  const [pdf, setPdf] = useState();
+  // const [pdf, setPdf] = useState();
   const [uploadCV, setUploadCV] = useState(null);
   function timeoutReload() {
     setTimeout(function () {
@@ -23,7 +23,7 @@ const MiCV = () => {
     const formData = new FormData();
     formData.append("uploadCV", uploadCV);
     try {
-      const res = await axios({
+      await axios({
         method: "post",
         url: `${config.apiUrl}/files/cv/?authorization=${token}`,
         data: formData,
@@ -61,35 +61,35 @@ const MiCV = () => {
     setUploadCV(e.target.files[0]);
   };
 
-  function splitFileName(str) {
-    return str.split("|")[1];
-  }
+  // function splitFileName(str) {
+  //   return str.split("|")[1];
+  // }
 
-  useEffect(() => {
-    const traerPdf = async () => {
-      const fetchedData = await axios.get(`${config.apiUrl}/files/`, {
-        headers: {
-          "Content-Type": "application/json",
-          type: "application/pdf",
-          file: splitFileName(datosUsuario.cv),
-          authorization: token,
-        },
-        responseType: "blob",
-      });
+  // useEffect(() => {
+  //   const traerPdf = async () => {
+  //     const fetchedData = await axios.get(`${config.apiUrl}/files/`, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         type: "application/pdf",
+  //         file: splitFileName(datosUsuario.cv),
+  //         authorization: token,
+  //       },
+  //       responseType: "blob",
+  //     });
 
-      console.log(fetchedData);
-      const pdfBlob = new Blob([fetchedData.data], { type: "application/pdf" });
-      console.log(pdfBlob);
-      const virtualUrl = URL.createObjectURL(pdfBlob);
-      console.log(virtualUrl);
-      setPdf(virtualUrl);
-    };
-    traerPdf();
-  }, [datosUsuario.cv, token]);
+  //     console.log(fetchedData);
+  //     const pdfBlob = new Blob([fetchedData.data], { type: "application/pdf" });
+  //     console.log(pdfBlob);
+  //     const virtualUrl = URL.createObjectURL(pdfBlob);
+  //     console.log(virtualUrl);
+  //     setPdf(virtualUrl);
+  //   };
+  //   traerPdf();
+  // }, [datosUsuario.cv, token]);
 
-  function abrirPdf() {
-    window.open(pdf);
-  }
+  // function abrirPdf() {
+  //   window.open(pdf);
+  // }
 
   return (
     <Fragment>
@@ -104,7 +104,7 @@ const MiCV = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={abrirPdf}
+            // onClick={abrirPdf}
             sx={{ width: "25rem" }}
           >
             VER MI CV

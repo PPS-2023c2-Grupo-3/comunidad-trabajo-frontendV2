@@ -74,8 +74,9 @@ export default function ListaOfertas({ Ofertas }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {Ofertas.map((oferta) => (
+          {Ofertas.map((oferta, index) => (
             <TableRow
+              key={index}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">

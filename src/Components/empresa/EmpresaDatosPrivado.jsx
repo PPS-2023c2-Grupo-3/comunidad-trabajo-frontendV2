@@ -47,7 +47,7 @@ export default function DividerText() {
           <Button variant="contained">Editar</Button>
         </Link>
       </Box>
-      <Typography style={{ margin: "2rem" }}>
+      <Box style={{ margin: "2rem" }}>
         <Root>
           <Divider>
             <Chip
@@ -56,7 +56,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -71,8 +71,8 @@ export default function DividerText() {
               >
                 {datosUsuario.nombre_empresa}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -87,7 +87,7 @@ export default function DividerText() {
               >
                 {datosUsuario.descripcion}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -96,7 +96,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -111,8 +111,8 @@ export default function DividerText() {
               >
                 {datosUsuario.email_representante}
               </Typography>
-            </Typography>
-            <Typography sx={{ display: "flex", justifyContent: "center" }}>
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Typography
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
@@ -125,8 +125,8 @@ export default function DividerText() {
               >
                 +54 9 {datosUsuario.telefono}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -141,7 +141,7 @@ export default function DividerText() {
               >
                 {datosUsuario.web}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -150,7 +150,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -165,8 +165,8 @@ export default function DividerText() {
               >
                 {datosUsuario.pais}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -181,8 +181,8 @@ export default function DividerText() {
               >
                 {datosUsuario.Provincia.nombre}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -197,10 +197,10 @@ export default function DividerText() {
               >
                 {datosUsuario.Ciudad.nombre}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
         </Root>
-      </Typography>
+      </Box>
     </React.Fragment>
   );
 }

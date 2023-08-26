@@ -109,7 +109,6 @@ export default function WithMaterialUI() {
   llamarProvincias();
 
   const [listaCiudades, setListaCiudades] = useState([]);
-  const [llamadoCiudades, setLlamadoCiudades] = useState(false);
   const llamarCiudades = async (provincia) => {
     if (provinciaActual !== provincia) {
       try {
@@ -119,7 +118,6 @@ export default function WithMaterialUI() {
         const datos = await api.json();
         console.log(datos);
         setListaCiudades(datos.ciudades);
-        setLlamadoCiudades(true);
       } catch (error) {
         console.log(error);
       }

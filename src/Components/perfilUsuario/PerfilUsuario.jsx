@@ -4,9 +4,9 @@ import { Avatar, Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import Header from "../Header";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+// import { useState } from "react";
 import axios from "axios";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { useRef } from "react";
 import Swal from "sweetalert2";
 import { AddAPhoto } from "@mui/icons-material";
@@ -15,7 +15,7 @@ import { config } from "../../config/config";
 export default function PerfilUsuario() {
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
   var token = sessionStorage.getItem("token");
-  const [foto, setFoto] = useState();
+  // const [foto, setFoto] = useState();
   const uploadFoto = useRef();
 
   function timeoutReload() {
@@ -28,7 +28,7 @@ export default function PerfilUsuario() {
     const formData = new FormData();
     formData.append("uploadFoto", uploadFoto.current);
     try {
-      const res = await axios({
+      await axios({
         method: "post",
         url: `${config.apiUrl}/files/foto/?authorization=${token}`,
         data: formData,
@@ -67,30 +67,30 @@ export default function PerfilUsuario() {
     handleSubmit(e);
   };
 
-  function splitFileName(str) {
-    return str.split("|")[1];
-  }
+  // function splitFileName(str) {
+  //   return str.split("|")[1];
+  // }
 
-  useEffect(() => {
-    const traerFoto = async () => {
-      const fetchedData = await axios.get(`${config.apiUrl}/files`, {
-        headers: {
-          type: "image/jpeg",
-          file: splitFileName(datosUsuario.foto),
-          authorization: token,
-        },
-        responseType: "blob",
-      });
+  // useEffect(() => {
+  //   const traerFoto = async () => {
+  //     const fetchedData = await axios.get(`${config.apiUrl}/files`, {
+  //       headers: {
+  //         type: "image/jpeg",
+  //         file: splitFileName(datosUsuario.foto),
+  //         authorization: token,
+  //       },
+  //       responseType: "blob",
+  //     });
 
-      console.log(fetchedData);
-      const imageBlob = new Blob([fetchedData.data], { type: "image/jpeg" });
-      console.log(imageBlob);
-      const virtualUrl = URL.createObjectURL(imageBlob);
-      console.log(virtualUrl);
-      setFoto(virtualUrl);
-    };
-    traerFoto();
-  }, [datosUsuario.foto, token]);
+  //     console.log(fetchedData);
+  //     const imageBlob = new Blob([fetchedData.data], { type: "image/jpeg" });
+  //     console.log(imageBlob);
+  //     const virtualUrl = URL.createObjectURL(imageBlob);
+  //     console.log(virtualUrl);
+  //     setFoto(virtualUrl);
+  //   };
+  //   traerFoto();
+  // }, [datosUsuario.foto, token]);
 
   return (
     <React.Fragment>
@@ -106,7 +106,9 @@ export default function PerfilUsuario() {
           <Box>
             <Stack direction="row" spacing={1} sx={{ padding: "1rem" }}>
               <Avatar
-                src={foto}
+                src={
+                  "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+                }
                 sx={{
                   height: "8rem",
                   width: "8rem",
@@ -116,7 +118,7 @@ export default function PerfilUsuario() {
               />
 
               <form>
-                <label for="uploadFoto">
+                <label htmlFor="uploadFoto">
                   <AddAPhoto color="primary" className="botonCambioFoto" />
                 </label>
                 <input

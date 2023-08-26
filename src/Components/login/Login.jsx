@@ -98,11 +98,10 @@ const Login = () => {
         sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
         variant="h4"
       >
-        {" "}
-        Iniciar sesión{" "}
+        Iniciar sesión
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}>
-        <form onSubmit="#">
+        <form>
           <Box
             sx={{
               display: "flex",

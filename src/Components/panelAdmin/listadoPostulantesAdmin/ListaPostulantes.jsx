@@ -30,8 +30,9 @@ export default function ListaPostulantes({ postulantes }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {postulantes.map((postulante) => (
+          {postulantes.map((postulante, index) => (
             <TableRow
+              key={index}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">

@@ -1,13 +1,12 @@
-import * as React from "react";
+import React, { useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import { styled } from "@mui/material/styles";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import Header from "../Header";
 import { Box, Typography, Button } from "@mui/material";
 import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
-import { useContext } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
 import { config } from "../../config/config";
 
 const Root = styled("div")(({ theme }) => ({
@@ -18,36 +17,47 @@ const Root = styled("div")(({ theme }) => ({
   },
 }));
 
-export default function DividerText() {
+const DividerText = () => {
   const { cambiarDatosUsuario } = useContext(DatosUsuarioContextProvider);
-  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
 
-  async function traerDatos() {
-    await axios
-      .get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}?`)
-      .then(({ data }) => {
-        cambiarDatosUsuario(data);
-      });
-  }
-  traerDatos();
+  useEffect(() => {
+    async function traerDatos() {
+      try {
+        const response = await axios.get(
+          `${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`
+        );
+        cambiarDatosUsuario(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    traerDatos();
+  }, [cambiarDatosUsuario, datosUsuario.Usuario.id]);
+
   const formatoFechaNacimiento = (fecha) => {
-    var fechaNacimiento = new Date(fecha);
-    var dia = fechaNacimiento.getDate() + 1;
-    var mes = fechaNacimiento.getMonth() + 1;
-    var anio = fechaNacimiento.getFullYear();
-    return dia + "/" + mes + "/" + anio;
+    const fechaNacimiento = new Date(fecha);
+    const dia = fechaNacimiento.getDate() + 1;
+    const mes = fechaNacimiento.getMonth() + 1;
+    const anio = fechaNacimiento.getFullYear();
+    return `${dia}/${mes}/${anio}`;
   };
+
   return (
-    <React.Fragment>
+    <>
       <Header />
       <Box
-        sx={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "1rem",
+        }}
       >
         <Link to="/miPerfil/misDatos/editar" style={{ textDecoration: "none" }}>
           <Button variant="contained">Editar</Button>
         </Link>
       </Box>
-      <Typography style={{ margin: "2rem" }}>
+      <Box style={{ margin: "2rem" }}>
         <Root>
           <Divider>
             <Chip
@@ -56,7 +66,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -71,8 +81,8 @@ export default function DividerText() {
               >
                 {datosUsuario.nombre} {datosUsuario.apellido}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -87,7 +97,7 @@ export default function DividerText() {
               >
                 {formatoFechaNacimiento(datosUsuario.fecha_nac)}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -96,7 +106,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -111,8 +121,8 @@ export default function DividerText() {
               >
                 {datosUsuario.Usuario.usuario}
               </Typography>
-            </Typography>
-            <Typography sx={{ display: "flex", justifyContent: "center" }}>
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Typography
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
@@ -123,10 +133,9 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {" "}
                 +54 9 {datosUsuario.telefono}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -135,7 +144,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -150,8 +159,8 @@ export default function DividerText() {
               >
                 {datosUsuario.pais}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -166,8 +175,8 @@ export default function DividerText() {
               >
                 {datosUsuario.Provincia.nombre}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -182,10 +191,12 @@ export default function DividerText() {
               >
                 {datosUsuario.Ciudad.nombre}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
         </Root>
-      </Typography>
-    </React.Fragment>
+      </Box>
+    </>
   );
-}
+};
+
+export default DividerText;

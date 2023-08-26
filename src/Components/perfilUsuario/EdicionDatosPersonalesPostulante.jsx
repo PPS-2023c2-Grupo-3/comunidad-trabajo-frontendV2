@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
@@ -16,8 +16,6 @@ import {
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Swal from "sweetalert2";
-import { useContext } from "react";
-import IdFormContext from "../../Context/IdFormContext";
 import axios from "axios";
 import { config } from "../../config/config";
 
@@ -46,6 +44,20 @@ export default function WithMaterialUI() {
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
   var token = sessionStorage.getItem("token");
 
+  const [selectedTipoDocumento, setSelectedTipoDocumento] = useState("");
+  const [selectedProvincia, setSelectedProvincia] = useState("");
+  const [selectedCiudad, setSelectedCiudad] = useState("");
+
+  useEffect(() => {
+    setSelectedTipoDocumento(datosUsuario.Tipo_documento.id || "");
+    setSelectedProvincia(datosUsuario.provincia || "");
+    setSelectedCiudad(datosUsuario.ciudad || "");
+  }, [
+    datosUsuario.Tipo_documento.id,
+    datosUsuario.provincia,
+    datosUsuario.ciudad,
+  ]);
+
   const formatoFechaNacimiento = (fecha) => {
     var fechaNacimiento = new Date(fecha);
     var dia = fechaNacimiento.getDate() + 1;
@@ -72,40 +84,6 @@ export default function WithMaterialUI() {
   };
   llamarTipoDocumento();
 
-  /*Llama a las CARRERAS para seleccionar en el formulario*/
-  const [listaCarreras, setListaCarreras] = useState([]);
-  const [llamadoListaCarreras, setLlamadoListaCarreras] = useState(false);
-  const llamarCarreras = async () => {
-    if (llamadoListaCarreras === false) {
-      try {
-        const api = await fetch(`${config.apiUrl}/carreras/?`);
-        const datos = await api.json();
-        setListaCarreras(datos.carreras);
-        setLlamadoListaCarreras(true);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-  llamarCarreras();
-
-  /*Llama a los ESTUDIOS para seleccionar en el formulario*/
-  const [listaEstudios, setListaEstudios] = useState([]);
-  const [llamadoEstudios, setLlamadoEstudios] = useState(false);
-  const llamarEstudios = async () => {
-    if (llamadoTipoDocumento === false) {
-      try {
-        const api = await fetch(`${config.apiUrl}/estudios/?`);
-        const datos = await api.json();
-        setListaEstudios(datos.estudios);
-        setLlamadoEstudios(true);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-  llamarEstudios();
-
   const [listaProvincias, setListaProvincias] = useState([]);
   const [llamadoProvincias, setLlamadoProvincias] = useState(false);
   const [provinciaActual, setProvinciaActual] = useState();
@@ -124,7 +102,6 @@ export default function WithMaterialUI() {
   llamarProvincias();
 
   const [listaCiudades, setListaCiudades] = useState([]);
-  const [llamadoCiudades, setLlamadoCiudades] = useState(false);
   const llamarCiudades = async (provincia) => {
     if (provinciaActual !== provincia) {
       try {
@@ -134,7 +111,6 @@ export default function WithMaterialUI() {
         const datos = await api.json();
         console.log(datos);
         setListaCiudades(datos.ciudades);
-        setLlamadoCiudades(true);
       } catch (error) {
         console.log(error);
       }
@@ -142,8 +118,6 @@ export default function WithMaterialUI() {
     }
   };
 
-  const { id } = useContext(IdFormContext);
-  console.log(id);
   const formik = useFormik({
     initialValues: {
       nombre: datosUsuario.nombre,
@@ -237,7 +211,7 @@ export default function WithMaterialUI() {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6} md={4}>
                 <TextField
-                  color="success"
+                  color="primary"
                   variant="outlined"
                   id="nombre"
                   name="nombre"
@@ -293,8 +267,10 @@ export default function WithMaterialUI() {
                     label="Tipo de documento"
                     type="number"
                     fullWidth
-                    value={formik.values.tipoDocumento}
-                    onChange={formik.handleChange}
+                    value={selectedTipoDocumento}
+                    onChange={(e) => {
+                      setSelectedTipoDocumento(e.target.value);
+                    }}
                     error={
                       formik.touched.tipoDocumento &&
                       Boolean(formik.errors.tipoDocumento)
@@ -359,8 +335,15 @@ export default function WithMaterialUI() {
                     label="Provincia"
                     type="number"
                     fullWidth
-                    value={formik.values.provincia}
-                    onChange={formik.handleChange}
+                    value={selectedProvincia}
+                    onChange={(e) => {
+                      setSelectedProvincia(e.target.value);
+                      setSelectedCiudad("");
+                    }}
+                    error={
+                      formik.touched.tipoDocumento &&
+                      Boolean(formik.errors.tipoDocumento)
+                    }
                   >
                     {listaProvincias.map((provincia) => (
                       <MenuList
@@ -405,8 +388,10 @@ export default function WithMaterialUI() {
                     label="Ciudad"
                     type="number"
                     fullWidth
-                    value={formik.values.ciudad}
-                    onChange={formik.handleChange}
+                    value={selectedCiudad}
+                    onChange={(e) => {
+                      setSelectedCiudad(e.target.value);
+                    }}
                     error={
                       formik.touched.tipoDocumento &&
                       Boolean(formik.errors.tipoDocumento)

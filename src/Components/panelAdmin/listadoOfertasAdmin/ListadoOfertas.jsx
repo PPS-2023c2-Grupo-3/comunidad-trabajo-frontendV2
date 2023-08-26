@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import Header from "../../Header";
 import { Box, Button, Pagination, Typography } from "@mui/material";
 import BarraBusquedaOfertas from "./BarraBusquedaOfertas";
@@ -6,6 +6,7 @@ import ListaOfertas from "./ListaOfertas";
 import BusquedaNoEncontrada from "./BusquedaNoEncontrada";
 import { Link } from "react-router-dom";
 import { config } from "../../../config/config";
+
 const ListadoOfertas = () => {
   const [llamado, setLlamado] = useState(false);
   const [ofertas, setOfertas] = useState([]);
@@ -18,21 +19,25 @@ const ListadoOfertas = () => {
 
   const API_URL = `${config.apiUrl}/ofertas/?pagina=0&limite=6&ordenar=id&idEstado=1`;
 
-  const primerLlamado = async () => {
-    if (llamado === false) {
-      try {
-        const api = await fetch(API_URL);
-        const datos = await api.json();
-        setLlamado(true);
-        setOfertas(datos.ofertas.rows);
-        setCantPaginas(datos.totalPaginas);
-      } catch (error) {
-        console.log(error);
+  useEffect(() => {
+    const primerLlamado = async () => {
+      if (llamado === false) {
+        try {
+          const api = await fetch(API_URL);
+          const datos = await api.json();
+          setLlamado(true);
+          setOfertas(datos.ofertas.rows);
+          setCantPaginas(datos.totalPaginas);
+        } catch (error) {
+          console.log(error);
+        }
       }
-    }
-  };
+    };
 
-  const traerOfertas = async (e, p) => {
+    primerLlamado();
+  }, [llamado, API_URL]);
+
+  const traerOfertas = async (e) => {
     try {
       e.preventDefault();
       const { oferta } = e.target.elements;
@@ -43,10 +48,8 @@ const ListadoOfertas = () => {
       );
       const datos = await api.json();
       setPagina(1);
-      console.log(datos);
       setOfertas(datos.ofertas.rows);
       setCantPaginas(datos.totalPaginas);
-      console.log(ofertas);
     } catch (err) {
       console.log(err);
     }
@@ -61,49 +64,53 @@ const ListadoOfertas = () => {
     const datos = await api.json();
     setOfertas(datos.ofertas.rows);
     setPagina(p);
-    console.log(datos.ofertas.rows);
   };
 
-  const traerOfertasPendientes = async () => {
-    try {
-      const api = await fetch(
-        `${config.apiUrl}/ofertas/?pagina=0&ordenar=id&idEstado=2`
-      );
-      const datos = await api.json();
-      setCantOfertasPendientes(datos.ofertas.count);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  traerOfertasPendientes();
+  useEffect(() => {
+    const traerOfertasPendientes = async () => {
+      try {
+        const api = await fetch(
+          `${config.apiUrl}/ofertas/?pagina=0&ordenar=id&idEstado=2`
+        );
+        const datos = await api.json();
+        setCantOfertasPendientes(datos.ofertas.count);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    traerOfertasPendientes();
+  }, []);
 
-  const traerOfertasRevision = async () => {
-    try {
-      const api = await fetch(
-        `${config.apiUrl}/ofertas/?pagina=0&ordenar=id&idEstado=4`
-      );
-      const datos = await api.json();
-      setCantOfertasRevision(datos.ofertas.count);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  traerOfertasRevision();
+  useEffect(() => {
+    const traerOfertasRevision = async () => {
+      try {
+        const api = await fetch(
+          `${config.apiUrl}/ofertas/?pagina=0&ordenar=id&idEstado=4`
+        );
+        const datos = await api.json();
+        setCantOfertasRevision(datos.ofertas.count);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    traerOfertasRevision();
+  }, []);
 
-  const traerOfertasFinalizadas = async () => {
-    try {
-      const api = await fetch(
-        `${config.apiUrl}/ofertas/?pagina=0&ordenar=id&idEstado=5`
-      );
-      const datos = await api.json();
-      setCantOfertasFinalizadas(datos.ofertas.count);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  traerOfertasFinalizadas();
+  useEffect(() => {
+    const traerOfertasFinalizadas = async () => {
+      try {
+        const api = await fetch(
+          `${config.apiUrl}/ofertas/?pagina=0&ordenar=id&idEstado=5`
+        );
+        const datos = await api.json();
+        setCantOfertasFinalizadas(datos.ofertas.count);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    traerOfertasFinalizadas();
+  }, []);
 
-  primerLlamado();
   return (
     <Fragment>
       <Header />

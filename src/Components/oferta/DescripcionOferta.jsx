@@ -57,10 +57,7 @@ const CustomizedDialogs = () => {
   const [salario, setSalario] = useState();
   const [horarioEntrada, setHorarioEntrada] = useState();
   const [horarioSalida, setHorarioSalida] = useState();
-  const [jornada, setJornada] = useState();
   const [contrato, setContrato] = useState();
-  const [edadDesde, setEdadDesde] = useState();
-  const [edadHasta, setEdadHasta] = useState();
   const [beneficios, setBeneficios] = useState();
   const [idEmpresa, setIdEmpresa] = useState();
   const [estado, setEstado] = useState();
@@ -81,10 +78,7 @@ const CustomizedDialogs = () => {
       setSalario(datos.remuneracion);
       setHorarioEntrada(datos.horario_laboral_desde);
       setHorarioSalida(datos.horario_laboral_hasta);
-      setJornada(datos.Jornada.nombre_jornada);
       setContrato(datos.Contrato.nombre_contrato);
-      setEdadDesde(datos.edad_desde);
-      setEdadHasta(datos.edad_hasta);
       setBeneficios(datos.beneficios);
       setEstado(datos.Estado.id);
       setFechaPublicacion(datos.createdAt);
@@ -99,36 +93,35 @@ const CustomizedDialogs = () => {
   var grupo = sessionStorage.getItem("grupo");
   var estaLogeado = sessionStorage.getItem("estaLogeado");
 
-  const [llamado, setLlamado] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [encontrado, setEcontrado] = useState(false);
 
-  const estaPostulado = async () => {
-    let idsOfertas;
-    if (estaLogeado && datosUsuario.id != null) {
-      try {
-        const api = await fetch(
-          `${config.apiUrl}/postulacionesId/postulante/?&id=${datosUsuario.id}&`
-        );
-        const datos = await api.json();
-        console.log(datos);
-        idsOfertas = datos.postulaciones.rows.map(
-          (postulacion) => postulacion.fk_id_oferta
-        );
-        console.log(idsOfertas);
-      } catch (error) {
-        console.log(error);
-      }
-      setLlamado(true);
-      console.log(id);
-      for (let i = 0; i <= idsOfertas.length; i++) {
-        if (idsOfertas[i] === id) {
-          setEcontrado(true);
-        }
-      }
+  // const estaPostulado = async () => {
+  //   let idsOfertas;
+  //   if (estaLogeado && datosUsuario && datosUsuario.id != null) {
+  //     try {
+  //       const api = await fetch(
+  //         `${config.apiUrl}/postulacionesId/postulante/?&id=${datosUsuario.id}&`
+  //       );
+  //       const datos = await api.json();
+  //       console.log(datos);
+  //       idsOfertas = datos.postulaciones.rows.map(
+  //         (postulacion) => postulacion.fk_id_oferta
+  //       );
+  //       console.log(idsOfertas);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //     console.log(id);
+  //     for (let i = 0; i <= idsOfertas.length; i++) {
+  //       if (idsOfertas[i] === id) {
+  //         setEcontrado(true);
+  //       }
+  //     }
 
-      console.log(encontrado);
-    }
-  };
+  //     console.log(encontrado);
+  //   }
+  // };
 
   function timeoutReload() {
     setTimeout(function () {
@@ -136,7 +129,7 @@ const CustomizedDialogs = () => {
     }, 1000);
   }
 
-  estaPostulado();
+  // estaPostulado();
   const postularse = async (e) => {
     e.preventDefault();
     Swal.fire({
@@ -245,8 +238,7 @@ const CustomizedDialogs = () => {
           <Header />
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <Grid
-              containter
-              spacing={2}
+              container
               sx={{
                 display: "flex",
                 justifyContent: "center",

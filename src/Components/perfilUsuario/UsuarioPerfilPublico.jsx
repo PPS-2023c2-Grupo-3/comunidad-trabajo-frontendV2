@@ -48,7 +48,7 @@ export default function DividerText() {
   return (
     <React.Fragment>
       <Header />
-      <Typography style={{ margin: "2rem" }}>
+      <Box style={{ margin: "2rem" }}>
         <Root>
           <Divider>
             <Chip
@@ -57,7 +57,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -72,8 +72,8 @@ export default function DividerText() {
               >
                 {nombrePostulante} {apellidoPostulante}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -88,7 +88,7 @@ export default function DividerText() {
               >
                 {formatoFechaNacimiento(fechaNacPostulante)}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -97,7 +97,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -112,8 +112,8 @@ export default function DividerText() {
               >
                 {emailPostulante}
               </Typography>
-            </Typography>
-            <Typography sx={{ display: "flex", justifyContent: "center" }}>
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Typography
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
@@ -126,7 +126,7 @@ export default function DividerText() {
               >
                 +54 9 {telefonoPostulante}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -135,7 +135,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -150,8 +150,8 @@ export default function DividerText() {
               >
                 {paisPostulante}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -166,8 +166,8 @@ export default function DividerText() {
               >
                 {provinciaPostulante}
               </Typography>
-            </Typography>
-            <Typography
+            </Box>
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -182,10 +182,10 @@ export default function DividerText() {
               >
                 {ciudadPostulante}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
         </Root>
-      </Typography>
+      </Box>
     </React.Fragment>
   );
 }

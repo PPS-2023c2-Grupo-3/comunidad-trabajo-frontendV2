@@ -94,14 +94,12 @@ export default function WithMaterialUI() {
 
   /*Llama a los ESTUDIOS para seleccionar en el formulario*/
   const [listaEstudios, setListaEstudios] = useState([]);
-  const [llamadoEstudios, setLlamadoEstudios] = useState(false);
   const llamarEstudios = async () => {
     if (llamadoTipoDocumento === false) {
       try {
         const api = await fetch(`${config.apiUrl}/estudios/`);
         const datos = await api.json();
         setListaEstudios(datos.estudios);
-        setLlamadoEstudios(true);
       } catch (error) {
         console.log(error);
       }
@@ -127,7 +125,6 @@ export default function WithMaterialUI() {
   llamarProvincias();
 
   const [listaCiudades, setListaCiudades] = useState([]);
-  const [llamadoCiudades, setLlamadoCiudades] = useState(false);
   const llamarCiudades = async (provincia) => {
     if (provinciaActual !== provincia) {
       try {
@@ -137,7 +134,6 @@ export default function WithMaterialUI() {
         const datos = await api.json();
         console.log(datos);
         setListaCiudades(datos.ciudades);
-        setLlamadoCiudades(true);
       } catch (error) {
         console.log(error);
       }
@@ -179,7 +175,6 @@ export default function WithMaterialUI() {
   llamarNiveles();
 
   const [IdActual, setIdActual] = useState(0);
-  const [estadoSiguiente, setEstadoSiguiente] = useState(false);
 
   function mostrarSiguiente() {
     document.getElementById(listaIDs[IdActual + 1]).style.display = "block";
@@ -934,8 +929,6 @@ export default function WithMaterialUI() {
                 color="primary"
                 variant="contained"
                 type="submit"
-                //onClick= {}
-                disabled={estadoSiguiente}
               >
                 Siguiente
               </Button>

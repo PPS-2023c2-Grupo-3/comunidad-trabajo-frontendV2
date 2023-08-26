@@ -24,17 +24,16 @@ export default function DividerText() {
 
   React.useEffect(() => {
     axios
-    .get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
-    .then(({ data }) => {
-      cambiarDatosUsuario(data);
-      console.log(data);
-    });
-  }, []);
+      .get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
+      .then(({ data }) => {
+        cambiarDatosUsuario(data);
+      });
+  }, [cambiarDatosUsuario, datosUsuario.Usuario.id]);
 
   return (
     <React.Fragment>
       <Header />
-      <Typography style={{ margin: "2rem" }}>
+      <Box style={{ margin: "2rem" }}>
         <Root>
           <Divider>
             <Chip
@@ -43,7 +42,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -58,7 +57,7 @@ export default function DividerText() {
               >
                 {datosUsuario.Carrera.nombre_carrera}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -67,7 +66,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -83,7 +82,7 @@ export default function DividerText() {
                 {datosUsuario.Estudios.nombre_estudio} -{" "}
                 {datosUsuario.Estudios.estado_estudio}
               </Typography>
-            </Typography>
+            </Box>
           </Box>
           <Divider>
             <Chip
@@ -92,7 +91,7 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Typography
+            <Box
               sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
             >
               <Typography
@@ -114,10 +113,10 @@ export default function DividerText() {
                   No
                 </Typography>
               )}
-            </Typography>
+            </Box>
           </Box>
         </Root>
-      </Typography>
+      </Box>
     </React.Fragment>
   );
 }

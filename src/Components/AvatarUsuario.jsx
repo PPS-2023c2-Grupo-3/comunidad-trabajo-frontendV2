@@ -6,9 +6,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Fragment } from "react";
 import { useHistory } from "react-router-dom";
-import axios from "axios";
-import { useEffect } from "react";
-import { config } from "../config/config";
 
 const AvatarUsuario = () => {
   const {
@@ -19,7 +16,6 @@ const AvatarUsuario = () => {
     cambiarGrupo,
   } = useContext(DatosUsuarioContextProvider);
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
-  var token = sessionStorage.getItem("token");
   var grupo = sessionStorage.getItem("grupo");
 
   const [anchorEl, setAnchorEl] = useState(null);

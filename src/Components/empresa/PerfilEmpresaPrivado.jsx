@@ -9,7 +9,7 @@ import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
 import { useContext } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { useRef } from "react";
 import { AddAPhoto } from "@mui/icons-material";
 import { config } from "../../config/config";
@@ -20,7 +20,7 @@ export default function PerfilEmpresa() {
   var token = sessionStorage.getItem("token");
   var idUsuario = sessionStorage.getItem("idUsuario");
 
-  const [logo, setLogo] = useState();
+  // const [logo, setLogo] = useState();
   const uploadLogo = useRef();
   const [llamado, setLlamado] = useState(false);
 
@@ -46,7 +46,7 @@ export default function PerfilEmpresa() {
     const formData = new FormData();
     formData.append("uploadLogo", uploadLogo.current);
     try {
-      const res = await axios({
+      await axios({
         method: "post",
         url: `${config.apiUrl}/files/logo/?authorization=${token}`,
         data: formData,
@@ -82,30 +82,30 @@ export default function PerfilEmpresa() {
     handleSubmit(e);
   };
 
-  function splitFileName(str) {
-    return str.split("|")[1];
-  }
+  // function splitFileName(str) {
+  //   return str.split("|")[1];
+  // }
 
-  useEffect(() => {
-    const traerLogo = async () => {
-      const fetchedData = await axios.get(`${config.apiUrl}/files`, {
-        headers: {
-          type: "image/png",
-          file: splitFileName(datosUsuario.logo),
-          authorization: token,
-        },
-        responseType: "blob",
-      });
+  // useEffect(() => {
+  //   const traerLogo = async () => {
+  //     const fetchedData = await axios.get(`${config.apiUrl}/files`, {
+  //       headers: {
+  //         type: "image/png",
+  //         file: splitFileName(datosUsuario.logo),
+  //         authorization: token,
+  //       },
+  //       responseType: "blob",
+  //     });
 
-      console.log(fetchedData);
-      const imageBlob = new Blob([fetchedData.data], { type: "image/png" });
-      console.log(imageBlob);
-      const virtualUrl = URL.createObjectURL(imageBlob);
-      console.log(virtualUrl);
-      setLogo(virtualUrl);
-    };
-    traerLogo();
-  }, [datosUsuario.logo, token]);
+  //     console.log(fetchedData);
+  //     const imageBlob = new Blob([fetchedData.data], { type: "image/png" });
+  //     console.log(imageBlob);
+  //     const virtualUrl = URL.createObjectURL(imageBlob);
+  //     console.log(virtualUrl);
+  //     setLogo(virtualUrl);
+  //   };
+  //   traerLogo();
+  // }, [datosUsuario.logo, token]);
 
   return (
     <React.Fragment>
@@ -121,7 +121,9 @@ export default function PerfilEmpresa() {
           <Box>
             <Stack direction="row" spacing={1} sx={{ padding: "1rem" }}>
               <Avatar
-                src={logo}
+                src={
+                  "https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png"
+                }
                 sx={{
                   height: "8rem",
                   width: "8rem",
@@ -131,7 +133,7 @@ export default function PerfilEmpresa() {
               />
 
               <form>
-                <label for="uploadLogo">
+                <label htmlFor="uploadLogo">
                   <AddAPhoto color="primary" className="botonCambioFoto" />
                 </label>
                 <input
