@@ -2,12 +2,9 @@ import { Typography, Box, Button } from "@mui/material";
 import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
 import Header from "../Header";
-import { useContext } from "react";
-import IdFormContext from "../../Context/IdFormContext";
 
 const RegistroPregunta = () => {
-  const { id } = useContext(IdFormContext);
-  console.log(id);
+  
   return (
     <Fragment>
       <Header />
