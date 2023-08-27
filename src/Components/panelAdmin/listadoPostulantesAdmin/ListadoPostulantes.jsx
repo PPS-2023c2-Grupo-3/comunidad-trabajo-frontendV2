@@ -59,7 +59,6 @@ const ListadoPostulantes = () => {
     const datos = await api.json();
     setPostulantes(datos.postulantes.rows);
     setPagina(p);
-    console.log(datos.ofertas.rows);
   };
 
   primerLlamado();
