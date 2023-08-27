@@ -5,8 +5,6 @@ import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@mui/material/Typography";
 import Header from "../Header";
-import { useContext } from "react";
-import IdFormContext from "../../Context/IdFormContext";
 import { useHistory } from "react-router-dom";
 import { config } from "../../config/config";
 
@@ -23,8 +21,6 @@ const validationSchema = yup.object({
 
 export default function WithMaterialUI() {
   const history = useHistory();
-  const { id, cambiarId } = useContext(IdFormContext);
-  console.log(id);
 
   const formik = useFormik({
     initialValues: {
@@ -48,7 +44,6 @@ export default function WithMaterialUI() {
           console.log(
             "Success:",
             response,
-            cambiarId(response.id),
             history.push("/registroPregunta")
           )
         );
