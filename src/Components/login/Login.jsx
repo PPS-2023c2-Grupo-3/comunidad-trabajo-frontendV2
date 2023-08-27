@@ -101,7 +101,13 @@ const Login = () => {
         Iniciar sesión
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}>
-        <form>
+        <form
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit();
+            }
+          }}
+        >
           <Box
             sx={{
               display: "flex",
