@@ -4,39 +4,89 @@ import { Avatar, Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import Header from "../Header";
 import { Link } from "react-router-dom";
-// import { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-// import { useEffect } from "react";
-import { useRef } from "react";
+import { useEffect } from "react";
+// import { useRef } from "react";
 import Swal from "sweetalert2";
 import { AddAPhoto } from "@mui/icons-material";
 import { config } from "../../config/config";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "https://fjjrxhcerjjthjglqptp.supabase.co";
+const supabase = createClient(supabaseUrl, `${config.key}`);
 
 export default function PerfilUsuario() {
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
   var token = sessionStorage.getItem("token");
+  const postulanteId = datosUsuario.id; // Reemplaza con el ID correcto
   // const [foto, setFoto] = useState();
-  const uploadFoto = useRef();
+  const [uploadFoto, setUploadFoto] = useState(null);
+  const [photoURL, setPhotoURL] = useState("");
+  console.log(photoURL);
+  
+  // Realizar una solicitud HTTP para obtener el valor del campo 'foto' al cargar el componente
+  useEffect(() => {
+    async function fetchPhotoURL() {
+      try {
+        // Realiza una solicitud GET para obtener el valor del campo 'foto' desde tu backend
+        const response = await axios.get(`${config.apiUrl}/postulantes/dni/${postulanteId}`);
+        const fotoValor = response.data.foto;
 
-  function timeoutReload() {
-    setTimeout(function () {
-      window.location.reload();
-    }, 2000);
-  }
+        // Actualiza el estado de 'photoURL' con el valor obtenido
+        setPhotoURL(fotoValor);
+      } catch (error) {
+        console.error("Error al obtener el valor de 'foto' desde el backend:", error);
+      }
+    }
+
+    // Llama a la función para obtener y establecer el valor de 'photoURL' al cargar el componente
+    fetchPhotoURL();
+  }, []); // El segundo argumento es un array vacío para que se ejecute solo una vez al cargar el componente
+
+
+  // function timeoutReload() {
+  //   setTimeout(function () {
+  //     window.location.reload();
+  //   }, 2000);
+  // }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("uploadFoto", uploadFoto.current);
     try {
-      await axios({
-        method: "post",
-        url: `${config.apiUrl}/files/foto/?authorization=${token}`,
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-          id: datosUsuario.id,
-        },
-      });
+      const formData = new FormData();
+      formData.append("file", uploadFoto);
+
+      const { error } = await supabase.storage
+        .from("files")
+        .upload(uploadFoto.name, uploadFoto);
+
+      if (error) {
+        console.error("Error al cargar el archivo: ", error.message);
+        return;
+      }
+
+      const { data: signedURLData, error: signedURLError } = await supabase.storage
+        .from("files")
+        .createSignedUrl(uploadFoto.name, 6000);
+
+      if (signedURLError) {
+        console.error("Error al obtener la URL firmada: ", signedURLError.message);
+        return;
+      }
+
+      const newPhotoURL = signedURLData.signedUrl; // Obtén la nueva URL
+      console.log("Datos a enviar al servidor:", { foto: newPhotoURL });
+    
+      // Actualiza el estado de 'photoURL' con la nueva URL
+      setPhotoURL(newPhotoURL);
+
+      console.log("Datos a enviar al servidor:", { foto: photoURL });
+
+      const response = await axios.put(`${config.apiUrl}/postulantes/dni/${postulanteId}`, { foto: newPhotoURL });
+      console.log(newPhotoURL);
+      if (response.status === 200) {
+        console.log("Campo 'foto' actualizado en el backend:", newPhotoURL);
+      }
       Swal.fire({
         icon: "success",
         title: "Su foto fue actualizada correctamente",
@@ -53,7 +103,7 @@ export default function PerfilUsuario() {
             .then(({ data }) => {
               console.log(data);
               sessionStorage.setItem("datosUsuario", JSON.stringify(data));
-              timeoutReload();
+              // timeoutReload();
             });
         }
       });
@@ -63,34 +113,8 @@ export default function PerfilUsuario() {
   };
 
   const handleFileSelect = (e) => {
-    uploadFoto.current = e.target.files[0];
-    handleSubmit(e);
+    setUploadFoto(e.target.files[0]);
   };
-
-  // function splitFileName(str) {
-  //   return str.split("|")[1];
-  // }
-
-  // useEffect(() => {
-  //   const traerFoto = async () => {
-  //     const fetchedData = await axios.get(`${config.apiUrl}/files`, {
-  //       headers: {
-  //         type: "image/jpeg",
-  //         file: splitFileName(datosUsuario.foto),
-  //         authorization: token,
-  //       },
-  //       responseType: "blob",
-  //     });
-
-  //     console.log(fetchedData);
-  //     const imageBlob = new Blob([fetchedData.data], { type: "image/jpeg" });
-  //     console.log(imageBlob);
-  //     const virtualUrl = URL.createObjectURL(imageBlob);
-  //     console.log(virtualUrl);
-  //     setFoto(virtualUrl);
-  //   };
-  //   traerFoto();
-  // }, [datosUsuario.foto, token]);
 
   return (
     <React.Fragment>
@@ -106,9 +130,7 @@ export default function PerfilUsuario() {
           <Box>
             <Stack direction="row" spacing={1} sx={{ padding: "1rem" }}>
               <Avatar
-                src={
-                  "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-                }
+                src={photoURL}
                 sx={{
                   height: "8rem",
                   width: "8rem",
@@ -117,16 +139,18 @@ export default function PerfilUsuario() {
                 }}
               />
 
-              <form>
+              <form onSubmit={handleSubmit}>
                 <label htmlFor="uploadFoto">
                   <AddAPhoto color="primary" className="botonCambioFoto" />
                 </label>
                 <input
                   type="file"
+                  name="file"
                   id="uploadFoto"
                   onChange={handleFileSelect}
                   style={{ display: "none" }}
                 />
+                <input type="submit" value="SUBIR FOTO" />
               </form>
             </Stack>
           </Box>
