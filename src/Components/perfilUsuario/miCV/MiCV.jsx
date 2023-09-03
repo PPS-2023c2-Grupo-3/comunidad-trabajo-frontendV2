@@ -9,8 +9,7 @@ import Swal from "sweetalert2";
 import { config } from "../../../config/config";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://fjjrxhcerjjthjglqptp.supabase.co";
-const supabase = createClient(supabaseUrl, `${config.key}`);
+const supabase = createClient(config.supabaseUrl, config.supabaseKey);
 let pdfURL = ``;
 
 const MiCV = () => {
@@ -35,7 +34,7 @@ const MiCV = () => {
       const { error } = await supabase.storage
         .from("files")
         .upload(uploadCV.name, uploadCV);
-      pdfURL = `${supabaseUrl}/storage/v1/object/public/files/${uploadCV.name}`;
+      pdfURL = `${config.apiUrl}/storage/v1/object/public/files/${uploadCV.name}`;
 
       if (error) {
         console.error("Error al cargar el archivo PDF: ", error.message);
