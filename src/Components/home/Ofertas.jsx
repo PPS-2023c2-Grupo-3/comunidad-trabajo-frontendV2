@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -17,7 +17,7 @@ const Ofertas = ({ listaOfertas }) => {
     var minutos = Math.floor(diferencia / (1000 * 60));
 
     if (dias > 0) {
-      return dias + " dias";
+      return dias + " días";
     } else if (horas > 0) {
       return horas + " horas";
     } else {
@@ -30,9 +30,21 @@ const Ofertas = ({ listaOfertas }) => {
       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
         {listaOfertas.map((oferta) => (
           <Card
-            sx={{ width: 500, margin: "1rem" }}
+            sx={{
+              width: 500,
+              margin: "1rem",
+              "&:hover": {
+                boxShadow: "0 0 10px 0 rgba(0,0,0,0.2)",
+                transform: "scale(1.05)",
+                transition: "all 0.3s ease-in-out",
+              },
+              "&:not(:hover)": {
+                transform: "scale(1)",
+                transition: "all 0.3s ease-in-out",
+              },
+            }}
             key={oferta.id}
-            className="oferta"
+            //className="oferta"
           >
             <Box sx={{ height: 400, margin: "1rem" }}>
               <CardMedia

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import Header from "../../Header";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -7,11 +7,10 @@ import axios from "axios";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { config } from "../../../config/config";
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = 'https://fjjrxhcerjjthjglqptp.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqanJ4aGNlcmpqdGhqZ2xxcHRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTM1MjY0NjcsImV4cCI6MjAwOTEwMjQ2N30.yGkjxpJya0kre_XdN-JfUY1tFmvPJrYVoZg_aGvYlsw'
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabaseUrl = "https://fjjrxhcerjjthjglqptp.supabase.co";
+const supabase = createClient(supabaseUrl, `${config.key}`);
 let pdfURL = ``;
 
 const MiCV = () => {
@@ -31,18 +30,19 @@ const MiCV = () => {
 
     try {
       const formData = new FormData();
-      formData.append('file', uploadCV);
+      formData.append("file", uploadCV);
 
-      const {error} = await supabase.storage.from('files').upload(uploadCV.name, uploadCV);
+      const { error } = await supabase.storage
+        .from("files")
+        .upload(uploadCV.name, uploadCV);
       pdfURL = `${supabaseUrl}/storage/v1/object/public/files/${uploadCV.name}`;
 
-      if(error) {
-        console.error('Error al cargar el archivo PDF: ', error.message);
+      if (error) {
+        console.error("Error al cargar el archivo PDF: ", error.message);
         return;
       }
 
       setIsPDFReady(true);
-
 
       Swal.fire({
         icon: "success",
@@ -60,7 +60,6 @@ const MiCV = () => {
             .then(({ data }) => {
               console.log(data);
               sessionStorage.setItem("datosUsuario", JSON.stringify(data));
-              timeoutReload();
             });
         }
       });
@@ -69,12 +68,12 @@ const MiCV = () => {
     }
   };
 
-  const handleOpenPDF = () => { 
+  const handleOpenPDF = () => {
     if (isPDFReady) {
       // Abre la URL del PDF en una nueva ventana o pestaña del navegador
-      window.open(pdfURL, '_blank');
+      window.open(pdfURL, "_blank");
     }
-  };  
+  };
 
   const handleFileSelect = (e) => {
     setUploadCV(e.target.files[0]);
@@ -110,6 +109,29 @@ const MiCV = () => {
   //   window.open(pdf);
   // }
 
+  const handleOpenPDF2 = async () => {
+    if (!uploadCV) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se ha cargado ningún CV",
+        footer: "",
+        showCloseButton: true,
+      });
+      return;
+    }
+    const { data, error } = await supabase.storage
+      .from("files")
+      .createSignedUrl(uploadCV.name, 60);
+
+    if (error) {
+      console.error("Error al cargar el archivo PDF: ", error.message);
+      return;
+    }
+
+    window.open(data.signedUrl, "_blank");
+  };
+
   return (
     <Fragment>
       <Header />
@@ -123,7 +145,7 @@ const MiCV = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={handleOpenPDF}
+            onClick={handleOpenPDF2}
             sx={{ width: "25rem" }}
           >
             VER MI CV
