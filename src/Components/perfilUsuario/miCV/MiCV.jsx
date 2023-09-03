@@ -7,6 +7,12 @@ import axios from "axios";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { config } from "../../../config/config";
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://fjjrxhcerjjthjglqptp.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqanJ4aGNlcmpqdGhqZ2xxcHRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTM1MjY0NjcsImV4cCI6MjAwOTEwMjQ2N30.yGkjxpJya0kre_XdN-JfUY1tFmvPJrYVoZg_aGvYlsw'
+const supabase = createClient(supabaseUrl, supabaseKey)
+let pdfURL = ``;
 
 const MiCV = () => {
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
@@ -18,20 +24,26 @@ const MiCV = () => {
       window.location.reload();
     }, 2000);
   }
+  const [isPDFReady, setIsPDFReady] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("uploadCV", uploadCV);
+
     try {
-      await axios({
-        method: "post",
-        url: `${config.apiUrl}/files/cv/?authorization=${token}`,
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-          id: datosUsuario.id,
-        },
-      });
+      const formData = new FormData();
+      formData.append('file', uploadCV);
+
+      const {error} = await supabase.storage.from('files').upload(uploadCV.name, uploadCV);
+      pdfURL = `${supabaseUrl}/storage/v1/object/public/files/${uploadCV.name}`;
+
+      if(error) {
+        console.error('Error al cargar el archivo PDF: ', error.message);
+        return;
+      }
+
+      setIsPDFReady(true);
+
+
       Swal.fire({
         icon: "success",
         title: "Su CV fue actualizado correctamente",
@@ -56,6 +68,13 @@ const MiCV = () => {
       console.log(err);
     }
   };
+
+  const handleOpenPDF = () => { 
+    if (isPDFReady) {
+      // Abre la URL del PDF en una nueva ventana o pestaña del navegador
+      window.open(pdfURL, '_blank');
+    }
+  };  
 
   const handleFileSelect = (e) => {
     setUploadCV(e.target.files[0]);
@@ -104,7 +123,7 @@ const MiCV = () => {
           <Button
             variant="contained"
             size="large"
-            // onClick={abrirPdf}
+            onClick={handleOpenPDF}
             sx={{ width: "25rem" }}
           >
             VER MI CV
@@ -114,7 +133,7 @@ const MiCV = () => {
           sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
         >
           <form onSubmit={handleSubmit}>
-            <input type="file" onChange={handleFileSelect} />
+            <input type="file" name="file" onChange={handleFileSelect} />
             <input type="submit" value="SUBIR CV" />
           </form>
         </Box>
