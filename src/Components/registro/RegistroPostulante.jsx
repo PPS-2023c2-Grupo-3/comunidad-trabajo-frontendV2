@@ -268,7 +268,7 @@ export default function WithMaterialUI() {
         })
           .then((res) => res.json())
           .then((response) =>
-            console.log(
+            console.log( //todo esto dentro de un console.log??
               "Success:",
               response,
               Swal.fire({

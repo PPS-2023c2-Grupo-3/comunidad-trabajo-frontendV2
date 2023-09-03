@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
@@ -7,8 +7,8 @@ import Typography from "@mui/material/Typography";
 import Header from "../Header";
 import { useHistory } from "react-router-dom";
 import { config } from "../../config/config";
-import { useContext } from 'react';
-import IdFormContext from '../../Context/IdFormContext';
+import { useContext } from "react";
+import IdFormContext from "../../Context/IdFormContext";
 
 const validationSchema = yup.object({
   email: yup
@@ -23,7 +23,8 @@ const validationSchema = yup.object({
 
 export default function WithMaterialUI() {
   const history = useHistory();
-  const {cambiarId} = useContext(IdFormContext);
+  const { cambiarId } = useContext(IdFormContext);
+
   const formik = useFormik({
     initialValues: {
       email: "",

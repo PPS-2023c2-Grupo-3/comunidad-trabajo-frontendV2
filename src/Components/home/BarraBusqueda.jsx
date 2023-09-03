@@ -20,10 +20,18 @@ const BarraBusqueda = (props) => {
             placeholder="Buscar empleo..."
             type="search"
             name="ofertas"
-          ></TextField>
-          <Button type="submit" variant="contained">
-            <SearchIcon />
-          </Button>
+            sx={{
+              width: "50%",
+              margin: "1rem",
+            }}
+            InputProps={{
+              endAdornment: (
+                <Button type="submit">
+                  <SearchIcon />
+                </Button>
+              ),
+            }}
+          />
         </Box>
       </form>
     </Fragment>
