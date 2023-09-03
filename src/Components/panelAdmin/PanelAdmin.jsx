@@ -1,19 +1,12 @@
 import Header from "../Header";
-import { Fragment, useContext } from "react";
+import { Fragment } from "react";
 import Stack from "@mui/material/Stack";
 import { Avatar, Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import React from "react";
 import { Link } from "react-router-dom";
-import DatosUsuarioContext from "../../Context/DatosUsuarioContext";
 
 const PanelAdmin = () => {
-  const {cambiarDatosUsuario, cambiarToken, cambiarIdUsuario, cambiarEstadoLogeado, cambiarGrupo} = useContext(DatosUsuarioContext)
-  var datosUsuario = JSON.parse(sessionStorage.getItem('datosUsuario'))
-  var token = sessionStorage.getItem('token')
-  var idUsuario = sessionStorage.getItem('idUsuario')
-  var grupo =  sessionStorage.getItem('grupo')
-  var estaLogeado = sessionStorage.getItem('estaLogeado')
   return (
     <Fragment>
       <Header />
@@ -37,28 +30,37 @@ const PanelAdmin = () => {
             <h1 style={{ display: "flex" }}>ADMINISTRADOR</h1>
           </Box>
         </Box>
-        
+
         <Box
           sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
         >
-          <Link  style={{textDecoration:"none"}} to="/admin/listadoPostulantes"><Button variant="contained" sx={{ width: "25rem" }}>
-          
-            Postulantes
-          </Button></Link>
+          <Link
+            style={{ textDecoration: "none" }}
+            to="/admin/listadoPostulantes"
+          >
+            <Button variant="contained" sx={{ width: "25rem" }}>
+              Postulantes
+            </Button>
+          </Link>
         </Box>
         <Box
           sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
         >
-           <Link  style={{textDecoration:"none"}} to="/admin/listadoOfertas"><Button variant="contained" sx={{ width: "25rem" }}>
-            Ofertas
-          </Button></Link>
+          <Link style={{ textDecoration: "none" }} to="/admin/listadoOfertas">
+            <Button variant="contained" sx={{ width: "25rem" }}>
+              Ofertas
+            </Button>
+          </Link>
         </Box>
         <Box
           sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
         >
-        <Link  style={{textDecoration:"none"}} to="/admin/listadoEmpresas"> <Button variant="contained" sx={{ width: "25rem" }}>
-            Empresas
-          </Button></Link> 
+          <Link style={{ textDecoration: "none" }} to="/admin/listadoEmpresas">
+            {" "}
+            <Button variant="contained" sx={{ width: "25rem" }}>
+              Empresas
+            </Button>
+          </Link>
         </Box>
       </Box>
     </Fragment>

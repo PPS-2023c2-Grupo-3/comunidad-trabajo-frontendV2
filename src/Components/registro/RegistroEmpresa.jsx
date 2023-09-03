@@ -3,24 +3,19 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Header from "../Header";
 import { config } from "../../config/config";
 import {
   Box,
-  MenuItem,
   Select,
   InputLabel,
   FormControl,
   Typography,
-  alertClasses,
   Popover,
 } from "@mui/material";
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Swal from "sweetalert2";
-import FormFormHelperText from "@mui/material";
 import { MenuList } from "@material-ui/core";
 import IdFormContext from "../../Context/IdFormContext";
 import { useContext } from "react";
@@ -37,10 +32,6 @@ const validationSchema = yup.object({
     .optional("cuit requerido"),
   descripcion: yup
     .string("Ingrese su horario laboral desde")
-    .min(1, "Este campo no puede estar vacio")
-    .optional(),
-  descripcion: yup
-    .string("Ingrese su horario laboral hasta")
     .min(1, "Este campo no puede estar vacio")
     .optional(),
   ciudad: yup
@@ -99,9 +90,7 @@ export default function WithMaterialUI() {
   const llamarProvincias = async () => {
     if (llamadoProvincias === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/provincias`
-        );
+        const api = await fetch(`${config.apiUrl}/provincias`);
         const datos = await api.json();
         setListaProvincias(datos.provincias);
         setLlamadoProvincias(true);
@@ -113,9 +102,8 @@ export default function WithMaterialUI() {
   llamarProvincias();
 
   const [listaCiudades, setListaCiudades] = useState([]);
-  const [llamadoCiudades, setLlamadoCiudades] = useState(false);
   const llamarCiudades = async (provincia) => {
-    if (provinciaActual != provincia) {
+    if (provinciaActual !== provincia) {
       try {
         const api = await fetch(
           `${config.apiUrl}/ciudades/?idProvincia=${provincia}`
@@ -123,7 +111,6 @@ export default function WithMaterialUI() {
         const datos = await api.json();
         console.log(datos);
         setListaCiudades(datos.ciudades);
-        setLlamadoCiudades(true);
       } catch (error) {
         console.log(error);
       }
@@ -328,7 +315,7 @@ export default function WithMaterialUI() {
                 </FormControl>
                 {formik.values.provincia === undefined ? null : (
                   <Popover>
-                    {console.log("aca" + formik.values.provincia)}
+                    {console.log("aca" + formik.values.provincia)} {/*revisar esto*/}
                     {llamarCiudades(formik.values.provincia)}
                     {listaCiudades.map((ciudad) => (
                       <MenuList

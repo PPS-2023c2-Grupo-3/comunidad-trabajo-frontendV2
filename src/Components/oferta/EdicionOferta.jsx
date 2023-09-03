@@ -3,26 +3,19 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Header from "../Header";
-import {config} from '../../config/config'
+import { config } from "../../config/config";
 import {
   Box,
-  MenuItem,
   Select,
   InputLabel,
   FormControl,
   Typography,
-  alertClasses,
 } from "@mui/material";
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
-import Swal from 'sweetalert2'
-import FormFormHelperText from "@mui/material";
+import Swal from "sweetalert2";
 import { MenuList } from "@material-ui/core";
-import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
-import { useContext } from 'react';
 import { useHistory, useParams } from "react-router-dom";
 
 const validationSchema = yup.object({
@@ -40,10 +33,6 @@ const validationSchema = yup.object({
     .optional(),
   horarioLaboralDesde: yup
     .number("Ingrese su horario laboral desde")
-    .min(1, "Este campo no puede estar vacio")
-    .optional(),
-  horarioLaboralDesde: yup
-    .number("Ingrese su horario laboral hasta")
     .min(1, "Este campo no puede estar vacio")
     .optional(),
   edadDesde: yup
@@ -86,10 +75,6 @@ const validationSchema = yup.object({
     .number("Ingrese la remuneracion")
     .min(1, "Este campo no puede estar vacio")
     .optional(),
-  idCarrera: yup
-  .number("Ingrese la remuneracion")
-  .min(1, "Este campo no puede estar vacio")
-  .optional(),
   idContrato: yup
     .number("Ingrese la remuneracion")
     .min(1, "Este campo no puede estar vacio")
@@ -100,35 +85,29 @@ const validationSchema = yup.object({
     .optional(),
 });
 
-
-
-export default function WithMaterialUI()  {
-  const history = useHistory()
-  const {cambiarDatosUsuario, cambiarToken, cambiarIdUsuario, cambiarEstadoLogeado, cambiarGrupo} = useContext(DatosUsuarioContextProvider)
-  var datosUsuario = JSON.parse(sessionStorage.getItem('datosUsuario'))
-  var token = sessionStorage.getItem('token')
-  var idUsuario = sessionStorage.getItem('idUsuario')
-  var grupo =  sessionStorage.getItem('grupo')
-  var estaLogeado = sessionStorage.getItem('estaLogeado')
+export default function WithMaterialUI() {
+  const history = useHistory();
+  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  var token = sessionStorage.getItem("token");
 
   const { id } = useParams();
   const API_URL = `${config.apiUrl}/ofertas/idOferta/${id}?`;
 
   const [llamadoOferta, setLlamadoOferta] = useState(false);
-  const  descripcionAPI = async () => {
+  const descripcionAPI = async () => {
     if (llamadoOferta === false)
       try {
-      setLlamadoOferta(true)
-      const api = await fetch(API_URL);
-      const datos = await api.json();
-      console.log(datos);
-      sessionStorage.setItem('datosOferta', JSON.stringify(datos))
+        setLlamadoOferta(true);
+        const api = await fetch(API_URL);
+        const datos = await api.json();
+        console.log(datos);
+        sessionStorage.setItem("datosOferta", JSON.stringify(datos));
       } catch (error) {
         console.log(error);
       }
-  }
-descripcionAPI();
-let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
+  };
+  descripcionAPI();
+  let datosOferta = JSON.parse(sessionStorage.getItem("datosOferta"));
 
   /*Llama a los idEstudio para seleccionar en el formulario*/
   const [listaEstudio, setlistaEstudio] = useState([]);
@@ -136,9 +115,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
   const llamarEstudios = async () => {
     if (llamadolistaEstudio === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/estudios/?`
-        );
+        const api = await fetch(`${config.apiUrl}/estudios/?`);
         const datos = await api.json();
         setlistaEstudio(datos.estudios);
         setLlamadolistaEstudio(true);
@@ -155,9 +132,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
   const llamarCarreras = async () => {
     if (llamadolistaCarrera === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/carreras/?`
-        );
+        const api = await fetch(`${config.apiUrl}/carreras/?`);
         const datos = await api.json();
         setlistaCarrera(datos.carreras);
         setLlamadolistaCarrera(true);
@@ -174,9 +149,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
   const llamarJornada = async () => {
     if (llamadolistaJornada === false) {
       try {
-        const api = await fetch(
-          ` https://comunidad-backend-v3.herokuapp.com/jornadas/?`
-        );
+        const api = await fetch(`${config.apiUrl}/jornadas/?`);
         const datos = await api.json();
         setlistaJornada(datos.jornadas);
         setLlamadolistaJornada(true);
@@ -193,9 +166,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
   const llamarContrato = async () => {
     if (llamadolistaContrato === false) {
       try {
-        const api = await fetch(
-          ` https://comunidad-backend-v3.herokuapp.com/contratos/?`
-        );
+        const api = await fetch(`${config.apiUrl}/contratos/?`);
         const datos = await api.json();
         setlistaContrato(datos.contratos);
         setLlamadolistaContrato(true);
@@ -225,7 +196,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
       idEstudio: datosOferta.fk_id_estudio,
       idCarrera: datosOferta.fk_id_carrera,
       idContrato: datosOferta.fk_id_contrato,
-      idJornada:datosOferta.fk_id_jornada,
+      idJornada: datosOferta.fk_id_jornada,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -234,7 +205,6 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
         idCarrera: values.idCarrera,
         idContrato: values.idContrato,
         idEstudio: values.idEstudio,
-        idCarrera: values.idCarrera,
         idJornada: values.idJornada,
         fechaVigencia: values.fechaVigencia,
         tituloOferta: values.tituloOferta,
@@ -249,44 +219,50 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
         otrosDetalles: values.otrosDetalles,
         beneficios: values.beneficios,
         remuneracion: values.remuneracion,
-        idEstado: 2
+        idEstado: 2,
       };
       console.log(values);
-        await fetch(`${config.apiUrl}/ofertas/idOferta/${datosOferta.id}?authorization=${token}`, {
-        method: "PUT", // or 'PUT'
-        body: JSON.stringify(data), // data can be `string` or {object}!
-        headers: {
-          "Content-Type": "application/json",
-        },
-        
-        })
-        Swal.fire({
-          icon: 'success',
-          title: 'La oferta fue editada exitosamente',
-          confirmButtonText: 'Finalizar',
-          text: 'Para continuar pulse el boton',
-          footer: '',
-          showCloseButton: true
-        })
+      await fetch(
+        `${config.apiUrl}/ofertas/idOferta/${datosOferta.id}?authorization=${token}`,
+        {
+          method: "PUT", // or 'PUT'
+          body: JSON.stringify(data), // data can be `string` or {object}!
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      Swal.fire({
+        icon: "success",
+        title: "La oferta fue editada exitosamente",
+        confirmButtonText: "Finalizar",
+        text: "Para continuar pulse el boton",
+        footer: "",
+        showCloseButton: true,
+      })
         .then(function (result) {
           if (result.value) {
-              history.push(`/oferta/${id}`)
+            history.push(`/oferta/${id}`);
           }
         })
-        .catch((error) => console.error("Error:", error,
-        Swal.fire({
-          icon: 'error',
-          title: 'Ocurrio un error al editar la oferta',
-          confirmButtonText: 'Volver',
-          text: 'Verifique sus datos',
-          footer: '',
-          showCloseButton: true
-        })))
+        .catch((error) =>
+          console.error(
+            "Error:",
+            error,
+            Swal.fire({
+              icon: "error",
+              title: "Ocurrio un error al editar la oferta",
+              confirmButtonText: "Volver",
+              text: "Verifique sus datos",
+              footer: "",
+              showCloseButton: true,
+            })
+          )
+        );
     },
   });
-  
+
   return (
-    
     <Fragment>
       <Header />
       <Typography
@@ -298,8 +274,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
       <Box sx={{ display: "flex", justifyContent: "center", padding: "2rem" }}>
         <form onSubmit={formik.handleSubmit}>
           <div>
-            <Grid sx={{display:'flex', justifyContent:'center'}} container spacing={2}>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+            <Grid
+              sx={{ display: "flex", justifyContent: "center" }}
+              container
+              spacing={2}
+            >
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   variant="outlined"
                   id="tituloOferta"
@@ -313,10 +293,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                     Boolean(formik.errors.tituloOferta) &&
                     true
                   }
-                  helperText={formik.touched.tituloOferta && formik.errors.tituloOferta}
+                  helperText={
+                    formik.touched.tituloOferta && formik.errors.tituloOferta
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   variant="outlined"
                   id="descripcion"
@@ -331,10 +313,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                     Boolean(formik.errors.descripcion) &&
                     true
                   }
-                  helperText={formik.touched.descripcion && formik.errors.descripcion}
+                  helperText={
+                    formik.touched.descripcion && formik.errors.descripcion
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   variant="outlined"
                   id="fechaVigencia"
@@ -346,11 +330,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   value={formik.values.fechaVigencia}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.fechaVigencia && Boolean(formik.errors.fechaVigencia)
+                    formik.touched.fechaVigencia &&
+                    Boolean(formik.errors.fechaVigencia)
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="horarioLaboralDesde"
                   name="horarioLaboralDesde"
@@ -361,18 +346,23 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   value={formik.values.horarioLaboralDesde}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.horarioLaboralDesde && Boolean(formik.errors.horarioLaboralDesde) && true
+                    formik.touched.horarioLaboralDesde &&
+                    Boolean(formik.errors.horarioLaboralDesde) &&
+                    true
                   }
-                  helperText={formik.touched.horarioLaboralDesde && formik.errors.horarioLaboralDesde}
+                  helperText={
+                    formik.touched.horarioLaboralDesde &&
+                    formik.errors.horarioLaboralDesde
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="horarioLaboralHasta"
                   name="horarioLaboralHasta"
                   label="Horario laboral hasta:"
                   variant="outlined"
-                  type= "number"
+                  type="number"
                   fullWidth
                   value={formik.values.horarioLaboralHasta}
                   onChange={formik.handleChange}
@@ -382,13 +372,13 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="edadDesde"
                   name="edadDesde"
                   label="Edad desde: "
                   variant="outlined"
-                  type= "number"
+                  type="number"
                   fullWidth
                   value={formik.values.edadDesde}
                   onChange={formik.handleChange}
@@ -397,7 +387,7 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="edadHasta"
                   name="edadHasta"
@@ -407,10 +397,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   fullWidth
                   value={formik.values.edadHasta}
                   onChange={formik.handleChange}
-                  error={formik.touched.edadHasta && Boolean(formik.errors.edadHasta)}
+                  error={
+                    formik.touched.edadHasta && Boolean(formik.errors.edadHasta)
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="experienciaPreviaDesc"
                   name="experienciaPreviaDesc"
@@ -419,10 +411,13 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   fullWidth
                   value={formik.values.experienciaPreviaDesc}
                   onChange={formik.handleChange}
-                  error={formik.touched.experienciaPreviaDesc && Boolean(formik.errors.experienciaPreviaDesc)}
+                  error={
+                    formik.touched.experienciaPreviaDesc &&
+                    Boolean(formik.errors.experienciaPreviaDesc)
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="zonaTrabajo"
                   name="zonaTrabajo"
@@ -431,10 +426,13 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   fullWidth
                   value={formik.values.zonaTrabajo}
                   onChange={formik.handleChange}
-                  error={formik.touched.zonaTrabajo && Boolean(formik.errors.zonaTrabajo)}
+                  error={
+                    formik.touched.zonaTrabajo &&
+                    Boolean(formik.errors.zonaTrabajo)
+                  }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="areasEstudio"
                   name="areasEstudio"
@@ -444,11 +442,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   value={formik.values.areasEstudio}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.areasEstudio && Boolean(formik.errors.areasEstudio)
+                    formik.touched.areasEstudio &&
+                    Boolean(formik.errors.areasEstudio)
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="otrosDetalles"
                   name="otrosDetalles"
@@ -459,11 +458,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   value={formik.values.otrosDetalles}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.otrosDetalles && Boolean(formik.errors.otrosDetalles)
+                    formik.touched.otrosDetalles &&
+                    Boolean(formik.errors.otrosDetalles)
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="beneficios"
                   name="beneficios"
@@ -473,11 +473,12 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   value={formik.values.beneficios}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.beneficios && Boolean(formik.errors.beneficios)
+                    formik.touched.beneficios &&
+                    Boolean(formik.errors.beneficios)
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <TextField
                   id="remuneracion"
                   name="remuneracion"
@@ -488,105 +489,133 @@ let datosOferta = JSON.parse(sessionStorage.getItem('datosOferta'))
                   value={formik.values.remuneracion}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.remuneracion && Boolean(formik.errors.remuneracion)
+                    formik.touched.remuneracion &&
+                    Boolean(formik.errors.remuneracion)
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
-              <FormControl fullWidth>
-              <InputLabel>Estudio</InputLabel>
-              <Select
-                id="idEstudio"
-                name="idEstudio"
-                label="Nivel de estudio"
-                variant="outlined"
-                type="number"
-                value={formik.values.idEstudio}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.estudio && Boolean(formik.errors.estudio)
-                }
-              >
-                {listaEstudio.map((estudio) => (
-                  <MenuList className="selectCss" value={estudio.id} key={estudio.id}>
-                    <Box sx={{display:'flex', justifyContent:'center'}}>{estudio.id}: {estudio.nombre_estudio} - {estudio.estado_estudio}</Box> 
-                  </MenuList>
-                ))}
-              </Select>
-              </FormControl>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
+                <FormControl fullWidth>
+                  <InputLabel>Estudio</InputLabel>
+                  <Select
+                    id="idEstudio"
+                    name="idEstudio"
+                    label="Nivel de estudio"
+                    variant="outlined"
+                    type="number"
+                    value={formik.values.idEstudio}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.estudio && Boolean(formik.errors.estudio)
+                    }
+                  >
+                    {listaEstudio.map((estudio) => (
+                      <MenuList
+                        className="selectCss"
+                        value={estudio.id}
+                        key={estudio.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {estudio.id}: {estudio.nombre_estudio} -{" "}
+                          {estudio.estado_estudio}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
-              <FormControl fullWidth>
-                <InputLabel>Carrera</InputLabel>
-                <Select
-                  id="idCarrera"
-                  name="idCarrera"
-                  variant="outlined"
-                  label="Carrera"
-                  type="number"
-                  value={formik.values.idCarrera}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.carrera && Boolean(formik.errors.carrera)
-                  }
-                >
-                  {listaCarrera.map((carrera) => (
-                    <MenuList className="selectCss" value={carrera.id} key={carrera.id}>
-                      <Box sx={{display:'flex', justifyContent:'center'}}> {carrera.id}: {carrera.nombre_carrera}</Box>
-                    </MenuList>
-                  ))}
-                </Select>
-              </FormControl>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
+                <FormControl fullWidth>
+                  <InputLabel>Carrera</InputLabel>
+                  <Select
+                    id="idCarrera"
+                    name="idCarrera"
+                    variant="outlined"
+                    label="Carrera"
+                    type="number"
+                    value={formik.values.idCarrera}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.carrera && Boolean(formik.errors.carrera)
+                    }
+                  >
+                    {listaCarrera.map((carrera) => (
+                      <MenuList
+                        className="selectCss"
+                        value={carrera.id}
+                        key={carrera.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {" "}
+                          {carrera.id}: {carrera.nombre_carrera}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
-              <FormControl fullWidth>
-              <InputLabel>Jornada</InputLabel>
-              <Select
-                id="idJornada"
-                name="idJornada"
-                label="Ingrese la jornada"
-                variant="outlined"
-                type="number"
-                value={formik.values.idJornada}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.jornada && Boolean(formik.errors.jornada)
-                }
-              >
-                {listaJornada.map((jornada) => (
-                  <MenuList className="selectCss" value={jornada.id} key={jornada.id}>
-                    <Box sx={{display:'flex', justifyContent:'center'}}>{jornada.id} : {jornada.nombre_jornada}</Box> 
-                  </MenuList>
-                ))}
-              </Select>
-              </FormControl>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
+                <FormControl fullWidth>
+                  <InputLabel>Jornada</InputLabel>
+                  <Select
+                    id="idJornada"
+                    name="idJornada"
+                    label="Ingrese la jornada"
+                    variant="outlined"
+                    type="number"
+                    value={formik.values.idJornada}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.jornada && Boolean(formik.errors.jornada)
+                    }
+                  >
+                    {listaJornada.map((jornada) => (
+                      <MenuList
+                        className="selectCss"
+                        value={jornada.id}
+                        key={jornada.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {jornada.id} : {jornada.nombre_jornada}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
-              <FormControl fullWidth>
-                <InputLabel>Contrato</InputLabel>
-                <Select
-                  id="idContrato"
-                  name="idContrato"
-                  variant="outlined"
-                  label="Tipo de contrato"
-                  type="number"
-                  value={formik.values.idContrato}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.contrato && Boolean(formik.errors.contrato)
-                  }
-                >
-                  {listaContrato.map((contrato) => (
-                    <MenuList className="selectCss" value={contrato.id} key={contrato.id}>
-                      <Box sx={{display:'flex', justifyContent:'center'}}> {contrato.id} : {contrato.nombre_contrato}</Box>
-                    </MenuList>
-                  ))}
-                </Select>
-              </FormControl>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
+                <FormControl fullWidth>
+                  <InputLabel>Contrato</InputLabel>
+                  <Select
+                    id="idContrato"
+                    name="idContrato"
+                    variant="outlined"
+                    label="Tipo de contrato"
+                    type="number"
+                    value={formik.values.idContrato}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.contrato && Boolean(formik.errors.contrato)
+                    }
+                  >
+                    {listaContrato.map((contrato) => (
+                      <MenuList
+                        className="selectCss"
+                        value={contrato.id}
+                        key={contrato.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {" "}
+                          {contrato.id} : {contrato.nombre_contrato}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid item xs={12} sm={8} md={8} sx={{padding:'1rem'}}>
+              <Grid item xs={12} sm={8} md={8} sx={{ padding: "1rem" }}>
                 <Button
-                  style={{ display: "flex", justifyContent:'center'}}
+                  style={{ display: "flex", justifyContent: "center" }}
                   fullWidth
                   id="confirmar"
                   variant="contained"

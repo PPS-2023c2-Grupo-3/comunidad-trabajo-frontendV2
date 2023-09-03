@@ -3,27 +3,20 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Header from "../Header";
 import {
   Box,
-  MenuItem,
   Select,
   InputLabel,
   FormControl,
   Typography,
-  alertClasses,
 } from "@mui/material";
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
-import Swal from 'sweetalert2'
-import FormFormHelperText from "@mui/material";
+import Swal from "sweetalert2";
 import { MenuList } from "@material-ui/core";
-import DatosUsuarioContextProvider from '../../Context/DatosUsuarioContext';
-import { useContext } from 'react';
 import { useHistory } from "react-router-dom";
-import {config} from '../../config/config'
+import { config } from "../../config/config";
 
 const validationSchema = yup.object({
   tituloOferta: yup
@@ -40,10 +33,6 @@ const validationSchema = yup.object({
     .optional(),
   horarioLaboralDesde: yup
     .number("Ingrese su horario laboral desde")
-    .min(1, "Este campo no puede estar vacio")
-    .optional(),
-  horarioLaboralDesde: yup
-    .number("Ingrese su horario laboral hasta")
     .min(1, "Este campo no puede estar vacio")
     .optional(),
   edadDesde: yup
@@ -86,10 +75,6 @@ const validationSchema = yup.object({
     .number("Ingrese la remuneracion")
     .min(1, "Este campo no puede estar vacio")
     .optional(),
-  idCarrera: yup
-  .number("Ingrese la remuneracion")
-  .min(1, "Este campo no puede estar vacio")
-  .optional(),
   idContrato: yup
     .number("Ingrese la remuneracion")
     .min(1, "Este campo no puede estar vacio")
@@ -100,15 +85,10 @@ const validationSchema = yup.object({
     .optional(),
 });
 
-
 export default function WithMaterialUI() {
-  const history = useHistory()
-  const {cambiarDatosUsuario, cambiarToken, cambiarIdUsuario, cambiarEstadoLogeado, cambiarGrupo} = useContext(DatosUsuarioContextProvider)
-  var datosUsuario = JSON.parse(sessionStorage.getItem('datosUsuario'))
-  var token = sessionStorage.getItem('token')
-  var idUsuario = sessionStorage.getItem('idUsuario')
-  var grupo =  sessionStorage.getItem('grupo')
-  var estaLogeado = sessionStorage.getItem('estaLogeado')
+  const history = useHistory();
+  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  var token = sessionStorage.getItem("token");
 
   /*Llama a los idEstudio para seleccionar en el formulario*/
   const [listaEstudio, setlistaEstudio] = useState([]);
@@ -116,9 +96,7 @@ export default function WithMaterialUI() {
   const llamarEstudios = async () => {
     if (llamadolistaEstudio === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/estudios/?`
-        );
+        const api = await fetch(`${config.apiUrl}/estudios/?`);
         const datos = await api.json();
         setlistaEstudio(datos.estudios);
         setLlamadolistaEstudio(true);
@@ -135,9 +113,7 @@ export default function WithMaterialUI() {
   const llamarCarreras = async () => {
     if (llamadolistaCarrera === false) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/carreras/?`
-        );
+        const api = await fetch(`${config.apiUrl}/carreras/?`);
         const datos = await api.json();
         setlistaCarrera(datos.carreras);
         setLlamadolistaCarrera(true);
@@ -154,9 +130,7 @@ export default function WithMaterialUI() {
   const llamarJornada = async () => {
     if (llamadolistaJornada === false) {
       try {
-        const api = await fetch(
-          ` https://comunidad-backend-v3.herokuapp.com/jornadas/?`
-        );
+        const api = await fetch(`${config.apiUrl}/jornadas/?`);
         const datos = await api.json();
         setlistaJornada(datos.jornadas);
         setLlamadolistaJornada(true);
@@ -173,9 +147,7 @@ export default function WithMaterialUI() {
   const llamarContrato = async () => {
     if (llamadolistaContrato === false) {
       try {
-        const api = await fetch(
-          ` https://comunidad-backend-v3.herokuapp.com/contratos/?`
-        );
+        const api = await fetch(`${config.apiUrl}/contratos/?`);
         const datos = await api.json();
         setlistaContrato(datos.contratos);
         setLlamadolistaContrato(true);
@@ -205,7 +177,7 @@ export default function WithMaterialUI() {
       idEstudio: undefined,
       idCarrera: undefined,
       idContrato: undefined,
-      idJornada:undefined,
+      idJornada: undefined,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -214,7 +186,6 @@ export default function WithMaterialUI() {
         idCarrera: values.idCarrera,
         idContrato: values.idContrato,
         idEstudio: values.idEstudio,
-        idCarrera: values.idCarrera,
         idJornada: values.idJornada,
         fechaVigencia: values.fechaVigencia,
         tituloOferta: values.tituloOferta,
@@ -228,45 +199,52 @@ export default function WithMaterialUI() {
         areasEstudio: values.areasEstudio,
         otrosDetalles: values.otrosDetalles,
         beneficios: values.beneficios,
-        remuneracion: values.remuneracion
+        remuneracion: values.remuneracion,
       };
       console.log(values);
-        fetch(`${config.apiUrl}/ofertas/?authorization=${token}`, {
+      fetch(`${config.apiUrl}/ofertas/?authorization=${token}`, {
         method: "POST", // or 'PUT'
         body: JSON.stringify(data), // data can be `string` or {object}!
         headers: {
           "Content-Type": "application/json",
         },
-        
-        })
+      })
         .then((res) => res.json())
-        .then((response) => console.log("Success:", response,
-        Swal.fire({
-          icon: 'success',
-          title: 'La oferta fue creada exitosamente',
-          confirmButtonText: 'Finalizar',
-          text: 'Para continuar pulse el boton',
-          footer: '',
-          showCloseButton: true
-        })
-        .then(function (result) {
-          if (result.value) {
-              history.push('/listadoOfertasEmpresa')
-          }
-        })))
-        .catch((error) => console.error("Error:", error,
-        Swal.fire({
-          icon: 'error',
-          title: 'Ocurrio un error al crear la oferta',
-          confirmButtonText: 'Volver',
-          text: 'Verifique sus datos',
-          footer: '',
-          showCloseButton: true
-        })))
+        .then((response) =>
+          console.log(
+            "Success:",
+            response,
+            Swal.fire({
+              icon: "success",
+              title: "La oferta fue creada exitosamente",
+              confirmButtonText: "Finalizar",
+              text: "Para continuar pulse el boton",
+              footer: "",
+              showCloseButton: true,
+            }).then(function (result) {
+              if (result.value) {
+                history.push("/listadoOfertasEmpresa");
+              }
+            })
+          )
+        )
+        .catch((error) =>
+          console.error(
+            "Error:",
+            error,
+            Swal.fire({
+              icon: "error",
+              title: "Ocurrio un error al crear la oferta",
+              confirmButtonText: "Volver",
+              text: "Verifique sus datos",
+              footer: "",
+              showCloseButton: true,
+            })
+          )
+        );
     },
   });
   return (
-    
     <Fragment>
       <Header />
       <Typography
@@ -277,8 +255,12 @@ export default function WithMaterialUI() {
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "center", padding: "2rem" }}>
         <form onSubmit={formik.handleSubmit}>
-          <Box sx={{display:"flex", justifyContent:"center"}}>
-            <Grid sx={{diaplay:'flex', justifyContent:'center'}}container spacing={2}>
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Grid
+              sx={{ diaplay: "flex", justifyContent: "center" }}
+              container
+              spacing={2}
+            >
               <Grid item xs={12} sm={8} md={8}>
                 <TextField
                   variant="outlined"
@@ -293,7 +275,9 @@ export default function WithMaterialUI() {
                     Boolean(formik.errors.tituloOferta) &&
                     true
                   }
-                  helperText={formik.touched.tituloOferta && formik.errors.tituloOferta}
+                  helperText={
+                    formik.touched.tituloOferta && formik.errors.tituloOferta
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
@@ -311,7 +295,9 @@ export default function WithMaterialUI() {
                     Boolean(formik.errors.descripcion) &&
                     true
                   }
-                  helperText={formik.touched.descripcion && formik.errors.descripcion}
+                  helperText={
+                    formik.touched.descripcion && formik.errors.descripcion
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
@@ -326,7 +312,8 @@ export default function WithMaterialUI() {
                   value={formik.values.fechaVigencia}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.fechaVigencia && Boolean(formik.errors.fechaVigencia)
+                    formik.touched.fechaVigencia &&
+                    Boolean(formik.errors.fechaVigencia)
                   }
                 />
               </Grid>
@@ -341,9 +328,14 @@ export default function WithMaterialUI() {
                   value={formik.values.horarioLaboralDesde}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.horarioLaboralDesde && Boolean(formik.errors.horarioLaboralDesde) && true
+                    formik.touched.horarioLaboralDesde &&
+                    Boolean(formik.errors.horarioLaboralDesde) &&
+                    true
                   }
-                  helperText={formik.touched.horarioLaboralDesde && formik.errors.horarioLaboralDesde}
+                  helperText={
+                    formik.touched.horarioLaboralDesde &&
+                    formik.errors.horarioLaboralDesde
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
@@ -352,7 +344,7 @@ export default function WithMaterialUI() {
                   name="horarioLaboralHasta"
                   label="Horario laboral hasta:"
                   variant="outlined"
-                  type= "number"
+                  type="number"
                   fullWidth
                   value={formik.values.horarioLaboralHasta}
                   onChange={formik.handleChange}
@@ -368,7 +360,7 @@ export default function WithMaterialUI() {
                   name="edadDesde"
                   label="Edad desde: "
                   variant="outlined"
-                  type= "number"
+                  type="number"
                   fullWidth
                   value={formik.values.edadDesde}
                   onChange={formik.handleChange}
@@ -387,7 +379,9 @@ export default function WithMaterialUI() {
                   fullWidth
                   value={formik.values.edadHasta}
                   onChange={formik.handleChange}
-                  error={formik.touched.edadHasta && Boolean(formik.errors.edadHasta)}
+                  error={
+                    formik.touched.edadHasta && Boolean(formik.errors.edadHasta)
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
@@ -399,7 +393,10 @@ export default function WithMaterialUI() {
                   fullWidth
                   value={formik.values.experienciaPreviaDesc}
                   onChange={formik.handleChange}
-                  error={formik.touched.experienciaPreviaDesc && Boolean(formik.errors.experienciaPreviaDesc)}
+                  error={
+                    formik.touched.experienciaPreviaDesc &&
+                    Boolean(formik.errors.experienciaPreviaDesc)
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
@@ -411,7 +408,10 @@ export default function WithMaterialUI() {
                   fullWidth
                   value={formik.values.zonaTrabajo}
                   onChange={formik.handleChange}
-                  error={formik.touched.zonaTrabajo && Boolean(formik.errors.zonaTrabajo)}
+                  error={
+                    formik.touched.zonaTrabajo &&
+                    Boolean(formik.errors.zonaTrabajo)
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
@@ -424,7 +424,8 @@ export default function WithMaterialUI() {
                   value={formik.values.areasEstudio}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.areasEstudio && Boolean(formik.errors.areasEstudio)
+                    formik.touched.areasEstudio &&
+                    Boolean(formik.errors.areasEstudio)
                   }
                 />
               </Grid>
@@ -439,7 +440,8 @@ export default function WithMaterialUI() {
                   value={formik.values.otrosDetalles}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.otrosDetalles && Boolean(formik.errors.otrosDetalles)
+                    formik.touched.otrosDetalles &&
+                    Boolean(formik.errors.otrosDetalles)
                   }
                 />
               </Grid>
@@ -453,7 +455,8 @@ export default function WithMaterialUI() {
                   value={formik.values.beneficios}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.beneficios && Boolean(formik.errors.beneficios)
+                    formik.touched.beneficios &&
+                    Boolean(formik.errors.beneficios)
                   }
                 />
               </Grid>
@@ -468,101 +471,129 @@ export default function WithMaterialUI() {
                   value={formik.values.remuneracion}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.remuneracion && Boolean(formik.errors.remuneracion)
+                    formik.touched.remuneracion &&
+                    Boolean(formik.errors.remuneracion)
                   }
                 />
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
-              <FormControl fullWidth>
-              <InputLabel>Estudio</InputLabel>
-              <Select
-                id="idEstudio"
-                name="idEstudio"
-                label="Nivel de estudio"
-                variant="outlined"
-                type="number"
-                value={formik.values.estudio}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.estudio && Boolean(formik.errors.estudio)
-                }
-              >
-                {listaEstudio.map((estudio) => (
-                  <MenuList className="selectCss" value={estudio.id} key={estudio.id}>
-                    <Box sx={{display:'flex', justifyContent:'center'}}>{estudio.id}: {estudio.nombre_estudio} - {estudio.estado_estudio}</Box> 
-                  </MenuList>
-                ))}
-              </Select>
-              </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>Estudio</InputLabel>
+                  <Select
+                    id="idEstudio"
+                    name="idEstudio"
+                    label="Nivel de estudio"
+                    variant="outlined"
+                    type="number"
+                    value={formik.values.estudio}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.estudio && Boolean(formik.errors.estudio)
+                    }
+                  >
+                    {listaEstudio.map((estudio) => (
+                      <MenuList
+                        className="selectCss"
+                        value={estudio.id}
+                        key={estudio.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {estudio.id}: {estudio.nombre_estudio} -{" "}
+                          {estudio.estado_estudio}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
-              <FormControl fullWidth>
-                <InputLabel>Carrera</InputLabel>
-                <Select
-                  id="idCarrera"
-                  name="idCarrera"
-                  variant="outlined"
-                  label="Carrera"
-                  type="number"
-                  value={formik.values.carrera}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.carrera && Boolean(formik.errors.carrera)
-                  }
-                >
-                  {listaCarrera.map((carrera) => (
-                    <MenuList className="selectCss" value={carrera.id} key={carrera.id}>
-                      <Box sx={{display:'flex', justifyContent:'center'}}> {carrera.id}: {carrera.nombre_carrera}</Box>
-                    </MenuList>
-                  ))}
-                </Select>
-              </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>Carrera</InputLabel>
+                  <Select
+                    id="idCarrera"
+                    name="idCarrera"
+                    variant="outlined"
+                    label="Carrera"
+                    type="number"
+                    value={formik.values.carrera}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.carrera && Boolean(formik.errors.carrera)
+                    }
+                  >
+                    {listaCarrera.map((carrera) => (
+                      <MenuList
+                        className="selectCss"
+                        value={carrera.id}
+                        key={carrera.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {" "}
+                          {carrera.id}: {carrera.nombre_carrera}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
-              <FormControl fullWidth>
-              <InputLabel>Jornada</InputLabel>
-              <Select
-                id="idJornada"
-                name="idJornada"
-                label="Ingrese la jornada"
-                variant="outlined"
-                type="number"
-                value={formik.values.jornada}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.jornada && Boolean(formik.errors.jornada)
-                }
-              >
-                {listaJornada.map((jornada) => (
-                  <MenuList className="selectCss" value={jornada.id} key={jornada.id}>
-                    <Box sx={{display:'flex', justifyContent:'center'}}>{jornada.id} : {jornada.nombre_jornada}</Box> 
-                  </MenuList>
-                ))}
-              </Select>
-              </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>Jornada</InputLabel>
+                  <Select
+                    id="idJornada"
+                    name="idJornada"
+                    label="Ingrese la jornada"
+                    variant="outlined"
+                    type="number"
+                    value={formik.values.jornada}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.jornada && Boolean(formik.errors.jornada)
+                    }
+                  >
+                    {listaJornada.map((jornada) => (
+                      <MenuList
+                        className="selectCss"
+                        value={jornada.id}
+                        key={jornada.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {jornada.id} : {jornada.nombre_jornada}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
-              <FormControl fullWidth>
-                <InputLabel>Contrato</InputLabel>
-                <Select
-                  id="idContrato"
-                  name="idContrato"
-                  variant="outlined"
-                  label="Tipo de contrato"
-                  type="number"
-                  value={formik.values.contrato}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.contrato && Boolean(formik.errors.contrato)
-                  }
-                >
-                  {listaContrato.map((contrato) => (
-                    <MenuList className="selectCss" value={contrato.id} key={contrato.id}>
-                      <Box sx={{display:'flex', justifyContent:'center'}}> {contrato.id} : {contrato.nombre_contrato}</Box>
-                    </MenuList>
-                  ))}
-                </Select>
-              </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>Contrato</InputLabel>
+                  <Select
+                    id="idContrato"
+                    name="idContrato"
+                    variant="outlined"
+                    label="Tipo de contrato"
+                    type="number"
+                    value={formik.values.contrato}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.contrato && Boolean(formik.errors.contrato)
+                    }
+                  >
+                    {listaContrato.map((contrato) => (
+                      <MenuList
+                        className="selectCss"
+                        value={contrato.id}
+                        key={contrato.id}
+                      >
+                        <Box sx={{ display: "flex", justifyContent: "center" }}>
+                          {" "}
+                          {contrato.id} : {contrato.nombre_contrato}
+                        </Box>
+                      </MenuList>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={8} md={8}>
                 <Button
