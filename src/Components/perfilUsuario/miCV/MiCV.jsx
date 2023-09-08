@@ -7,9 +7,8 @@ import axios from "axios";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { config } from "../../../config/config";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../../supabase/supabase.config";
 
-const supabase = createClient(config.supabaseUrl, config.supabaseKey);
 let pdfURL = ``;
 
 const MiCV = () => {

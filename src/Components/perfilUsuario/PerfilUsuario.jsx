@@ -11,10 +11,7 @@ import { useEffect } from "react";
 import Swal from "sweetalert2";
 import { AddAPhoto } from "@mui/icons-material";
 import { config } from "../../config/config";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = "https://fjjrxhcerjjthjglqptp.supabase.co";
-const supabase = createClient(supabaseUrl, `${config.key}`);
+import { supabase } from "../../supabase/supabase.config";
 
 export default function PerfilUsuario() {
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
@@ -24,26 +21,30 @@ export default function PerfilUsuario() {
   const [uploadFoto, setUploadFoto] = useState(null);
   const [photoURL, setPhotoURL] = useState("");
   console.log(photoURL);
-  
+
   // Realizar una solicitud HTTP para obtener el valor del campo 'foto' al cargar el componente
   useEffect(() => {
     async function fetchPhotoURL() {
       try {
         // Realiza una solicitud GET para obtener el valor del campo 'foto' desde tu backend
-        const response = await axios.get(`${config.apiUrl}/postulantes/dni/${postulanteId}`);
+        const response = await axios.get(
+          `${config.apiUrl}/postulantes/dni/${postulanteId}`
+        );
         const fotoValor = response.data.foto;
 
         // Actualiza el estado de 'photoURL' con el valor obtenido
         setPhotoURL(fotoValor);
       } catch (error) {
-        console.error("Error al obtener el valor de 'foto' desde el backend:", error);
+        console.error(
+          "Error al obtener el valor de 'foto' desde el backend:",
+          error
+        );
       }
     }
 
     // Llama a la función para obtener y establecer el valor de 'photoURL' al cargar el componente
     fetchPhotoURL();
   }, []); // El segundo argumento es un array vacío para que se ejecute solo una vez al cargar el componente
-
 
   // function timeoutReload() {
   //   setTimeout(function () {
@@ -65,24 +66,31 @@ export default function PerfilUsuario() {
         return;
       }
 
-      const { data: signedURLData, error: signedURLError } = await supabase.storage
-        .from("files")
-        .createSignedUrl(uploadFoto.name, 6000);
+      const { data: signedURLData, error: signedURLError } =
+        await supabase.storage
+          .from("files")
+          .createSignedUrl(uploadFoto.name, 6000);
 
       if (signedURLError) {
-        console.error("Error al obtener la URL firmada: ", signedURLError.message);
+        console.error(
+          "Error al obtener la URL firmada: ",
+          signedURLError.message
+        );
         return;
       }
 
       const newPhotoURL = signedURLData.signedUrl; // Obtén la nueva URL
       console.log("Datos a enviar al servidor:", { foto: newPhotoURL });
-    
+
       // Actualiza el estado de 'photoURL' con la nueva URL
       setPhotoURL(newPhotoURL);
 
       console.log("Datos a enviar al servidor:", { foto: photoURL });
 
-      const response = await axios.put(`${config.apiUrl}/postulantes/dni/${postulanteId}`, { foto: newPhotoURL });
+      const response = await axios.put(
+        `${config.apiUrl}/postulantes/dni/${postulanteId}`,
+        { foto: newPhotoURL }
+      );
       console.log(newPhotoURL);
       if (response.status === 200) {
         console.log("Campo 'foto' actualizado en el backend:", newPhotoURL);
