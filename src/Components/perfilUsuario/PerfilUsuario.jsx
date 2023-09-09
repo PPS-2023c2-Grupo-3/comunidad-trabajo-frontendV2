@@ -88,7 +88,7 @@ export default function PerfilUsuario() {
       console.log("Datos a enviar al servidor:", { foto: photoURL });
 
       const response = await axios.put(
-        `${config.apiUrl}/postulantes/dni/${postulanteId}`,
+        `${config.apiUrl}/postulantes/dni/${postulanteId}?authorization=${token}`,
         { foto: newPhotoURL }
       );
       console.log(newPhotoURL);
