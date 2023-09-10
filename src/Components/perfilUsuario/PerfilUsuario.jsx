@@ -69,7 +69,7 @@ export default function PerfilUsuario() {
       const { data: signedURLData, error: signedURLError } =
         await supabase.storage
           .from("files")
-          .createSignedUrl(uploadFoto.name, 6000);
+          .createSignedUrl(uploadFoto.name, 999999999999999);
 
       if (signedURLError) {
         console.error(

@@ -24,7 +24,7 @@ const MiCV2 = () => {
 
     const { data, error: error2 } = await supabase.storage
       .from("files")
-      .createSignedUrl(pdf.name, 6000);
+      .createSignedUrl(pdf.name, 999999999999999);
     console.log(data);
     console.log(error2);
 
@@ -63,8 +63,18 @@ const MiCV2 = () => {
     window.open(pdfURL, "_blank");
   };
 
+  const allowedExtensions = ["pdf", "docx"]; // Extensiones permitidas
+
   const handleFileSelected = (e) => {
-    setPdf(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      const fileExtension = selectedFile.name.split(".").pop().toLowerCase();
+      if (allowedExtensions.includes(fileExtension)) {
+        setPdf(selectedFile);
+      } else {
+        alert("Por favor, seleccione un archivo PDF o DOCX.");
+      }
+    }
   };
 
   return (
@@ -88,7 +98,7 @@ const MiCV2 = () => {
         onSubmit={handleSubmit}
         sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
       >
-        <input type="file" onChange={handleFileSelected} />
+        <input type="file" accept=".pdf,.docx" onChange={handleFileSelected} />
         <input type="submit" value="Subir CV" />
       </Box>
     </>
