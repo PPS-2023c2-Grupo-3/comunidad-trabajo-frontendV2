@@ -72,7 +72,13 @@ const MiCV2 = () => {
       if (allowedExtensions.includes(fileExtension)) {
         setPdf(selectedFile);
       } else {
-        alert("Por favor, seleccione un archivo PDF o DOCX.");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Solo se permiten archivos PDF o DOCX",
+          footer: "",
+          showCloseButton: true,
+        });
       }
     }
   };
