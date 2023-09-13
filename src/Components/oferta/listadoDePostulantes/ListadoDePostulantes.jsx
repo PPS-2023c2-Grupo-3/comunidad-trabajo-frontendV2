@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import Header from "../../Header";
 import ListaPostulantes from "./ListaPostulantes";
@@ -27,7 +27,6 @@ const ListadoPostulantes = () => {
           const datos = await api.json();
           setLlamado(true);
           setPostulantes(datos.postulaciones.rows);
-          console.log(datos.postulaciones.rows);
         } catch (error) {
           console.log(error);
         }

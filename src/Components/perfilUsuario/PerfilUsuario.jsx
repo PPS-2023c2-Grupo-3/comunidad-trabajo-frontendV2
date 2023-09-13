@@ -20,7 +20,6 @@ export default function PerfilUsuario() {
   // const [foto, setFoto] = useState();
   const [uploadFoto, setUploadFoto] = useState(null);
   const [photoURL, setPhotoURL] = useState("");
-  console.log(photoURL);
 
   // Realizar una solicitud HTTP para obtener el valor del campo 'foto' al cargar el componente
   useEffect(() => {
@@ -186,7 +185,7 @@ export default function PerfilUsuario() {
             style={{ textDecoration: "none" }}
           >
             <Button variant="contained" sx={{ width: "25rem" }}>
-              Datos academicos
+              Datos académicos
             </Button>
           </Link>
         </Box>
