@@ -1,5 +1,5 @@
 import "../../App.css";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import Header from "../Header";
 import Ofertas from "./Ofertas";
 import { useState } from "react";
@@ -41,7 +41,7 @@ const Home = () => {
     }
   };
 
-  const ofertasAPI = async (e, p) => {
+  const ofertasAPI = async (e) => {
     try {
       e.preventDefault();
       const { ofertas } = e.target.elements;
@@ -116,7 +116,7 @@ const Home = () => {
             onChange={cambiarPagina}
             variant="text"
             sx={{ display: "flex", justifyContent: "center" }}
-          ></Pagination>
+          />
         </div>
       </div>
     </Fragment>
