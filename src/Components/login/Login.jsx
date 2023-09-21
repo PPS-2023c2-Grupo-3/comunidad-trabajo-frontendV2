@@ -1,14 +1,15 @@
 import { TextField, Box, Typography } from "@mui/material";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { useState } from "react";
 import Header from "../Header";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
 import { useContext } from "react";
 import Swal from "sweetalert2";
-import { config } from "../../config/config";
+import { signIn } from "../../services/usuarios_service";
+import { getPostulanteById } from "../../services/postulantes_service";
+import { getEmpresaByIdUsuario } from "../../services/empresas_service";
 
 const Login = () => {
   const {
@@ -30,66 +31,46 @@ const Login = () => {
     });
   };
   const handleSubmit = async () => {
-    await axios
-      .post(`${config.apiUrl}/usuarios/signin`, body)
-      .then(({ data }) => {
-        console.log(data);
-        cambiarToken(data.token);
-        cambiarGrupo(data.grupo);
-        cambiarIdUsuario(data.id);
-        console.log(idUsuario);
-        if (data.estado === false) {
-          Swal.fire({
-            icon: "error",
-            title: "Su cuenta aun no se encuentra activa",
-            confirmButtonText: "Volver",
-            text: "Verifique sus datos",
-            footer: "",
-            showCloseButton: true,
-          });
-        } else if (data.grupo === 1) {
-          axios
-            .get(`${config.apiUrl}/postulantes/idUsuario/${data.id}`)
-            .then(({ data }) => {
-              cambiarEstadoLogeado(true);
-              cambiarDatosUsuario(data);
-              console.log(data);
-              window.location.href = "/";
-            });
-        } else if (data.grupo === 2) {
-          axios
-            .get(`${config.apiUrl}/empresas/idUsuario/${data.id}`)
-            .then(({ data }) => {
-              cambiarEstadoLogeado(true);
-              cambiarDatosUsuario(data);
-              console.log(data);
-              window.location.href = "/";
-            });
-        } else if (data.grupo === 3) {
-          cambiarEstadoLogeado(true);
-          window.location.href = "/";
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Su grupo de usuario no es valido",
-            confirmButtonText: "Volver",
-            text: "Verifique sus datos",
-            footer: "",
-            showCloseButton: true,
-          });
-        }
-      })
+    const response = await signIn(body);
 
-      .catch(({ response }) => {
-        Swal.fire({
-          icon: "error",
-          title: "Los datos ingresados no son incorrectos!",
-          confirmButtonText: "Volver",
-          text: "Verifique sus datos",
-          footer: "",
-          showCloseButton: true,
-        });
+    cambiarToken(response.token);
+    cambiarGrupo(response.grupo);
+    cambiarIdUsuario(response.id);
+    console.log(idUsuario);
+    if (response.estado === false) {
+      Swal.fire({
+        icon: "error",
+        title: "Su cuenta aun no se encuentra activa",
+        confirmButtonText: "Volver",
+        text: "Verifique sus datos",
+        footer: "",
+        showCloseButton: true,
       });
+    } else if (response.grupo === 1) {
+      const dataPostulante = await getPostulanteById(response.id);
+      cambiarEstadoLogeado(true);
+      cambiarDatosUsuario(dataPostulante);
+      console.log(dataPostulante);
+      window.location.href = "/";
+    } else if (response.grupo === 2) {
+      const dataEmpresa = await getEmpresaByIdUsuario(response.id);
+      cambiarEstadoLogeado(true);
+      cambiarDatosUsuario(dataEmpresa);
+      console.log(dataEmpresa);
+      window.location.href = "/";
+    } else if (response.grupo === 3) {
+      cambiarEstadoLogeado(true);
+      window.location.href = "/";
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Su grupo de usuario no es valido",
+        confirmButtonText: "Volver",
+        text: "Verifique sus datos",
+        footer: "",
+        showCloseButton: true,
+      });
+    }
   };
   return (
     <Fragment>
