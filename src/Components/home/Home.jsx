@@ -8,6 +8,7 @@ import BarraBusqueda from "./BarraBusqueda";
 import BusquedaNoEncontrada from "./BusquedaNoEncontrada";
 import { Pagination } from "@mui/material";
 import { config } from "../../config/config";
+import { getOfertaByCuit, getOfertas } from "../../services/ofertas_service";
 
 const Home = () => {
   const [listaOfertas, setListaOfertas] = useState([]);
@@ -16,24 +17,21 @@ const Home = () => {
   const [pagina, setPagina] = useState(1);
   const [busquedaActual, setBusquedaActual] = useState("");
 
-  var API_URL = `${config.apiUrl}/ofertas/?pagina=0&limite=6&ordenar=id&idEstado=1`;
   var grupo = sessionStorage.getItem("grupo");
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
 
   const primerLlamado = async () => {
     if (llamado === false) {
       try {
-        var api;
-        if (grupo === "2") {
-          api = await fetch(
-            `${config.apiUrl}/ofertas/cuit/${datosUsuario.id}?pagina=0&limite=6&ordenar=id&idEstado=1`
-          );
+        if(grupo === "2") {
+          const ofertas = await getOfertaByCuit(0, 6, "id", 1, datosUsuario.id);
+          setListaOfertas(ofertas.ofertas.rows);
+          setCantPaginas(ofertas.totalPaginas);
         } else {
-          api = await fetch(API_URL);
+          const response = await getOfertas(0, 6, "", "id", 1);
+          setListaOfertas(response.ofertas.rows);
+          setCantPaginas(response.totalPaginas);
         }
-        const datos = await api.json();
-        setListaOfertas(datos.ofertas.rows);
-        setCantPaginas(datos.totalPaginas);
         setLlamado(true);
       } catch (error) {
         console.log(error);
