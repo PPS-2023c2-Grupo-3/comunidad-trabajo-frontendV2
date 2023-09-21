@@ -1,10 +1,9 @@
 import { Typography, Box, Button } from "@mui/material";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import Header from "../Header";
 
 const RegistroPregunta = () => {
-  
   return (
     <Fragment>
       <Header />
