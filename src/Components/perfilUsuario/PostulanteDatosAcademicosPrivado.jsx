@@ -1,14 +1,9 @@
-import * as React from "react";
+import { useContext, useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
+import { Box, Typography, Chip, Divider } from "@mui/material";
 import Header from "../Header";
-import { Box, Typography } from "@mui/material";
-
 import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
-import { useContext } from "react";
-import { config } from "../../config/config";
-import axios from "axios";
+import { getPostulanteById } from "../../services/postulantes_service";
 
 const Root = styled("div")(({ theme }) => ({
   width: "100%",
@@ -20,18 +15,20 @@ const Root = styled("div")(({ theme }) => ({
 
 export default function DividerText() {
   const { cambiarDatosUsuario } = useContext(DatosUsuarioContextProvider);
-  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  const [datosUsuario, setDatosUsuario] = useState(null);
 
-  React.useEffect(() => {
-    axios
-      .get(`${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`)
-      .then(({ data }) => {
-        cambiarDatosUsuario(data);
-      });
-  }, [cambiarDatosUsuario, datosUsuario.Usuario.id]);
+  useEffect(() => {
+    async function fetchData() {
+      const idUsuario = sessionStorage.getItem("idUsuario");
+      const datos = await getPostulanteById(idUsuario);
+      setDatosUsuario(datos);
+      cambiarDatosUsuario(datos);
+    }
+    fetchData();
+  }, [cambiarDatosUsuario]);
 
   return (
-    <React.Fragment>
+    <>
       <Header />
       <Box style={{ margin: "2rem" }}>
         <Root>
@@ -55,7 +52,7 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {datosUsuario.Carrera.nombre_carrera}
+                {datosUsuario?.Carrera.nombre_carrera}
               </Typography>
             </Box>
           </Box>
@@ -73,14 +70,14 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                Nivel academico:
+                Nivel académico:
               </Typography>
               <Typography
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {datosUsuario.Estudios.nombre_estudio} -{" "}
-                {datosUsuario.Estudios.estado_estudio}
+                {datosUsuario?.Estudios.nombre_estudio} -{" "}
+                {datosUsuario?.Estudios.estado_estudio}
               </Typography>
             </Box>
           </Box>
@@ -98,25 +95,16 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               ></Typography>
-              {datosUsuario.alumno_unahur ? (
-                <Typography
-                  sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                  variant="body1"
-                >
-                  Si
-                </Typography>
-              ) : (
-                <Typography
-                  sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                  variant="body1"
-                >
-                  No
-                </Typography>
-              )}
+              <Typography
+                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
+                variant="body1"
+              >
+                {datosUsuario?.alumno_unahur ? "Si" : "No"}
+              </Typography>
             </Box>
           </Box>
         </Root>
       </Box>
-    </React.Fragment>
+    </>
   );
 }

@@ -1,37 +1,28 @@
-import * as React from "react";
-import Stack from "@mui/material/Stack";
-import { Avatar, Button } from "@mui/material";
-import Box from "@mui/material/Box";
-import Header from "../Header";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import axios from "axios";
-import { useEffect } from "react";
-// import { useRef } from "react";
-import Swal from "sweetalert2";
+import { Button, Box, Stack, Avatar } from "@mui/material";
 import { AddAPhoto } from "@mui/icons-material";
-import { config } from "../../config/config";
+import Swal from "sweetalert2";
+import Header from "../Header";
+import {
+  getPostulanteByDni,
+  putPostulante,
+  getPostulanteById,
+} from "../../services/postulantes_service";
 import { supabase } from "../../supabase/supabase.config";
 
 export default function PerfilUsuario() {
-  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
-  var token = sessionStorage.getItem("token");
-  const postulanteId = datosUsuario.id; // Reemplaza con el ID correcto
-  // const [foto, setFoto] = useState();
   const [uploadFoto, setUploadFoto] = useState(null);
   const [photoURL, setPhotoURL] = useState("");
+  const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  const token = sessionStorage.getItem("token");
+  const postulanteId = datosUsuario.id;
 
-  // Realizar una solicitud HTTP para obtener el valor del campo 'foto' al cargar el componente
   useEffect(() => {
     async function fetchPhotoURL() {
       try {
-        // Realiza una solicitud GET para obtener el valor del campo 'foto' desde tu backend
-        const response = await axios.get(
-          `${config.apiUrl}/postulantes/dni/${postulanteId}`
-        );
-        const fotoValor = response.data.foto;
-
-        // Actualiza el estado de 'photoURL' con el valor obtenido
+        const response = await getPostulanteByDni(postulanteId);
+        const fotoValor = response.foto;
         setPhotoURL(fotoValor);
       } catch (error) {
         console.error(
@@ -41,15 +32,9 @@ export default function PerfilUsuario() {
       }
     }
 
-    // Llama a la función para obtener y establecer el valor de 'photoURL' al cargar el componente
     fetchPhotoURL();
-  }, []); // El segundo argumento es un array vacío para que se ejecute solo una vez al cargar el componente
+  }, []);
 
-  // function timeoutReload() {
-  //   setTimeout(function () {
-  //     window.location.reload();
-  //   }, 2000);
-  // }
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -78,22 +63,21 @@ export default function PerfilUsuario() {
         return;
       }
 
-      const newPhotoURL = signedURLData.signedUrl; // Obtén la nueva URL
-      console.log("Datos a enviar al servidor:", { foto: newPhotoURL });
-
-      // Actualiza el estado de 'photoURL' con la nueva URL
+      const newPhotoURL = signedURLData.signedUrl;
       setPhotoURL(newPhotoURL);
 
-      console.log("Datos a enviar al servidor:", { foto: photoURL });
+      console.log("Datos a enviar al servidor:", { foto: newPhotoURL });
 
-      const response = await axios.put(
-        `${config.apiUrl}/postulantes/dni/${postulanteId}?authorization=${token}`,
-        { foto: newPhotoURL }
+      const response = await putPostulante(
+        postulanteId,
+        { foto: newPhotoURL },
+        token
       );
-      console.log(newPhotoURL);
+
       if (response.status === 200) {
         console.log("Campo 'foto' actualizado en el backend:", newPhotoURL);
       }
+
       Swal.fire({
         icon: "success",
         title: "Su foto fue actualizada correctamente",
@@ -103,15 +87,9 @@ export default function PerfilUsuario() {
         showCloseButton: true,
       }).then(async function (result) {
         if (result.value) {
-          await axios
-            .get(
-              `${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}?`
-            )
-            .then(({ data }) => {
-              console.log(data);
-              sessionStorage.setItem("datosUsuario", JSON.stringify(data));
-              // timeoutReload();
-            });
+          const response = await getPostulanteById(datosUsuario.Usuario.id);
+          sessionStorage.setItem("datosUsuario", JSON.stringify(response));
+          window.location.reload();
         }
       });
     } catch (err) {
@@ -124,7 +102,7 @@ export default function PerfilUsuario() {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Header />
       <Box>
         <Box
@@ -168,46 +146,24 @@ export default function PerfilUsuario() {
             <h2 style={{ display: "flex" }}>{datosUsuario.Usuario.usuario}</h2>
           </Box>
         </Box>
-        <Box
-          sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
-        >
-          <Link to="/miPerfil/misDatos" style={{ textDecoration: "none" }}>
-            <Button variant="contained" sx={{ width: "25rem" }}>
-              Datos personales
-            </Button>
-          </Link>
-        </Box>
-        <Box
-          sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
-        >
-          <Link
-            to="/miPerfil/datosAcademicos"
-            style={{ textDecoration: "none" }}
+        {[
+          { to: "/miPerfil/misDatos", label: "Datos personales" },
+          { to: "/miPerfil/datosAcademicos", label: "Datos académicos" },
+          { to: "/miPerfil/MiCV", label: "MI CV" },
+          { to: "/ofertasPostulante", label: "Postulaciones" },
+        ].map((link) => (
+          <Box
+            key={link.to}
+            sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
           >
-            <Button variant="contained" sx={{ width: "25rem" }}>
-              Datos académicos
-            </Button>
-          </Link>
-        </Box>
-        <Box
-          sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
-        >
-          <Link to="/miPerfil/MiCV" style={{ textDecoration: "none" }}>
-            <Button variant="contained" sx={{ width: "25rem" }}>
-              MI CV
-            </Button>
-          </Link>
-        </Box>
-        <Box
-          sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
-        >
-          <Link to="/ofertasPostulante" style={{ textDecoration: "none" }}>
-            <Button variant="contained" sx={{ width: "25rem" }}>
-              Postulaciones
-            </Button>
-          </Link>
-        </Box>
+            <Link to={link.to} style={{ textDecoration: "none" }}>
+              <Button variant="contained" sx={{ width: "25rem" }}>
+                {link.label}
+              </Button>
+            </Link>
+          </Box>
+        ))}
       </Box>
-    </React.Fragment>
+    </>
   );
 }

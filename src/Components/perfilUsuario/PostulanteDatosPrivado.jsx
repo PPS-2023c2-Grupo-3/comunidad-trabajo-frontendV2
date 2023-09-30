@@ -1,13 +1,10 @@
-import React, { useEffect, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { styled } from "@mui/material/styles";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
+import { Box, Typography, Button, Divider, Chip } from "@mui/material";
 import Header from "../Header";
-import { Box, Typography, Button } from "@mui/material";
 import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
-import { config } from "../../config/config";
+import { getPostulanteById } from "../../services/postulantes_service";
 
 const Root = styled("div")(({ theme }) => ({
   width: "100%",
@@ -17,31 +14,27 @@ const Root = styled("div")(({ theme }) => ({
   },
 }));
 
+const formatDate = (date) => {
+  const birthDate = new Date(date);
+  const day = birthDate.getDate() + 1;
+  const month = birthDate.getMonth() + 1;
+  const year = birthDate.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 const DividerText = () => {
   const { cambiarDatosUsuario } = useContext(DatosUsuarioContextProvider);
-  const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  const [datosUsuario, setDatosUsuario] = useState(null);
 
   useEffect(() => {
-    async function traerDatos() {
-      try {
-        const response = await axios.get(
-          `${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}`
-        );
-        cambiarDatosUsuario(response.data);
-      } catch (error) {
-        console.log(error);
-      }
+    async function fetchData() {
+      const idUsuario = sessionStorage.getItem("idUsuario");
+      const response = await getPostulanteById(idUsuario);
+      setDatosUsuario(response);
+      cambiarDatosUsuario(response);
     }
-    traerDatos();
-  }, [cambiarDatosUsuario, datosUsuario.Usuario.id]);
-
-  const formatoFechaNacimiento = (fecha) => {
-    const fechaNacimiento = new Date(fecha);
-    const dia = fechaNacimiento.getDate() + 1;
-    const mes = fechaNacimiento.getMonth() + 1;
-    const anio = fechaNacimiento.getFullYear();
-    return `${dia}/${mes}/${anio}`;
-  };
+    fetchData();
+  }, [cambiarDatosUsuario]);
 
   return (
     <>
@@ -79,7 +72,7 @@ const DividerText = () => {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {datosUsuario.nombre} {datosUsuario.apellido}
+                {datosUsuario?.nombre} {datosUsuario?.apellido}
               </Typography>
             </Box>
             <Box
@@ -95,7 +88,7 @@ const DividerText = () => {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {formatoFechaNacimiento(datosUsuario.fecha_nac)}
+                {formatDate(datosUsuario?.fecha_nac)}
               </Typography>
             </Box>
           </Box>
@@ -119,7 +112,7 @@ const DividerText = () => {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {datosUsuario.Usuario.usuario}
+                {datosUsuario?.Usuario.usuario}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -133,14 +126,14 @@ const DividerText = () => {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                +54 9 {datosUsuario.telefono}
+                +54 9 {datosUsuario?.telefono}
               </Typography>
             </Box>
           </Box>
           <Divider>
             <Chip
               sx={{ backgroundColor: "#009688", color: "#ffffff" }}
-              label="UBICACION"
+              label="UBICACIÓN"
             />
           </Divider>
           <Box>
@@ -157,7 +150,7 @@ const DividerText = () => {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {datosUsuario.pais}
+                {datosUsuario?.pais}
               </Typography>
             </Box>
             <Box
@@ -173,7 +166,7 @@ const DividerText = () => {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {datosUsuario.Provincia.nombre}
+                {datosUsuario?.Provincia.nombre}
               </Typography>
             </Box>
             <Box
@@ -189,7 +182,7 @@ const DividerText = () => {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {datosUsuario.Ciudad.nombre}
+                {datosUsuario?.Ciudad.nombre}
               </Typography>
             </Box>
           </Box>
