@@ -1,10 +1,9 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Header from "../Header";
-import { config } from "../../config/config";
 import {
   Box,
   Select,
@@ -17,6 +16,11 @@ import Grid from "@mui/material/Grid";
 import Swal from "sweetalert2";
 import { MenuList } from "@material-ui/core";
 import { useHistory, useParams } from "react-router-dom";
+import { getOfertaById, putOferta } from "../../services/ofertas_service";
+import { getEstudios } from "../../services/estudios_service";
+import { getCarreras } from "../../services/carreras_service";
+import { getJornadas } from "../../services/jornadas_service";
+import { getTiposContratos } from "../../services/contratos_service";
 
 const validationSchema = yup.object({
   tituloOferta: yup
@@ -91,17 +95,15 @@ export default function WithMaterialUI() {
   var token = sessionStorage.getItem("token");
 
   const { id } = useParams();
-  const API_URL = `${config.apiUrl}/ofertas/idOferta/${id}?`;
 
   const [llamadoOferta, setLlamadoOferta] = useState(false);
   const descripcionAPI = async () => {
     if (llamadoOferta === false)
       try {
         setLlamadoOferta(true);
-        const api = await fetch(API_URL);
-        const datos = await api.json();
-        console.log(datos);
-        sessionStorage.setItem("datosOferta", JSON.stringify(datos));
+        const api = await getOfertaById(id);
+        console.log(api);
+        sessionStorage.setItem("datosOferta", JSON.stringify(api));
       } catch (error) {
         console.log(error);
       }
@@ -115,9 +117,8 @@ export default function WithMaterialUI() {
   const llamarEstudios = async () => {
     if (llamadolistaEstudio === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/estudios/?`);
-        const datos = await api.json();
-        setlistaEstudio(datos.estudios);
+        const api = await getEstudios();
+        setlistaEstudio(api.estudios);
         setLlamadolistaEstudio(true);
       } catch (error) {
         console.log(error);
@@ -132,9 +133,8 @@ export default function WithMaterialUI() {
   const llamarCarreras = async () => {
     if (llamadolistaCarrera === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/carreras/?`);
-        const datos = await api.json();
-        setlistaCarrera(datos.carreras);
+        const api = await getCarreras();
+        setlistaCarrera(api.carreras);
         setLlamadolistaCarrera(true);
       } catch (error) {
         console.log(error);
@@ -149,9 +149,8 @@ export default function WithMaterialUI() {
   const llamarJornada = async () => {
     if (llamadolistaJornada === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/jornadas/?`);
-        const datos = await api.json();
-        setlistaJornada(datos.jornadas);
+        const api = await getJornadas();
+        setlistaJornada(api.jornadas);
         setLlamadolistaJornada(true);
       } catch (error) {
         console.log(error);
@@ -166,9 +165,8 @@ export default function WithMaterialUI() {
   const llamarContrato = async () => {
     if (llamadolistaContrato === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/contratos/?`);
-        const datos = await api.json();
-        setlistaContrato(datos.contratos);
+        const api = await getTiposContratos();
+        setlistaContrato(api.contratos);
         setLlamadolistaContrato(true);
       } catch (error) {
         console.log(error);
@@ -177,6 +175,7 @@ export default function WithMaterialUI() {
   };
   llamarContrato();
 
+  console.log(datosOferta);
   const formik = useFormik({
     initialValues: {
       tituloOferta: datosOferta.titulo_oferta,
@@ -222,16 +221,7 @@ export default function WithMaterialUI() {
         idEstado: 2,
       };
       console.log(values);
-      await fetch(
-        `${config.apiUrl}/ofertas/idOferta/${datosOferta.id}?authorization=${token}`,
-        {
-          method: "PUT", // or 'PUT'
-          body: JSON.stringify(data), // data can be `string` or {object}!
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await putOferta(datosOferta.id, data, token);
       Swal.fire({
         icon: "success",
         title: "La oferta fue editada exitosamente",
