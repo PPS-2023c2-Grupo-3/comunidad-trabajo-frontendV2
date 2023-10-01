@@ -1,51 +1,59 @@
-import { Fragment, useState } from "react";
-import { Box } from "@mui/system";
+import { useState, useEffect } from "react";
 import Header from "../../Header";
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import BarraBusquedaOfertas from "./BarraBusquedaOfertas";
 import ListaOfertas from "./ListaOfertas";
 import BusquedaNoEncontrada from "./BusquedaNoEncontrada";
-import { config } from "../../../config/config";
+import { getOfertaByCuit, getOfertas } from "../../../services/ofertas_service";
 
 const ListadoOfertas = () => {
-  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
   const [llamado, setLlamado] = useState(false);
   const [Ofertas, setOfertas] = useState([]);
-  const API_URL = `${config.apiUrl}/ofertas/cuit/${datosUsuario.id}/`;
+  const [pagina, setPagina] = useState(0);
+  const [limite, setLimite] = useState(20);
+  const [ordenar, setOrdenar] = useState("DESC");
+  const [idEstado, setIdEstado] = useState(1);
+  const cuit = datosUsuario.id;
 
-  const primerLlamado = async () => {
-    if (llamado === false) {
-      try {
-        const api = await fetch(API_URL);
-        const datos = await api.json();
-        setLlamado(true);
-        setOfertas(datos.ofertas.rows);
-        console.log(datos.ofertas.rows);
-      } catch (error) {
-        console.log(error);
+  useEffect(() => {
+    async function primerLlamado() {
+      if (!llamado) {
+        try {
+          const response = await getOfertaByCuit(
+            pagina,
+            limite,
+            ordenar,
+            idEstado,
+            cuit
+          );
+          setLlamado(true);
+          setOfertas(response.ofertas.rows);
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
-  };
+    primerLlamado();
+  }, [llamado, pagina, limite, ordenar, idEstado, cuit]);
 
   const traerOfertas = async (e) => {
     try {
-      e.preventDefault();
-      const { usuario } = e.target.elements;
-      const usuarioValue = usuario.value;
-      const api = await fetch(
-        `${config.apiUrl}/usuariosOfertas/?buscarApellido=${usuarioValue}`
+      const response = await getOfertas(
+        pagina,
+        limite,
+        e.target.value,
+        ordenar,
+        idEstado
       );
-      const datos = await api.json();
-      console.log(datos.Ofertas.rows);
-      setOfertas(datos.Ofertas.rows);
+      setOfertas(response.ofertas.rows);
     } catch (err) {
       console.log(err);
     }
   };
 
-  primerLlamado();
   return (
-    <Fragment>
+    <>
       <Header />
       <Box
         sx={{
@@ -64,7 +72,7 @@ const ListadoOfertas = () => {
       ) : (
         <ListaOfertas Ofertas={Ofertas} />
       )}
-    </Fragment>
+    </>
   );
 };
 

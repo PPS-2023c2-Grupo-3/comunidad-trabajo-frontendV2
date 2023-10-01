@@ -1,55 +1,51 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import CircleIcon from "@mui/icons-material/Circle";
-import { Box } from "@mui/system";
 import Swal from "sweetalert2";
-import { config } from "../../../config/config";
-export default function ListaOfertas({ Ofertas }) {
-  var token = sessionStorage.getItem("token");
-  const finalizar = async (idOferta) => {
-    var data = {
-      idEstado: 5,
-    };
+import { putOferta } from "../../../services/ofertas_service";
 
+export default function ListaOfertas({ Ofertas }) {
+  const token = sessionStorage.getItem("token");
+
+  const finalizarOferta = (idOferta) => {
     Swal.fire({
       icon: "warning",
-      title: `¿Deseas finalizar la oferta?`,
+      title: "¿Deseas finalizar la oferta?",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "¡Si, finalizar!",
+      confirmButtonText: "¡Sí, finalizar!",
       cancelButtonText: "No, cancelar",
-    }).then(async (result) => {
+    }).then((result) => {
       if (result.isConfirmed) {
+        const data = {
+          idEstado: 5,
+        };
+
         try {
-          await fetch(
-            `${config.apiUrl}/ofertas/idOferta/${idOferta}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          putOferta(idOferta, data, token).then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Oferta finalizada",
+              showConfirmButton: true,
+            }).then(() => {
+              window.location.reload();
+            });
+          });
         } catch (error) {
           console.log(error);
         }
-        Swal.fire({
-          icon: "success",
-          title: "Oferta finalizada",
-          showConfirmButton: true,
-        }).then(() => {
-          window.location.reload();
-        });
       }
     });
   };
@@ -89,15 +85,17 @@ export default function ListaOfertas({ Ofertas }) {
               </TableCell>
               <TableCell align="center">
                 <Box sx={{}}>
-                  {oferta.Estado.id === 1 ? (
-                    <CircleIcon color="success" />
-                  ) : oferta.Estado.id === 2 ? (
-                    <CircleIcon color="warning" />
-                  ) : oferta.Estado.id === 5 ? (
-                    <CircleIcon />
-                  ) : (
-                    <CircleIcon color="error" />
-                  )}
+                  <CircleIcon
+                    color={
+                      oferta.Estado.id === 1
+                        ? "success"
+                        : oferta.Estado.id === 2
+                        ? "warning"
+                        : oferta.Estado.id === 5
+                        ? undefined
+                        : "error"
+                    }
+                  />
                   <Typography variant="body1">
                     {oferta.Estado.nombre_estado}
                   </Typography>
@@ -129,7 +127,7 @@ export default function ListaOfertas({ Ofertas }) {
                     variant="outlined"
                     color="error"
                     sx={{ margin: "0.5rem" }}
-                    onClick={async () => finalizar(oferta.id)}
+                    onClick={() => finalizarOferta(oferta.id)}
                   >
                     Finalizar
                   </Button>
