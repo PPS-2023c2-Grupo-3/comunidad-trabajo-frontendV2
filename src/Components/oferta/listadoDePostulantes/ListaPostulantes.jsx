@@ -1,4 +1,3 @@
-import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,17 +7,14 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import Swal from "sweetalert2";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import { useRef } from "react";
-import { config } from "../../../config/config";
+import { putPostulacion } from "../../../services/postulaciones_service";
 
 export default function ListaPostulantes({ postulantes }) {
-  const pdf = useRef();
-  var token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   const contactar = async (idPostulacion) => {
     var data = {
       contactado: true,
@@ -34,16 +30,7 @@ export default function ListaPostulantes({ postulantes }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await fetch(
-            `${config.apiUrl}/postulaciones/${idPostulacion}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          await putPostulacion(idPostulacion, data, token);
         } catch (error) {
           console.log(error);
         }
@@ -58,33 +45,8 @@ export default function ListaPostulantes({ postulantes }) {
     });
   };
 
-  function splitFileName(str) {
-    return str.split("|")[1];
-  }
-
-  const traerPdf = async (cvPostulante) => {
-    const fetchedData = await axios.get(`${config.apiUrl}/files`, {
-      headers: {
-        "Content-Type": "application/json",
-        type: "application/pdf",
-        file: splitFileName(cvPostulante),
-        authorization: token,
-      },
-      responseType: "blob",
-    });
-
-    console.log(fetchedData);
-    const pdfBlob = new Blob([fetchedData.data], { type: "application/pdf" });
-    console.log(pdfBlob);
-    const virtualUrl = URL.createObjectURL(pdfBlob);
-    console.log(virtualUrl);
-    pdf.current = virtualUrl;
-    console.log(pdf);
-  };
-
   async function abrirPdf(cvPostulante) {
-    await traerPdf(cvPostulante);
-    window.open(pdf.current);
+    window.open(cvPostulante);
   }
 
   return (

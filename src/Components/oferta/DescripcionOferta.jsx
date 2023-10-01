@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Button, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { Fragment } from "react";
@@ -10,13 +9,15 @@ import Grid from "@mui/material/Grid";
 import Header from "../Header";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { config } from "../../config/config";
 import Swal from "sweetalert2";
 import PlaceIcon from "@mui/icons-material/Place";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import NotFound from "../NotFound";
 import "../../App.css";
+import { useEffect } from "react";
+import { getOfertaById, putOferta } from "../../services/ofertas_service";
+import { postPostulacion } from "../../services/postulaciones_service";
 
 const BootstrapDialogTitle = (props) => {
   const { children, onClose, ...other } = props;
@@ -49,44 +50,48 @@ BootstrapDialogTitle.propTypes = {
 
 const CustomizedDialogs = () => {
   const { id } = useParams();
-  const [tituloOferta, setTituloOferta] = useState();
-  const [nombreEmpresa, setNombreEmpresa] = useState();
-  const [descripcionEmpresa, setDescripcionEmpresa] = useState();
-  const [descripcion, setDescripcion] = useState();
-  const [zona, setZona] = useState();
-  const [salario, setSalario] = useState();
-  const [horarioEntrada, setHorarioEntrada] = useState();
-  const [horarioSalida, setHorarioSalida] = useState();
-  const [contrato, setContrato] = useState();
-  const [beneficios, setBeneficios] = useState();
-  const [idEmpresa, setIdEmpresa] = useState();
-  const [estado, setEstado] = useState();
-  const [fechaPublicacion, setFechaPublicacion] = useState();
-  const API_URL = `${config.apiUrl}/ofertas/idOferta/${id}?`;
+  const [tituloOferta, setTituloOferta] = useState("");
+  const [nombreEmpresa, setNombreEmpresa] = useState("");
+  const [descripcionEmpresa, setDescripcionEmpresa] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [zona, setZona] = useState("");
+  const [salario, setSalario] = useState("");
+  const [horarioEntrada, setHorarioEntrada] = useState("");
+  const [horarioSalida, setHorarioSalida] = useState("");
+  const [contrato, setContrato] = useState("");
+  const [beneficios, setBeneficios] = useState("");
+  const [idEmpresa, setIdEmpresa] = useState("");
+  const [estado, setEstado] = useState("");
+  const [fechaPublicacion, setFechaPublicacion] = useState("");
 
-  const descripcionAPI = async () => {
-    try {
-      const api = await fetch(API_URL);
-      const datos = await api.json();
-      sessionStorage.setItem("datosOferta", JSON.stringify(datos));
-      setTituloOferta(datos.titulo_oferta);
-      setNombreEmpresa(datos.Empresa.nombre_empresa);
-      setDescripcionEmpresa(datos.Empresa.descripcion);
-      setIdEmpresa(datos.Empresa.id);
-      setDescripcion(datos.descripcion);
-      setZona(datos.zona_trabajo);
-      setSalario(datos.remuneracion);
-      setHorarioEntrada(datos.horario_laboral_desde);
-      setHorarioSalida(datos.horario_laboral_hasta);
-      setContrato(datos.Contrato.nombre_contrato);
-      setBeneficios(datos.beneficios);
-      setEstado(datos.Estado.id);
-      setFechaPublicacion(datos.createdAt);
-    } catch (error) {
-      console.log(error);
+  useEffect(() => {
+    const getOfertaData = async () => {
+      try {
+        const datos = await getOfertaById(id);
+        if (datos) {
+          setTituloOferta(datos.titulo_oferta || "");
+          setNombreEmpresa(datos.Empresa?.nombre_empresa || "");
+          setDescripcionEmpresa(datos.Empresa?.descripcion || "");
+          setIdEmpresa(datos.Empresa?.id || "");
+          setDescripcion(datos.descripcion || "");
+          setZona(datos.zona_trabajo || "");
+          setSalario(datos.remuneracion || "");
+          setHorarioEntrada(datos.horario_laboral_desde || "");
+          setHorarioSalida(datos.horario_laboral_hasta || "");
+          setContrato(datos.Contrato?.nombre_contrato || "");
+          setBeneficios(datos.beneficios || "");
+          setEstado(datos.Estado?.id || "");
+          setFechaPublicacion(datos.createdAt || "");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    if (id) {
+      getOfertaData();
     }
-  };
-  descripcionAPI();
+  }, [id]);
 
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
   var token = sessionStorage.getItem("token");
@@ -143,75 +148,65 @@ const CustomizedDialogs = () => {
       cancelButtonText: "No, cancelar",
     }).then(async (result) => {
       if (result.isConfirmed) {
+        const postulacionData = {
+          postulante: datosUsuario.id,
+          oferta: id,
+          empresa: idEmpresa,
+        };
+
         try {
-          const api = await fetch(
-            `${config.apiUrl}/postulaciones/?authorization=${token}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                postulante: datosUsuario.id,
-                oferta: id,
-                empresa: idEmpresa,
-              }),
-            }
-          );
-          const datos = await api.json();
-          console.log(datos);
+          const response = await postPostulacion(postulacionData, token);
+          console.log(response);
+          Swal.fire(
+            `Te has postulado a ${tituloOferta}`,
+            "¡Buena suerte!",
+            "success"
+          ).then(() => {
+            timeoutReload();
+          });
         } catch (error) {
           console.log(error);
         }
-        Swal.fire(
-          `Te has postulado a ${tituloOferta}`,
-          "¡Buena suerte!",
-          "success"
-        ).then(() => {
-          timeoutReload();
-        });
       }
     });
   };
 
   const activar = async (idOferta) => {
-    var data = {
-      idEstado: 1,
+    const data = {
+      idEstado: 1
     };
-    await fetch(
-      `${config.apiUrl}/ofertas/idOferta/${idOferta}?authorization=${token}`,
-      {
-        method: "PUT", // or 'PUT'
-        body: JSON.stringify(data), // data can be `string` or {object}!
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    Swal.fire({
-      icon: "success",
-      title: "La oferta fue aceptada exitosamente",
-      confirmButtonText: "Finalizar",
-      text: "Para continuar pulse el boton",
-      footer: "",
-      showCloseButton: true,
-    })
-      .then(window.location.reload())
-      .catch((error) =>
-        console.error(
-          "Error:",
-          error,
+  
+    try {
+      const response = await putOferta(idOferta, data, token);
+  
+      console.log(response);
+  
+      Swal.fire({
+        icon: "success",
+        title: "La oferta fue aceptada exitosamente",
+        confirmButtonText: "Finalizar",
+        text: "Para continuar pulse el botón",
+        footer: "",
+        showCloseButton: true,
+      })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
           Swal.fire({
             icon: "error",
-            title: "Ocurrio un error al aceptar la oferta",
+            title: "Ocurrió un error al aceptar la oferta",
             confirmButtonText: "Volver",
             text: "Verifique sus datos",
             footer: "",
             showCloseButton: true,
-          })
-        )
-      );
-  };
+          });
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };  
 
   function publicadoHace(fechaPublicacion) {
     var fechaPublicacionDate = new Date(fechaPublicacion);
