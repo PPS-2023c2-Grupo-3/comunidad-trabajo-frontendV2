@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import { Fragment, useState } from "react";
 
 import Header from "../../Header";
 import { Pagination, Typography } from "@mui/material";
