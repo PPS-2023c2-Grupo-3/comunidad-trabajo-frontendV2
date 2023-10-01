@@ -20,7 +20,7 @@ const ListadoOfertas = () => {
   useEffect(() => {
     const fetchOfertas = async (page = 1) => {
       try {
-        const response = await getOfertas(0, 6, busquedaActual, "id", page);
+        const response = await getOfertas(page-1, 6, busquedaActual, "id", 1);
         setLlamado(true);
         setOfertas(response.ofertas.rows);
         setCantPaginas(response.totalPaginas);
@@ -54,6 +54,7 @@ const ListadoOfertas = () => {
     e.preventDefault();
     const { oferta } = e.target.elements;
     const ofertaValue = oferta.value;
+    console.log(ofertaValue);
     setBusquedaActual(ofertaValue);
     setPagina(1);
     await fetchOfertas();
@@ -61,7 +62,7 @@ const ListadoOfertas = () => {
 
   const fetchOfertas = async (page = 1) => {
     try {
-      const response = await getOfertas(0, 6, busquedaActual, "id", page);
+      const response = await getOfertas(page-1, 6, busquedaActual, "id", 1);
       setOfertas(response.ofertas.rows);
       setCantPaginas(response.totalPaginas);
       setPagina(page);

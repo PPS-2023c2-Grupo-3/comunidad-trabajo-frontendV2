@@ -101,33 +101,6 @@ const CustomizedDialogs = () => {
   // eslint-disable-next-line no-unused-vars
   const [encontrado, setEcontrado] = useState(false);
 
-  // const estaPostulado = async () => {
-  //   let idsOfertas;
-  //   if (estaLogeado && datosUsuario && datosUsuario.id != null) {
-  //     try {
-  //       const api = await fetch(
-  //         `${config.apiUrl}/postulacionesId/postulante/?&id=${datosUsuario.id}&`
-  //       );
-  //       const datos = await api.json();
-  //       console.log(datos);
-  //       idsOfertas = datos.postulaciones.rows.map(
-  //         (postulacion) => postulacion.fk_id_oferta
-  //       );
-  //       console.log(idsOfertas);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //     console.log(id);
-  //     for (let i = 0; i <= idsOfertas.length; i++) {
-  //       if (idsOfertas[i] === id) {
-  //         setEcontrado(true);
-  //       }
-  //     }
-
-  //     console.log(encontrado);
-  //   }
-  // };
-
   function timeoutReload() {
     setTimeout(function () {
       window.location.reload();
