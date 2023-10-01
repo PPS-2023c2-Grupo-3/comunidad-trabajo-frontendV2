@@ -1,6 +1,4 @@
-import Box from "@mui/material/Box";
-import { TextField } from "@mui/material";
-import Button from "@mui/material/Button";
+import { TextField, Button, Box } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 const BarraBusquedaPostulantes = (props) => {

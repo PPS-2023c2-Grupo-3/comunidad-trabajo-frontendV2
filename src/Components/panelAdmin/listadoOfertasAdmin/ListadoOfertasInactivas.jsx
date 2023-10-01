@@ -1,70 +1,59 @@
-import React, { Fragment, useState } from "react";
-
+import { useState, useEffect } from "react";
 import Header from "../../Header";
 import { Box, Pagination, Typography } from "@mui/material";
 import BarraBusquedaOfertas from "./BarraBusquedaOfertas";
 import ListaOfertasInactivas from "./ListaOfertasInactivas";
 import BusquedaNoEncontrada from "./BusquedaNoEncontrada";
-import { config } from "../../../config/config";
+import { getOfertas } from "../../../services/ofertas_service";
 
 const ListadoOfertas = () => {
-  const [llamado, setLlamado] = useState(false);
   const [ofertas, setOfertas] = useState([]);
   const [cantPaginas, setCantPaginas] = useState(0);
   const [pagina, setPagina] = useState(1);
   const [busquedaActual, setBusquedaActual] = useState("");
 
-  const API_URL = `${config.apiUrl}/ofertas/?pagina=0&limite=6&idEstado=2&ordenar=id`;
-
-  const primerLlamado = async () => {
-    if (llamado === false) {
+  useEffect(() => {
+    const primerLlamado = async () => {
       try {
-        const api = await fetch(API_URL);
-        const datos = await api.json();
-        setLlamado(true);
-        setOfertas(datos.ofertas.rows);
-        setCantPaginas(datos.totalPaginas);
+        const response = await getOfertas(0, 6, "", "id", 2);
+        setOfertas(response.ofertas.rows);
+        setCantPaginas(response.totalPaginas);
       } catch (error) {
         console.log(error);
       }
-    }
-  };
+    };
 
-  const traerOfertas = async (e, p) => {
+    primerLlamado();
+  }, []);
+
+  const traerOfertas = async (e) => {
     try {
       e.preventDefault();
       const { oferta } = e.target.elements;
       const ofertaValue = oferta.value;
       setBusquedaActual(ofertaValue);
-      const api = await fetch(
-        `${config.apiUrl}/ofertas/?pagina=0&limite=6&idEstado=2&ordenar=id&buscarTitulo=${ofertaValue}`
-      );
-      const datos = await api.json();
-      console.log(datos);
       setPagina(1);
-      setOfertas(datos.ofertas.rows);
-      setCantPaginas(datos.totalPaginas);
-      console.log(ofertas);
+
+      const response = await getOfertas(0, 6, ofertaValue, "id", 2);
+      setOfertas(response.ofertas.rows);
+      setCantPaginas(response.totalPaginas);
     } catch (err) {
       console.log(err);
     }
   };
 
   const cambiarPagina = async (e, p) => {
-    const api = await fetch(
-      `${config.apiUrl}/ofertas/?pagina=${
-        p - 1
-      }&limite=6&ordenar=id&buscarTitulo=${busquedaActual}&idEstado=2`
-    );
-    const datos = await api.json();
-    setOfertas(datos.ofertas.rows);
-    setPagina(p);
-    console.log(datos.ofertas.rows);
+    try {
+      const response = await getOfertas(p - 1, 6, busquedaActual, "id", 2);
+      setOfertas(response.ofertas.rows);
+      setPagina(p);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  primerLlamado();
   return (
-    <Fragment>
+    <>
       <Header />
       <Box
         sx={{
@@ -74,11 +63,11 @@ const ListadoOfertas = () => {
         }}
       >
         <Typography variant="h4" sx={{ textAlign: "center", margin: "1rem" }}>
-          Ofertas pendientes{" "}
+          Ofertas pendientes
         </Typography>
         <BarraBusquedaOfertas traerOfertas={traerOfertas} />
       </Box>
-      {ofertas.length === 0 && llamado === true ? (
+      {ofertas.length === 0 ? (
         <BusquedaNoEncontrada />
       ) : (
         <ListaOfertasInactivas ofertas={ofertas} />
@@ -90,7 +79,7 @@ const ListadoOfertas = () => {
         onChange={cambiarPagina}
         sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
       />
-    </Fragment>
+    </>
   );
 };
 

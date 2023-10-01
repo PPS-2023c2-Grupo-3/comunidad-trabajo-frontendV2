@@ -1,25 +1,27 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
-import { config } from "../../../config/config";
+import { putEmpresa } from "../../../services/empresas_service";
 
 export default function ListaEmpresas({ empresas }) {
-  var token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
-  const activar = async (idEmpresa, nombre) => {
-    var data = {
+  const handleActivarEmpresa = async (idEmpresa, nombre) => {
+    const data = {
       idEstado: 1,
     };
 
-    Swal.fire({
+    const confirmResult = await Swal.fire({
       icon: "warning",
       title: `¿Deseas activar la empresa ${nombre}?`,
       showCancelButton: true,
@@ -27,32 +29,23 @@ export default function ListaEmpresas({ empresas }) {
       cancelButtonColor: "#d33",
       confirmButtonText: "Activar",
       cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await fetch(
-            `${config.apiUrl}/empresas/cuit/${idEmpresa}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-        } catch (error) {
-          console.log(error);
-        }
-        Swal.fire({
+    });
+
+    if (confirmResult.isConfirmed) {
+      try {
+        await putEmpresa(idEmpresa, data, token);
+        await Swal.fire({
           icon: "success",
           title: `La empresa fue aceptada correctamente`,
           confirmButtonText: "Aceptar",
-        }).then(() => {
-          window.location.reload();
         });
+        window.location.reload();
+      } catch (error) {
+        console.log(error);
       }
-    });
+    }
   };
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -104,8 +97,8 @@ export default function ListaEmpresas({ empresas }) {
                   variant="contained"
                   color="relaxed"
                   sx={{ margin: "0.5rem" }}
-                  onClick={async () =>
-                    activar(empresa.id, empresa.nombre_empresa)
+                  onClick={() =>
+                    handleActivarEmpresa(empresa.id, empresa.nombre_empresa)
                   }
                 >
                   Activar

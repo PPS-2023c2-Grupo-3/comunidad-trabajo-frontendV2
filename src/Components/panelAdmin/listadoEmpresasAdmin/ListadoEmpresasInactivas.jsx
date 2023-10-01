@@ -1,69 +1,45 @@
-import React, { Fragment, useState } from "react";
-import { Box } from "@mui/system";
+import { useState, useEffect } from "react";
 import Header from "../../Header";
-import { Pagination, Typography } from "@mui/material";
+import { Pagination, Typography, Box } from "@mui/material";
 import BarraBusquedaEmpresas from "./BarraBusquedaEmpresas";
 import ListaEmpresasInactivas from "./ListaEmpresasInactivas";
 import BusquedaNoEncontrada from "./BusquedaNoEncontrada";
-import { config } from "../../../config/config";
+import { getEmpresas } from "../../../services/empresas_service";
 
 const ListadoEmpresas = () => {
-  const [llamado, setLlamado] = useState(false);
   const [empresas, setEmpresas] = useState([]);
   const [cantPaginas, setCantPaginas] = useState(0);
   const [pagina, setPagina] = useState(1);
   const [busquedaActual, setBusquedaActual] = useState("");
-  const API_URL = `${config.apiUrl}/empresas/?pagina=0&limite=5&idEstado=2&ordenar=id`;
 
-  const primerLlamado = async () => {
-    if (llamado === false) {
-      try {
-        const api = await fetch(API_URL);
-        const datos = await api.json();
-        setLlamado(true);
-        setEmpresas(datos.empresas.rows);
-        setCantPaginas(datos.totalPaginas);
-      } catch (error) {
-        console.log(error);
-      }
+  useEffect(() => {
+    async function fetchData() {
+      const response = await getEmpresas(0, 5, "id", 2, "");
+      setEmpresas(response.empresas.rows);
+      setCantPaginas(response.totalPaginas);
     }
-  };
+    fetchData();
+  }, []);
 
-  const traerEmpresas = async (e, p) => {
-    try {
-      e.preventDefault();
-      const { empresa } = e.target.elements;
-      const empresaValue = empresa.value;
-      setBusquedaActual(empresaValue);
-      const api = await fetch(
-        `${config.apiUrl}/empresas/?pagina=0&limite=5&idEstado=2&ordenar=id&nombreEmpresa=${empresaValue}`
-      );
-      const datos = await api.json();
-      setPagina(1);
-      console.log(datos);
-      setEmpresas(datos.empresas.rows);
-      setCantPaginas(datos.totalPaginas);
-      console.log(empresas);
-    } catch (err) {
-      console.log(err);
-    }
+  const traerEmpresas = async (e) => {
+    e.preventDefault();
+    const { empresa } = e.target.elements;
+    const empresaValue = empresa.value;
+    setBusquedaActual(empresaValue);
+    const response = await getEmpresas(0, 5, "id", 2, empresaValue);
+    setPagina(1);
+    setEmpresas(response.empresas.rows);
+    setCantPaginas(response.totalPaginas);
   };
 
   const cambiarPagina = async (e, p) => {
-    const api = await fetch(
-      `${config.apiUrl}/empresas/?pagina=${
-        p - 1
-      }&limite=5&idEstado=2&ordenar=id&nombreEmpresa=${busquedaActual}`
-    );
-    const datos = await api.json();
-    setEmpresas(datos.empresas.rows);
+    const response = await getEmpresas(p - 1, 5, "id", 2, busquedaActual);
+    setEmpresas(response.empresas.rows);
     setPagina(p);
-    console.log(datos.empresas.rows);
   };
 
-  primerLlamado();
   return (
-    <Fragment>
+    <>
       <Header />
       <Box
         sx={{
@@ -72,12 +48,12 @@ const ListadoEmpresas = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h4" sx={{ textAlign: "center", margin_: "1rem" }}>
+        <Typography variant="h4" sx={{ textAlign: "center", margin: "1rem" }}>
           Empresas pendientes
         </Typography>
         <BarraBusquedaEmpresas traerEmpresas={traerEmpresas} />
       </Box>
-      {empresas.length === 0 && llamado === true ? (
+      {empresas.length === 0 && busquedaActual ? (
         <BusquedaNoEncontrada />
       ) : (
         <ListaEmpresasInactivas empresas={empresas} />
@@ -89,7 +65,7 @@ const ListadoEmpresas = () => {
         onChange={cambiarPagina}
         sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
       />
-    </Fragment>
+    </>
   );
 };
 

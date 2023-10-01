@@ -1,26 +1,29 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import CircleIcon from "@mui/icons-material/Circle";
-import { Box } from "@mui/system";
-import { config } from "../../../config/config";
+import { putOferta } from "../../../services/ofertas_service";
 
-export default function ListaOfertas({ ofertas }) {
-  var token = sessionStorage.getItem("token");
+function ListaOfertas({ ofertas }) {
+  const token = sessionStorage.getItem("token");
+
   const mandarARevision = async (idOferta, titulo) => {
-    var data = {
+    const data = {
       idEstado: 5,
     };
 
-    Swal.fire({
+    const confirmResult = await Swal.fire({
       icon: "warning",
       title: `¿Deseas finalizar la oferta ${titulo}?`,
       showCancelButton: true,
@@ -28,22 +31,11 @@ export default function ListaOfertas({ ofertas }) {
       cancelButtonColor: "#d33",
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await fetch(
-            `${config.apiUrl}/ofertas/idOferta/${idOferta}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-        } catch (error) {
-          console.log(error);
-        }
+    });
+
+    if (confirmResult.isConfirmed) {
+      try {
+        await putOferta(idOferta, data, token);
         Swal.fire({
           icon: "success",
           title: `La oferta fue finalizada correctamente`,
@@ -51,8 +43,10 @@ export default function ListaOfertas({ ofertas }) {
         }).then(() => {
           window.location.reload();
         });
+      } catch (error) {
+        console.log(error);
       }
-    });
+    }
   };
 
   return (
@@ -90,8 +84,9 @@ export default function ListaOfertas({ ofertas }) {
                 <Typography variant="body1">{oferta.titulo_oferta}</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="body1"></Typography>
-                {oferta.Empresa.nombre_empresa}
+                <Typography variant="body1">
+                  {oferta.Empresa.nombre_empresa}
+                </Typography>
               </TableCell>
               <TableCell align="center">
                 <Box
@@ -150,3 +145,5 @@ export default function ListaOfertas({ ofertas }) {
     </TableContainer>
   );
 }
+
+export default ListaOfertas;

@@ -1,14 +1,10 @@
 import Header from "../Header";
-import { Fragment } from "react";
-import Stack from "@mui/material/Stack";
-import { Avatar, Button } from "@mui/material";
-import Box from "@mui/material/Box";
-import React from "react";
+import { Avatar, Button, Box, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const PanelAdmin = () => {
   return (
-    <Fragment>
+    <>
       <Header />
       <Box>
         <Box
@@ -56,14 +52,13 @@ const PanelAdmin = () => {
           sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}
         >
           <Link style={{ textDecoration: "none" }} to="/admin/listadoEmpresas">
-            {" "}
             <Button variant="contained" sx={{ width: "25rem" }}>
               Empresas
             </Button>
           </Link>
         </Box>
       </Box>
-    </Fragment>
+    </>
   );
 };
 

@@ -1,10 +1,8 @@
-import { Typography } from "@mui/material";
-import React from "react";
-import { Fragment } from "react";
-import Box from "@mui/material/Box";
+import { Typography, Box } from "@mui/material";
+
 const BusquedaNoEncontrada = () => {
   return (
-    <Fragment>
+    <>
       <Box
         sx={{
           display: "flex",
@@ -26,7 +24,7 @@ const BusquedaNoEncontrada = () => {
           Probá usando otras palabras en el cuadro de búsqueda
         </Typography>
       </Box>
-    </Fragment>
+    </>
   );
 };
 
