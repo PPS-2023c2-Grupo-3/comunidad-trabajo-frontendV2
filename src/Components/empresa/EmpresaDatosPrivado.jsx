@@ -1,15 +1,10 @@
-import * as React from "react";
 import { styled } from "@mui/material/styles";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
 import Header from "../Header";
-import { Box, Typography, Button } from "@mui/material";
-import { useState } from "react";
-import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
-import { useContext } from "react";
+import { Box, Typography, Button, Chip, Divider } from "@mui/material";
+import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { config } from "../../config/config";
+import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
+import { getEmpresaByIdUsuario } from "../../services/empresas_service";
 
 const Root = styled("div")(({ theme }) => ({
   width: "100%",
@@ -19,26 +14,62 @@ const Root = styled("div")(({ theme }) => ({
   },
 }));
 
-export default function DividerText() {
-  const { cambiarDatosUsuario } = useContext(DatosUsuarioContextProvider);
-  let datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
-  var idUsuario = sessionStorage.getItem("idUsuario");
-  const [llamado, setLlamado] = useState(false);
+function InfoItem({ label, value }) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        margin: "2rem",
+      }}
+    >
+      <Typography
+        sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
+        variant="body1"
+      >
+        {label}:
+      </Typography>
+      <Typography
+        sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
+        variant="body1"
+      >
+        {value}
+      </Typography>
+    </Box>
+  );
+}
 
-  async function actualizarDatos() {
-    if (llamado === false) {
-      await axios
-        .get(`${config.apiUrl}/empresas/idUsuario/${idUsuario}`)
-        .then(({ data }) => {
-          cambiarDatosUsuario(data);
-        });
-      setLlamado(true);
+export default function EmpresaInfo() {
+  const { cambiarDatosUsuario } = useContext(DatosUsuarioContextProvider);
+  const [llamado, setLlamado] = useState(false);
+  const [datosUsuario, setDatosUsuario] = useState({
+    nombre_empresa: "",
+    descripcion: "",
+    email_representante: "",
+    telefono: "",
+    web: "",
+    pais: "",
+    Provincia: { nombre: "" },
+    Ciudad: { nombre: "" },
+  });
+
+  useEffect(() => {
+    const idUsuario = sessionStorage.getItem("idUsuario");
+
+    async function actualizarDatos() {
+      if (!llamado) {
+        const data = await getEmpresaByIdUsuario(idUsuario);
+        setDatosUsuario(data);
+        cambiarDatosUsuario(data);
+        setLlamado(true);
+      }
     }
-  }
-  actualizarDatos();
+
+    actualizarDatos();
+  }, [llamado, cambiarDatosUsuario]);
 
   return (
-    <React.Fragment>
+    <>
       <Header />
       <Box
         sx={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}
@@ -56,38 +87,8 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Nombre:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {datosUsuario.nombre_empresa}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Descripcion:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {datosUsuario.descripcion}
-              </Typography>
-            </Box>
+            <InfoItem label="Nombre" value={datosUsuario.nombre_empresa} />
+            <InfoItem label="Descripción" value={datosUsuario.descripcion} />
           </Box>
           <Divider>
             <Chip
@@ -96,111 +97,29 @@ export default function DividerText() {
             />
           </Divider>
           <Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Email del representante:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {datosUsuario.email_representante}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Numero de contecto:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                +54 9 {datosUsuario.telefono}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Pagina web:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {datosUsuario.web}
-              </Typography>
-            </Box>
+            <InfoItem
+              label="Email del representante"
+              value={datosUsuario.email_representante}
+            />
+            <InfoItem
+              label="Número de contacto"
+              value={`+54 9 ${datosUsuario.telefono}`}
+            />
+            <InfoItem label="Página web" value={datosUsuario.web} />
           </Box>
           <Divider>
             <Chip
               sx={{ backgroundColor: "#009688", color: "#ffffff" }}
-              label="UBICACION"
+              label="UBICACIÓN"
             />
           </Divider>
           <Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Pais:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {datosUsuario.pais}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Provincia:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {datosUsuario.Provincia.nombre}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Ciudad:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {datosUsuario.Ciudad.nombre}
-              </Typography>
-            </Box>
+            <InfoItem label="País" value={datosUsuario.pais} />
+            <InfoItem label="Provincia" value={datosUsuario.Provincia.nombre} />
+            <InfoItem label="Ciudad" value={datosUsuario.Ciudad.nombre} />
           </Box>
         </Root>
       </Box>
-    </React.Fragment>
+    </>
   );
 }

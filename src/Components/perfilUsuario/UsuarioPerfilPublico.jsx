@@ -1,13 +1,9 @@
-import * as React from "react";
-import { styled } from "@mui/material/styles";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
-import Header from "../Header";
-import { Box, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { config } from "../../config/config";
+import { styled } from "@mui/material/styles";
+import Header from "../Header";
+import { Box, Typography, Chip, Divider } from "@mui/material";
+import { getPostulanteByDni } from "../../services/postulantes_service";
 
 const Root = styled("div")(({ theme }) => ({
   width: "100%",
@@ -17,36 +13,28 @@ const Root = styled("div")(({ theme }) => ({
   },
 }));
 
-export default function DividerText() {
+const DividerText = () => {
   const { id } = useParams();
-  const [nombrePostulante, setNombrePostulante] = useState();
-  const [apellidoPostulante, setApellidoPostulante] = useState();
-  const [emailPostulante, setEmailPostulante] = useState();
-  const [telefonoPostulante, setTelefonoPostulante] = useState();
-  const [paisPostulante, setPaisPostulante] = useState();
-  const [provinciaPostulante, setProvinciaPostulante] = useState();
-  const [ciudadPostulante, setCiudadPostulante] = useState();
-  const [fechaNacPostulante, setFechaNacPostulante] = useState();
-  axios.get(`${config.apiUrl}/postulantes/dni/${id}`).then(({ data }) => {
-    setNombrePostulante(data.nombre);
-    setApellidoPostulante(data.apellido);
-    setEmailPostulante(data.Usuario.usuario);
-    setTelefonoPostulante(data.telefono);
-    setPaisPostulante(data.pais);
-    setProvinciaPostulante(data.Provincia.nombre);
-    setCiudadPostulante(data.Ciudad.nombre);
-    setFechaNacPostulante(data.fecha_nac);
-  });
+  const [postulanteInfo, setPostulanteInfo] = useState(null);
 
-  const formatoFechaNacimiento = (fecha) => {
-    var fechaNacimiento = new Date(fecha);
-    var dia = fechaNacimiento.getDate() + 1;
-    var mes = fechaNacimiento.getMonth() + 1;
-    var anio = fechaNacimiento.getFullYear();
-    return dia + "/" + mes + "/" + anio;
+  useEffect(() => {
+    async function fetchData() {
+      const response = await getPostulanteByDni(id);
+      setPostulanteInfo(response);
+    }
+    fetchData();
+  }, [id]);
+
+  const formatDate = (fecha) => {
+    const fechaNacimiento = new Date(fecha);
+    const dia = fechaNacimiento.getDate() + 1;
+    const mes = fechaNacimiento.getMonth() + 1;
+    const anio = fechaNacimiento.getFullYear();
+    return `${dia}/${mes}/${anio}`;
   };
+
   return (
-    <React.Fragment>
+    <>
       <Header />
       <Box style={{ margin: "2rem" }}>
         <Root>
@@ -70,7 +58,7 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {nombrePostulante} {apellidoPostulante}
+                {postulanteInfo?.nombre} {postulanteInfo?.apellido}
               </Typography>
             </Box>
             <Box
@@ -86,7 +74,7 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {formatoFechaNacimiento(fechaNacPostulante)}
+                {formatDate(postulanteInfo?.fecha_nac)}
               </Typography>
             </Box>
           </Box>
@@ -110,7 +98,7 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {emailPostulante}
+                {postulanteInfo?.Usuario.usuario}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -124,7 +112,7 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                +54 9 {telefonoPostulante}
+                +54 9 {postulanteInfo?.telefono}
               </Typography>
             </Box>
           </Box>
@@ -148,7 +136,7 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {paisPostulante}
+                {postulanteInfo?.pais}
               </Typography>
             </Box>
             <Box
@@ -164,7 +152,7 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {provinciaPostulante}
+                {postulanteInfo?.Provincia.nombre}
               </Typography>
             </Box>
             <Box
@@ -180,12 +168,14 @@ export default function DividerText() {
                 sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
                 variant="body1"
               >
-                {ciudadPostulante}
+                {postulanteInfo?.Ciudad.nombre}
               </Typography>
             </Box>
           </Box>
         </Root>
       </Box>
-    </React.Fragment>
+    </>
   );
-}
+};
+
+export default DividerText;

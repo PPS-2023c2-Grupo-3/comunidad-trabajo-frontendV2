@@ -1,69 +1,54 @@
-import React, { Fragment, useState } from "react";
-
+import { useState, useEffect } from "react";
 import Header from "../../Header";
-import { Pagination, Typography } from "@mui/material";
+import { Pagination, Typography, Box } from "@mui/material";
 import BarraBusquedaPostulantes from "./BarraBusquedaPostulantes";
 import ListaPostulantes from "./ListaPostulantes";
 import BusquedaNoEncontrada from "./BusquedaNoEncontrada";
-import { Box } from "@mui/system";
-import { config } from "../../../config/config";
+import { getPostulantes } from "../../../services/postulantes_service";
 
 const ListadoPostulantes = () => {
-  const [llamado, setLlamado] = useState(false);
   const [postulantes, setPostulantes] = useState([]);
   const [cantPaginas, setCantPaginas] = useState(0);
   const [pagina, setPagina] = useState(1);
   const [busquedaActual, setBusquedaActual] = useState("");
-  const API_URL = `${config.apiUrl}/postulantes/?pagina=0&limite=6&ordenar=id`;
+
+  useEffect(() => {
+    primerLlamado();
+  }, []);
 
   const primerLlamado = async () => {
-    if (llamado === false) {
-      try {
-        const api = await fetch(API_URL);
-        const datos = await api.json();
-        setLlamado(true);
-        setPostulantes(datos.postulantes.rows);
-        setCantPaginas(datos.totalPaginas);
-      } catch (error) {
-        console.log(error);
-      }
+    try {
+      const response = await getPostulantes(0, 6, "id", "");
+      setPostulantes(response.postulantes.rows);
+      setCantPaginas(response.totalPaginas);
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const traerPostulantes = async (e, p) => {
+  const traerPostulantes = async (e) => {
     try {
       e.preventDefault();
       const { usuario } = e.target.elements;
       const usuarioValue = usuario.value;
       setBusquedaActual(usuarioValue);
-      const api = await fetch(
-        `${config.apiUrl}/postulantes/?pagina=0&limite=6&ordenar=id&buscarPostulante=${usuarioValue}`
-      );
-      const datos = await api.json();
-      console.log(datos);
+      const response = await getPostulantes(0, 6, "id", usuarioValue);
       setPagina(1);
-      setPostulantes(datos.postulantes.rows);
-      setCantPaginas(datos.totalPaginas);
-      console.log(postulantes);
+      setPostulantes(response.postulantes.rows);
+      setCantPaginas(response.totalPaginas);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const cambiarPagina = async (e, p) => {
-    const api = await fetch(
-      `${config.apiUrl}/postulantes/?pagina=${
-        p - 1
-      }&limite=6&ordenar=id&buscarPostulante=${busquedaActual}`
-    );
-    const datos = await api.json();
-    setPostulantes(datos.postulantes.rows);
+  const cambiarPagina = async (event, p) => {
+    const response = await getPostulantes(p - 1, 6, "id", busquedaActual);
+    setPostulantes(response.postulantes.rows);
     setPagina(p);
   };
 
-  primerLlamado();
   return (
-    <Fragment>
+    <>
       <Header />
       <Box
         sx={{
@@ -77,8 +62,10 @@ const ListadoPostulantes = () => {
         </Typography>
         <BarraBusquedaPostulantes traerPostulantes={traerPostulantes} />
       </Box>
-      {postulantes.length === 0 && llamado === true ? (
-        <BusquedaNoEncontrada />
+      {postulantes.length === 0 ? (
+        busquedaActual !== "" ? (
+          <BusquedaNoEncontrada />
+        ) : null
       ) : (
         <ListaPostulantes postulantes={postulantes} />
       )}
@@ -89,7 +76,7 @@ const ListadoPostulantes = () => {
         onChange={cambiarPagina}
         sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
       />
-    </Fragment>
+    </>
   );
 };
 

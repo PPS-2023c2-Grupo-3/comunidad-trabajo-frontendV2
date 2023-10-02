@@ -1,10 +1,9 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Header from "../Header";
-import { config } from "../../config/config";
 import {
   Box,
   Select,
@@ -20,63 +19,66 @@ import { MenuList } from "@material-ui/core";
 import IdFormContext from "../../Context/IdFormContext";
 import { useContext } from "react";
 import { useHistory } from "react-router-dom";
+import { getProvincias } from "../../services/provincias_service";
+import { getCiudades } from "../../services/ciudades_service";
+import { postEmpresa } from "../../services/empresas_service";
 
 const validationSchema = yup.object({
   nombreEmpresa: yup
     .string("Ingrese su un titulo para la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional("El titulo de la oferta requerido"),
   cuit: yup
     .string("Ingrese una cuit a la cuit")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional("cuit requerido"),
   descripcion: yup
     .string("Ingrese su horario laboral desde")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   ciudad: yup
     .string("Ingrese su edad hasta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   provincia: yup
     .string("Ingrese su edad desde de residencia")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   calle: yup
     .string("cuit de experiencia previa")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   nro: yup
     .number("Ingrese altura")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   piso: yup
     .string("Ingrese su piso de contacto")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   depto: yup
     .string("Ingrese otros detalles de la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   cp: yup
     .string("Ingrese otros detalles de la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   telefono: yup
-    .number("Ingrese la telefono")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese la teléfono")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   web: yup
     .string("Ingrese la web")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   nombreRepresentante: yup
     .string("Ingrese la nombreRepresentante")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   emailRepresentante: yup
     .string("Ingrese la emailRepresentante")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
 });
 
@@ -90,9 +92,8 @@ export default function WithMaterialUI() {
   const llamarProvincias = async () => {
     if (llamadoProvincias === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/provincias`);
-        const datos = await api.json();
-        setListaProvincias(datos.provincias);
+        const response = await getProvincias();
+        setListaProvincias(response.provincias);
         setLlamadoProvincias(true);
       } catch (error) {
         console.log(error);
@@ -105,12 +106,8 @@ export default function WithMaterialUI() {
   const llamarCiudades = async (provincia) => {
     if (provinciaActual !== provincia) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/ciudades/?idProvincia=${provincia}`
-        );
-        const datos = await api.json();
-        console.log(datos);
-        setListaCiudades(datos.ciudades);
+        const response = await getCiudades(provincia);
+        setListaCiudades(response.ciudades);
       } catch (error) {
         console.log(error);
       }
@@ -139,7 +136,7 @@ export default function WithMaterialUI() {
       idRubro: 1,
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       var data = {
         idUsuario: id,
         idRubro: 1,
@@ -159,47 +156,34 @@ export default function WithMaterialUI() {
         nombreRepresentante: values.nombreRepresentante,
         emailRepresentante: values.emailRepresentante,
       };
-      console.log(values);
-      fetch(`${config.apiUrl}/empresas/`, {
-        method: "POST", // or 'PUT'
-        body: JSON.stringify(data), // data can be `string` or {object}!
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .then((response) =>
-          console.log(
-            "Success:",
-            response,
-            Swal.fire({
-              icon: "success",
-              title: "La empresa fue creada exitosamente",
-              confirmButtonText: "Finalizar",
-              text: "Para continuar pulse el boton",
-              footer: "",
-              showCloseButton: true,
-            }).then(function (result) {
-              if (result.value) {
-                history.push("/");
-              }
-            })
-          )
-        )
-        .catch((error) =>
-          console.error(
-            "Error:",
-            error,
-            Swal.fire({
-              icon: "error",
-              title: "Ocurrio un error al crear la empresa",
-              confirmButtonText: "Volver",
-              text: "Verifique sus datos",
-              footer: "",
-              showCloseButton: true,
-            })
-          )
-        );
+      try {
+        const response = await postEmpresa(data);
+        if (response) {
+          Swal.fire({
+            icon: "success",
+            title: "La empresa fue creada exitosamente",
+            confirmButtonText: "Finalizar",
+            text: "Para continuar pulse el botón",
+            footer: "",
+            showCloseButton: true,
+          }).then(function (result) {
+            if (result.value) {
+              history.push("/");
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Ocurrió un error al crear la empresa",
+            confirmButtonText: "Volver",
+            text: "Verifique sus datos",
+            footer: "",
+            showCloseButton: true,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
   return (
@@ -215,7 +199,7 @@ export default function WithMaterialUI() {
         <form onSubmit={formik.handleSubmit}>
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <Grid
-              sx={{ diaplay: "flex", justifyContent: "center" }}
+              sx={{ display: "flex", justifyContent: "center" }}
               container
               spacing={2}
             >
@@ -258,7 +242,7 @@ export default function WithMaterialUI() {
                 <TextField
                   id="descripcion"
                   name="descripcion"
-                  label="Descripcion"
+                  label="Descripción"
                   fullWidth
                   variant="outlined"
                   value={formik.values.descripcion}
@@ -315,7 +299,8 @@ export default function WithMaterialUI() {
                 </FormControl>
                 {formik.values.provincia === undefined ? null : (
                   <Popover>
-                    {console.log("aca" + formik.values.provincia)} {/*revisar esto*/}
+                    {console.log("aca" + formik.values.provincia)}{" "}
+                    {/*revisar esto*/}
                     {llamarCiudades(formik.values.provincia)}
                     {listaCiudades.map((ciudad) => (
                       <MenuList
@@ -418,7 +403,7 @@ export default function WithMaterialUI() {
                   id="cp"
                   name="cp"
                   variant="outlined"
-                  label="Codigo postal"
+                  label="Código postal"
                   fullWidth
                   type="number"
                   value={formik.values.cp}
@@ -431,7 +416,7 @@ export default function WithMaterialUI() {
                   id="telefono"
                   name="telefono"
                   variant="outlined"
-                  label="Telefono"
+                  label="Teléfono"
                   fullWidth
                   type="number"
                   value={formik.values.telefono}

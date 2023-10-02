@@ -1,31 +1,32 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Button, Typography, Box } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import Swal from "sweetalert2";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import { useRef } from "react";
 import CircleIcon from "@mui/icons-material/Circle";
-import { config } from "../../../config/config";
+import { putPostulacion } from "../../../services/postulaciones_service";
 
 export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
-  const pdf = useRef();
-  var token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
-  const aceptarPostulacion = async (idPostulacion) => {
-    var data = {
-      estado: 1,
+  const realizarAccion = async (idPostulacion, estado, successTitle) => {
+    const data = {
+      estado,
     };
+
     Swal.fire({
       icon: "warning",
-      title: "¿Desea aceptar la postulación?",
+      title: `¿Desea ${estado === 1 ? "aceptar" : "rechazar"} la postulación?`,
       showCancelButton: true,
       confirmButtonText: `Aceptar`,
       cancelButtonText: "Cancelar",
@@ -34,96 +35,23 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await fetch(
-            `${config.apiUrl}/postulaciones/${idPostulacion}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          await putPostulacion(idPostulacion, data, token);
         } catch (error) {
           console.log(error);
         }
         Swal.fire({
           icon: "success",
-          title: `El postulante fue aceptado correctamente`,
+          title: `El postulante fue ${successTitle} correctamente`,
           confirmButtonText: "Aceptar",
         }).then(() => {
           window.location.reload();
         });
       }
     });
-  };
-
-  const rechazarPostulacion = async (idPostulacion) => {
-    var data = {
-      estado: 3,
-    };
-    Swal.fire({
-      icon: "warning",
-      title: "¿Desea rechazar la postulación?",
-      showCancelButton: true,
-      confirmButtonText: `Aceptar`,
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await fetch(
-            `${config.apiUrl}/postulaciones/${idPostulacion}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-        } catch (error) {
-          console.log(error);
-        }
-        Swal.fire({
-          icon: "success",
-          title: `El postulante fue rechazado correctamente`,
-          confirmButtonText: "Aceptar",
-        }).then(() => {
-          window.location.reload();
-        });
-      }
-    });
-  };
-
-  function splitFileName(str) {
-    return str.split("|")[1];
-  }
-
-  const traerPdf = async (cvPostulante) => {
-    const fetchedData = await axios.get(`${config.apiUrl}/files`, {
-      headers: {
-        "Content-Type": "application/json",
-        type: "application/pdf",
-        file: splitFileName(cvPostulante),
-        authorization: token,
-      },
-      responseType: "blob",
-    });
-
-    console.log(fetchedData);
-    const pdfBlob = new Blob([fetchedData.data], { type: "application/pdf" });
-    console.log(pdfBlob);
-    const virtualUrl = URL.createObjectURL(pdfBlob);
-    console.log(virtualUrl);
-    pdf.current = virtualUrl;
-    console.log(pdf);
   };
 
   async function abrirPdf(cvPostulante) {
-    await traerPdf(cvPostulante);
-    window.open(pdf.current);
+    window.open(cvPostulante);
   }
 
   return (
@@ -139,7 +67,7 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
                 <Typography variant="h6">DNI</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="h6">Telefono</Typography>
+                <Typography variant="h6">Teléfono</Typography>
               </TableCell>
               <TableCell align="center">
                 <Typography variant="h6">CV</Typography>
@@ -153,48 +81,51 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {postulantes.map((postulantes, index) => (
+            {postulantes.map((postulante, index) => (
               <TableRow
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {postulantes?.Postulante?.nombre}
-                  {postulantes?.Postulante?.apellido}
+                  {postulante?.Postulante?.nombre}{" "}
+                  {postulante?.Postulante?.apellido}
                 </TableCell>
                 <TableCell align="center">
                   <Typography variant="body1">
-                    {postulantes?.Postulante?.id}
+                    {postulante?.Postulante?.id}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Typography variant="body1"></Typography>
-                  {postulantes?.Postulante?.telefono}
+                  <Typography variant="body1">
+                    {postulante?.Postulante?.telefono}
+                  </Typography>
                 </TableCell>
                 <TableCell align="center">
                   <Button
-                    onClick={async () => abrirPdf(postulantes?.Postulante?.cv)}
+                    onClick={async () => abrirPdf(postulante?.Postulante?.cv)}
                   >
                     <PictureAsPdfIcon color="error" />
                   </Button>
                 </TableCell>
                 <TableCell align="center">
                   <Box>
-                    {postulantes?.Estado?.id === 1 ? (
-                      <CircleIcon color="success" />
-                    ) : postulantes?.Estado?.id === 2 ? (
-                      <CircleIcon color="warning" />
-                    ) : (
-                      <CircleIcon color="error" />
-                    )}{" "}
+                    <CircleIcon
+                      color={
+                        postulante?.Estado?.id === 1
+                          ? "success"
+                          : postulante?.Estado?.id === 2
+                          ? "warning"
+                          : "error"
+                      }
+                    />
                     <Typography variant="body1">
-                      {postulantes?.Estado?.nombre_estado}
+                      {postulante?.Estado?.nombre_estado}
                     </Typography>
                   </Box>
                 </TableCell>
                 <TableCell align="center">
                   <Link
-                    to={`/postulantes/${postulantes.Postulante.id}`}
+                    to={`/postulantes/${postulante.Postulante.id}`}
                     style={{ textDecoration: "none" }}
                   >
                     <Button
@@ -205,13 +136,14 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
                       Ver
                     </Button>
                   </Link>
-
-                  {postulantes?.Estado?.id === 2 ? (
+                  {postulante?.Estado?.id === 2 ? (
                     <>
                       <Button
                         variant="contained"
                         color="secondary"
-                        onClick={() => aceptarPostulacion(postulantes.id)}
+                        onClick={() =>
+                          realizarAccion(postulante.id, 1, "aceptado")
+                        }
                         sx={{ margin: "0.5rem" }}
                       >
                         Aceptar
@@ -219,7 +151,9 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
                       <Button
                         variant="contained"
                         color="error"
-                        onClick={() => rechazarPostulacion(postulantes.id)}
+                        onClick={() =>
+                          realizarAccion(postulante.id, 3, "rechazado")
+                        }
                         sx={{ margin: "0.5rem" }}
                       >
                         Rechazar
@@ -231,7 +165,9 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
                         disabled
                         variant="contained"
                         color="secondary"
-                        onClick={() => aceptarPostulacion(postulantes.id)}
+                        onClick={() =>
+                          realizarAccion(postulante.id, 1, "aceptado")
+                        }
                         sx={{ margin: "0.5rem" }}
                       >
                         Aceptar
@@ -240,11 +176,13 @@ export default function ListaPostulantesDeOfertaAdmin({ postulantes }) {
                         disabled
                         variant="contained"
                         color="error"
-                        onClick={() => rechazarPostulacion(postulantes.id)}
+                        onClick={() =>
+                          realizarAccion(postulante.id, 3, "rechazado")
+                        }
                         sx={{ margin: "0.5rem" }}
                       >
                         Rechazar
-                      </Button>{" "}
+                      </Button>
                     </>
                   )}
                 </TableCell>

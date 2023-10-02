@@ -1,49 +1,51 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
+import { Link } from "react-router-dom";
+import "../../App.css";
 import {
+  Box,
+  Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
   Typography,
 } from "@mui/material";
-import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
-import "../../App.css";
 
-export default function InputAdornments(props) {
+export default function PostulationConfirmation(props) {
   return (
-    <Box sx={{ justifyContent: "center", padding: "1rem" }}>
-      <h4
-        style={{ display: "flex", justifyContent: "center", padding: "1rem" }}
-      >
-        Postulacion confirmada!
-      </h4>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "1rem",
+      }}
+    >
+      <Typography variant="h4" sx={{ padding: "1rem" }}>
+        Postulación confirmada!
+      </Typography>
       <Card sx={{ maxWidth: 250, margin: "1rem" }}>
         <CardMedia
           component="img"
           height="140"
           image="https://cdn.discordapp.com/attachments/955646153297395722/996230598853148792/unknown.png"
+          alt="Offer"
         />
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography variant="h5" component="div">
             {props.tituloOferta}
           </Typography>
-          <Typography gutterBottom variant="body" component="div">
+          <Typography variant="body1" component="div">
             {props.nombreEmpresa}
           </Typography>
         </CardContent>
-        <CardActions
-          sx={{ display: "flex", justifyContent: "center" }}
-        ></CardActions>
+        <CardActions sx={{ justifyContent: "center" }}>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <Button size="large" variant="contained" color="primary">
+              Volver a inicio
+            </Button>
+          </Link>
+        </CardActions>
       </Card>
-      <Box sx={{ display: "flex", justifyContent: "center", padding: "1rem" }}>
-        <Link style={{ textDecoration: "none" }} to="/">
-          <Button size="large" variant="contained" color="relaxed">
-            Volver a inicio
-          </Button>
-        </Link>
-      </Box>
     </Box>
   );
 }

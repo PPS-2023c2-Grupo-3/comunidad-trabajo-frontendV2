@@ -7,7 +7,7 @@ import BarraBusqueda from "./BarraBusqueda";
 
 import BusquedaNoEncontrada from "./BusquedaNoEncontrada";
 import { Pagination } from "@mui/material";
-import { config } from "../../config/config";
+import { getOfertaByCuit, getOfertas } from "../../services/ofertas_service";
 
 const Home = () => {
   const [listaOfertas, setListaOfertas] = useState([]);
@@ -16,24 +16,21 @@ const Home = () => {
   const [pagina, setPagina] = useState(1);
   const [busquedaActual, setBusquedaActual] = useState("");
 
-  var API_URL = `${config.apiUrl}/ofertas/?pagina=0&limite=6&ordenar=id&idEstado=1`;
   var grupo = sessionStorage.getItem("grupo");
   var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
 
   const primerLlamado = async () => {
     if (llamado === false) {
       try {
-        var api;
-        if (grupo === "2") {
-          api = await fetch(
-            `${config.apiUrl}/ofertas/cuit/${datosUsuario.id}?pagina=0&limite=6&ordenar=id&idEstado=1`
-          );
+        if(grupo === "2") {
+          const ofertas = await getOfertaByCuit(0, 6, "id", 1, datosUsuario.id);
+          setListaOfertas(ofertas.ofertas.rows);
+          setCantPaginas(ofertas.totalPaginas);
         } else {
-          api = await fetch(API_URL);
+          const response = await getOfertas(0, 6, "", "id", 1);
+          setListaOfertas(response.ofertas.rows);
+          setCantPaginas(response.totalPaginas);
         }
-        const datos = await api.json();
-        setListaOfertas(datos.ofertas.rows);
-        setCantPaginas(datos.totalPaginas);
         setLlamado(true);
       } catch (error) {
         console.log(error);
@@ -47,46 +44,47 @@ const Home = () => {
       const { ofertas } = e.target.elements;
       const ofertasValue = ofertas.value;
       setBusquedaActual(ofertasValue);
-      var api;
+      
+      const pagina = 0;
+      const limite = grupo === "2" ? "" : 6;
+      const ordenar = "id";
+      const idEstado = 1;
+      
+      let resultados;
       if (grupo === "2") {
-        api = await fetch(
-          `${config.apiUrl}/ofertas/cuit/${datosUsuario.id}?pagina=0&limite=&buscarTitulo=${ofertasValue}3&ordenar=id&idEstado=1`
-        );
+        resultados = await getOfertaByCuit(pagina, limite, ordenar, idEstado, datosUsuario.id);
       } else {
-        api = await fetch(
-          `${config.apiUrl}/ofertas/?pagina=0&limite=6&buscarTitulo=${ofertasValue}&ordenar=id&idEstado=1`
-        );
+        resultados = await getOfertas(pagina, limite, ofertasValue, ordenar, idEstado);
       }
-      const datos = await api.json();
+      
       setPagina(1);
-      setListaOfertas(datos.ofertas.rows);
-      setCantPaginas(datos.totalPaginas);
-      console.log(datos.ofertas.rows);
+      setListaOfertas(resultados.ofertas.rows);
+      setCantPaginas(resultados.totalPaginas);
+    } catch (err) {
+      console.log(err);
+    }
+  };  
+
+  const cambiarPagina = async (e, p) => {
+    try {
+      const pagina = p - 1;
+      const limite = 6;
+      const ordenar = "id";
+      const idEstado = 1;
+  
+      let resultados;
+      if (grupo === "2") {
+        resultados = await getOfertaByCuit(pagina, limite, ordenar, idEstado, datosUsuario.id);
+      } else {
+        resultados = await getOfertas(pagina, limite, busquedaActual, ordenar, idEstado);
+      }
+      setListaOfertas(resultados.ofertas.rows);
+      setPagina(p);
     } catch (err) {
       console.log(err);
     }
   };
-
-  const cambiarPagina = async (e, p) => {
-    var api;
-    if (grupo === "2") {
-      api = await fetch(
-        `${config.apiUrl}/ofertas/cuit/${datosUsuario.id}?pagina=${
-          p - 1
-        }&limite=6&ordenar=id&buscarTitulo=${busquedaActual}&idEstado=1`
-      );
-    } else {
-      api = await fetch(
-        `${config.apiUrl}/ofertas/?pagina=${
-          p - 1
-        }&limite=6&ordenar=id&buscarTitulo=${busquedaActual}&idEstado=1`
-      );
-    }
-    const datos = await api.json();
-    setListaOfertas(datos.ofertas.rows);
-    setPagina(p);
-    console.log(datos.ofertas.rows);
-  };
+  
 
   primerLlamado();
 

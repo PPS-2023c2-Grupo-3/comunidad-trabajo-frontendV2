@@ -6,9 +6,9 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@mui/material/Typography";
 import Header from "../Header";
 import { useHistory } from "react-router-dom";
-import { config } from "../../config/config";
 import { useContext } from "react";
 import IdFormContext from "../../Context/IdFormContext";
+import { signUp } from "../../services/usuarios_service";
 
 const validationSchema = yup.object({
   email: yup
@@ -17,7 +17,7 @@ const validationSchema = yup.object({
     .required("El email es requerido"),
   password: yup
     .string("Ingrese su contraseña")
-    .min(8, "La contraseña debe tener como minimo 8 caracteres")
+    .min(8, "La contraseña debe tener como mínimo 8 caracteres")
     .required("La contraseña es requerida"),
 });
 
@@ -31,26 +31,15 @@ export default function WithMaterialUI() {
       password: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
-      var data = { usuario: values.email, password: values.password };
-      fetch(`${config.apiUrl}/usuarios/signup/`, {
-        method: "POST", // or 'PUT'
-        body: JSON.stringify(data), // data can be `string` or {object}!
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .catch((error) => console.error("Error:", error))
-        .then((response) =>
-          console.log(
-            "Success:",
-            response,
-            cambiarId(response.id),
-            history.push("/registroPregunta")
-          )
-        );
+    onSubmit: async (values) => {
+      try {
+        const data = { usuario: values.email, password: values.password };
+        const response = await signUp(data);
+        cambiarId(response.id);
+        history.push("/registroPregunta");
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
 

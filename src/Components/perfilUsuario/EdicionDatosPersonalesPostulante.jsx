@@ -1,8 +1,6 @@
-import React, { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 import Header from "../Header";
 import {
   Box,
@@ -12,21 +10,28 @@ import {
   FormControl,
   Typography,
   Popover,
+  TextField,
+  Grid,
+  Button,
 } from "@mui/material";
 import { useState } from "react";
-import Grid from "@mui/material/Grid";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { config } from "../../config/config";
+import { getTiposDocumentos } from "../../services/tiposDocumentos_service";
+import { getProvincias } from "../../services/provincias_service";
+import { getCiudades } from "../../services/ciudades_service";
+import {
+  putPostulante,
+  getPostulanteById,
+} from "../../services/postulantes_service";
 
 const validationSchema = yup.object({
   nombre: yup
     .string("Ingrese su nombre")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .required("Nombre requerido"),
   apellido: yup
     .string("Ingrese su apellido")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .required("Apellido requerido"),
   tipoDocumento: yup
     .string("Ingrese su tipo de documento")
@@ -37,7 +42,7 @@ const validationSchema = yup.object({
   provincia: yup.string("Ingrese su provincia de residencia").optional(),
   calle: yup.string("Ingrese el nombre de su calle").optional(),
   nro: yup.string("Ingrese altura").optional(),
-  telefono: yup.string("Ingrese su telefono de contacto").optional(),
+  telefono: yup.string("Ingrese su teléfono de contacto").optional(),
 });
 
 export default function WithMaterialUI() {
@@ -73,9 +78,8 @@ export default function WithMaterialUI() {
   const llamarTipoDocumento = async () => {
     if (llamadoTipoDocumento === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/tiposDocumento/`);
-        const datos = await api.json();
-        setTiposDocumentos(datos.tipos_documentos);
+        const response = await getTiposDocumentos();
+        setTiposDocumentos(response.tipos_documentos);
         setLlamadoTipoDocumento(true);
       } catch (error) {
         console.log(error);
@@ -90,9 +94,8 @@ export default function WithMaterialUI() {
   const llamarProvincias = async () => {
     if (llamadoProvincias === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/provincias/?`);
-        const datos = await api.json();
-        setListaProvincias(datos.provincias);
+        const response = await getProvincias();
+        setListaProvincias(response.provincias);
         setLlamadoProvincias(true);
       } catch (error) {
         console.log(error);
@@ -105,12 +108,8 @@ export default function WithMaterialUI() {
   const llamarCiudades = async (provincia) => {
     if (provinciaActual !== provincia) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/ciudades/?idProvincia=${provincia}&`
-        );
-        const datos = await api.json();
-        console.log(datos);
-        setListaCiudades(datos.ciudades);
+        const response = await getCiudades(provincia);
+        setListaCiudades(response.ciudades);
       } catch (error) {
         console.log(error);
       }
@@ -141,41 +140,26 @@ export default function WithMaterialUI() {
         nombre: values.nombre,
         apellido: values.apellido,
         nacionalidad: values.nacionalidad,
-
         provincia: values.provincia,
         ciudad: values.ciudad,
         calle: values.calle,
         nro: values.nro,
         telefono: values.telefono,
       };
-      fetch(
-        `${config.apiUrl}/postulantes/dni/${datosUsuario.id}?authorization=${token}`,
-        {
-          method: "PUT", // or 'PUT'
-          body: JSON.stringify(data), // data can be `string` or {object}!
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      putPostulante(datosUsuario.id, data, token);
 
       Swal.fire({
         icon: "success",
-        title: "Sus datos fueron actualizados correctaemente",
+        title: "Sus datos fueron actualizados correctamente",
         confirmButtonText: "Finalizar",
-        text: "Para continuar pulse el boton",
+        text: "Para continuar pulse el botón",
         footer: "",
         showCloseButton: true,
       })
         .then(function (result) {
           if (result.value) {
-            axios
-              .get(
-                `${config.apiUrl}/postulantes/idUsuario/${datosUsuario.Usuario.id}?`
-              )
-              .then(({ data }) => {
-                sessionStorage.setItem("datosUsuario", JSON.stringify(data));
-              });
+            const response = getPostulanteById(datosUsuario.id);
+            sessionStorage.setItem("datosUsuario", JSON.stringify(response));
             window.location.href = "/miPerfil/misDatos";
           }
         })
@@ -185,7 +169,7 @@ export default function WithMaterialUI() {
             err,
             Swal.fire({
               icon: "error",
-              title: "Ocurrio un error al registrarse",
+              title: "Ocurrió un error al registrarse",
               confirmButtonText: "Volver",
               text: "Verifique sus datos",
               footer: "",
@@ -197,7 +181,7 @@ export default function WithMaterialUI() {
   });
 
   return (
-    <Fragment>
+    <>
       <Header />
       <Typography
         variant="h4"
@@ -441,7 +425,7 @@ export default function WithMaterialUI() {
                   id="telefono"
                   name="telefono"
                   variant="outlined"
-                  label="Telefono de contacto"
+                  label="Teléfono de contacto"
                   type="number"
                   fullWidth
                   value={formik.values.telefono}
@@ -464,6 +448,6 @@ export default function WithMaterialUI() {
           </Button>
         </form>
       </Box>
-    </Fragment>
+    </>
   );
 }

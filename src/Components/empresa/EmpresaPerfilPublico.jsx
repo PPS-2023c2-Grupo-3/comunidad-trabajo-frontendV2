@@ -1,13 +1,9 @@
-import * as React from "react";
 import { styled } from "@mui/material/styles";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
 import Header from "../Header";
-import { Box, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Typography, Divider, Chip } from "@mui/material";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { config } from "../../config/config";
+import { getEmpresaByCuit } from "../../services/empresas_service";
 
 const Root = styled("div")(({ theme }) => ({
   width: "100%",
@@ -17,29 +13,59 @@ const Root = styled("div")(({ theme }) => ({
   },
 }));
 
-export default function DividerText() {
-  const { id } = useParams();
-  const [nombreEmpresa, setNombreEmpresa] = useState();
-  const [descripcionEmpresa, setDescripcionEmpresa] = useState();
-  const [emailRepresentanteEmpresa, setEmailRepresentanteEmpresa] = useState();
-  const [numContactoEmpresa, setNumContactoEmpresa] = useState();
-  const [webEmpresa, setWebEmpresa] = useState();
-  const [paisEmpresa, setPaisEmpresa] = useState();
-  const [provinciaEmpresa, seProvinciaEmpresa] = useState();
-  const [ciudadEmpresa, setCiudadEmpresa] = useState();
+const InfoItem = ({ label, value }) => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      margin: "2rem",
+    }}
+  >
+    <Typography
+      sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
+      variant="body1"
+    >
+      {label}:
+    </Typography>
+    <Typography
+      sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
+      variant="body1"
+    >
+      {value}
+    </Typography>
+  </Box>
+);
 
-  axios.get(`${config.apiUrl}/empresas/cuit/${id}?`).then(({ data }) => {
-    setNombreEmpresa(data.nombre_empresa);
-    setDescripcionEmpresa(data.descripcion);
-    setEmailRepresentanteEmpresa(data.email_representante);
-    setNumContactoEmpresa(data.telefono);
-    setWebEmpresa(data.web);
-    setPaisEmpresa(data.pais);
-    seProvinciaEmpresa(data.Provincia.nombre);
-    setCiudadEmpresa(data.Ciudad.nombre);
+export default function EmpresaInfo() {
+  const { id } = useParams();
+  const [empresaInfo, setEmpresaInfo] = useState({
+    nombreEmpresa: "",
+    descripcionEmpresa: "",
+    emailRepresentanteEmpresa: "",
+    numContactoEmpresa: "",
+    webEmpresa: "",
+    paisEmpresa: "",
+    provinciaEmpresa: "",
+    ciudadEmpresa: "",
   });
+
+  useEffect(() => {
+    getEmpresaByCuit(id).then((res) => {
+      setEmpresaInfo({
+        nombreEmpresa: res.nombre_empresa,
+        descripcionEmpresa: res.descripcion,
+        emailRepresentanteEmpresa: res.email_representante,
+        numContactoEmpresa: res.telefono,
+        webEmpresa: res.web,
+        paisEmpresa: res.pais,
+        provinciaEmpresa: res.Provincia.nombre,
+        ciudadEmpresa: res.Ciudad.nombre,
+      });
+    });
+  }, [id]);
+
   return (
-    <React.Fragment>
+    <>
       <Header />
       <Box style={{ margin: "2rem" }}>
         <Root>
@@ -49,152 +75,37 @@ export default function DividerText() {
               label="SOBRE LA EMPRESA"
             />
           </Divider>
-          <Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Nombre:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {nombreEmpresa}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Descripcion:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {descripcionEmpresa}
-              </Typography>
-            </Box>
-          </Box>
+          <InfoItem label="Nombre" value={empresaInfo.nombreEmpresa} />
+          <InfoItem
+            label="Descripción"
+            value={empresaInfo.descripcionEmpresa}
+          />
           <Divider>
             <Chip
               sx={{ backgroundColor: "#009688", color: "#ffffff" }}
               label="CONTACTO"
             />
           </Divider>
-          <Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Email del representante:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {emailRepresentanteEmpresa}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Numero de contecto:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                +54 9 {numContactoEmpresa}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Pagina web:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {webEmpresa}
-              </Typography>
-            </Box>
-          </Box>
+          <InfoItem
+            label="Email del representante"
+            value={empresaInfo.emailRepresentanteEmpresa}
+          />
+          <InfoItem
+            label="Número de contacto"
+            value={`+54 9 ${empresaInfo.numContactoEmpresa}`}
+          />
+          <InfoItem label="Página web" value={empresaInfo.webEmpresa} />
           <Divider>
             <Chip
               sx={{ backgroundColor: "#009688", color: "#ffffff" }}
-              label="UBICACION"
+              label="UBICACIÓN"
             />
           </Divider>
-          <Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Pais:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {paisEmpresa}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Provincia:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {provinciaEmpresa}
-              </Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", margin: "2rem" }}
-            >
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                Ciudad:
-              </Typography>
-              <Typography
-                sx={{ fontSize: "20px", paddingLeft: "0.5rem" }}
-                variant="body1"
-              >
-                {ciudadEmpresa}
-              </Typography>
-            </Box>
-          </Box>
+          <InfoItem label="País" value={empresaInfo.paisEmpresa} />
+          <InfoItem label="Provincia" value={empresaInfo.provinciaEmpresa} />
+          <InfoItem label="Ciudad" value={empresaInfo.ciudadEmpresa} />
         </Root>
       </Box>
-    </React.Fragment>
+    </>
   );
 }

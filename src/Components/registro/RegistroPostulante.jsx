@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
@@ -20,16 +20,23 @@ import Grid from "@mui/material/Grid";
 import Swal from "sweetalert2";
 import { useContext } from "react";
 import IdFormContext from "../../Context/IdFormContext";
-import { config } from "../../config/config";
+import { getTiposDocumentos } from "../../services/tiposDocumentos_service";
+import { getCarreras } from "../../services/carreras_service";
+import { getEstudios } from "../../services/estudios_service";
+import { getProvincias } from "../../services/provincias_service";
+import { getCiudades } from "../../services/ciudades_service";
+import { getIdiomas } from "../../services/idiomas_service";
+import { getNivelesIdiomas } from "../../services/nivelesIdiomas_service";
+import { postPostulante } from "../../services/postulantes_service";
 
 const validationSchema = yup.object({
   nombre: yup
     .string("Ingrese su nombre")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .required("Nombre requerido"),
   apellido: yup
     .string("Ingrese su apellido")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .required("Apellido requerido"),
   fechaNac: yup
     .string("Ingrese su fecha de nacimiento")
@@ -43,7 +50,7 @@ const validationSchema = yup.object({
   provincia: yup.string("Ingrese su provincia de residencia").optional(),
   calle: yup.string("Ingrese el nombre de su calle").optional(),
   nro: yup.string("Ingrese altura").optional(),
-  telefono: yup.string("Ingrese su telefono de contacto").optional(),
+  telefono: yup.string("Ingrese su teléfono de contacto").optional(),
   universidad: yup.string("Ingrese el nombre de su Universidad").optional(),
   carrera: yup.string("Ingrese su carrera").optional(),
   cantMateriasAprobadas: yup
@@ -64,9 +71,8 @@ export default function WithMaterialUI() {
   const llamarTipoDocumento = async () => {
     if (llamadoTipoDocumento === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/tiposDocumento`);
-        const datos = await api.json();
-        setTiposDocumentos(datos.tipos_documentos);
+        const response = await getTiposDocumentos();
+        setTiposDocumentos(response.tipos_documentos);
         setLlamadoTipoDocumento(true);
       } catch (error) {
         console.log(error);
@@ -81,9 +87,8 @@ export default function WithMaterialUI() {
   const llamarCarreras = async () => {
     if (llamadoListaCarreras === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/carreras/`);
-        const datos = await api.json();
-        setListaCarreras(datos.carreras);
+        const response = await getCarreras();
+        setListaCarreras(response.carreras);
         setLlamadoListaCarreras(true);
       } catch (error) {
         console.log(error);
@@ -97,9 +102,8 @@ export default function WithMaterialUI() {
   const llamarEstudios = async () => {
     if (llamadoTipoDocumento === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/estudios/`);
-        const datos = await api.json();
-        setListaEstudios(datos.estudios);
+        const response = await getEstudios();
+        setListaEstudios(response.estudios);
       } catch (error) {
         console.log(error);
       }
@@ -113,9 +117,8 @@ export default function WithMaterialUI() {
   const llamarProvincias = async () => {
     if (llamadoProvincias === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/provincias`);
-        const datos = await api.json();
-        setListaProvincias(datos.provincias);
+        const response = await getProvincias();
+        setListaProvincias(response.provincias);
         setLlamadoProvincias(true);
       } catch (error) {
         console.log(error);
@@ -128,12 +131,8 @@ export default function WithMaterialUI() {
   const llamarCiudades = async (provincia) => {
     if (provinciaActual !== provincia) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/ciudades/?idProvincia=${provincia}`
-        );
-        const datos = await api.json();
-        console.log(datos);
-        setListaCiudades(datos.ciudades);
+        const response = await getCiudades(provincia);
+        setListaCiudades(response.ciudades);
       } catch (error) {
         console.log(error);
       }
@@ -146,10 +145,8 @@ export default function WithMaterialUI() {
   const llamarIdiomas = async () => {
     if (llamadoIdiomas === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/idiomas`);
-        const datos = await api.json();
-        console.log(datos.idiomas);
-        setListaIdiomas(datos.idiomas);
+        const response = await getIdiomas();
+        setListaIdiomas(response.idiomas);
         setLlamadoIdiomas(true);
       } catch (error) {
         console.log(error);
@@ -163,9 +160,8 @@ export default function WithMaterialUI() {
   const llamarNiveles = async () => {
     if (llamadoNiveles === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/nivelesIdiomas`);
-        const datos = await api.json();
-        setListaNiveles(datos.niveles_idiomas);
+        const response = await getNivelesIdiomas();
+        setListaNiveles(response.niveles_idiomas);
         setLlamadoNiveles(true);
       } catch (error) {
         console.log(error);
@@ -231,7 +227,7 @@ export default function WithMaterialUI() {
       estudios: undefined,
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       var data = {
         documento: values.dni,
         tipoDocumento: values.tipoDocumento,
@@ -256,49 +252,36 @@ export default function WithMaterialUI() {
         alumnoUnahur: "true",
         presentacion: "",
       };
-      console.log(values);
-      console.log(IdActual);
+
       if (IdActual === listaIDs.length - 1) {
-        fetch(`${config.apiUrl}/postulantes/?`, {
-          method: "POST", // or 'PUT'
-          body: JSON.stringify(data), // data can be `string` or {object}!
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((response) =>
-            console.log( //todo esto dentro de un console.log??
-              "Success:",
-              response,
-              Swal.fire({
-                icon: "success",
-                title: "Su registro fue realizado correctamente",
-                confirmButtonText: "Finalizar",
-                text: "Para continuar pulse el boton",
-                footer: "",
-                showCloseButton: true,
-              }).then(function (result) {
-                if (result.value) {
-                  window.location = "/";
-                }
-              })
-            )
-          )
-          .catch((error) =>
-            console.error(
-              "Error:",
-              error,
-              Swal.fire({
-                icon: "error",
-                title: "Ocurrio un error al registrarse",
-                confirmButtonText: "Volver",
-                text: "Verifique sus datos",
-                footer: "",
-                showCloseButton: true,
-              })
-            )
-          );
+        try {
+          const response = await postPostulante(data);
+          if (response) {
+            Swal.fire({
+              icon: "success",
+              title: "Su registro fue realizado correctamente",
+              confirmButtonText: "Finalizar",
+              text: "Para continuar pulse el botón",
+              footer: "",
+              showCloseButton: true,
+            }).then(function (result) {
+              if (result.value) {
+                window.location = "/";
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Ocurrió un error al registrarse",
+              confirmButtonText: "Volver",
+              text: "Verifique sus datos",
+              footer: "",
+              showCloseButton: true,
+            });
+          }
+        } catch (error) {
+          console.log(error);
+        }
       } else {
         siguiente();
       }
@@ -320,7 +303,7 @@ export default function WithMaterialUI() {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6} md={4}>
                 <TextField
-                  color="success"
+                  color="primary"
                   variant="outlined"
                   id="nombre"
                   name="nombre"
@@ -542,7 +525,7 @@ export default function WithMaterialUI() {
                   id="telefono"
                   name="telefono"
                   variant="outlined"
-                  label="Telefono de contacto"
+                  label="Teléfono de contacto"
                   type="number"
                   fullWidth
                   value={formik.values.telefono}
@@ -559,7 +542,7 @@ export default function WithMaterialUI() {
               variant="h4"
               sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
             >
-              Datos academicos
+              Datos académicos
             </Typography>
             <Grid container spacing={2}>
               <Grid sx={{ width: "500px", margin: "1rem" }}>

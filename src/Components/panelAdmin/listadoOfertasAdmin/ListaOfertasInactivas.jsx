@@ -1,93 +1,42 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Button, Typography } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+} from "@mui/material";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 import CircleIcon from "@mui/icons-material/Circle";
-import { Box } from "@mui/system";
-import { config } from "../../../config/config";
+import { putOferta } from "../../../services/ofertas_service";
 
-export default function ListaOfertas({ ofertas }) {
-  var token = sessionStorage.getItem("token");
+function ListaOfertas({ ofertas }) {
+  const token = sessionStorage.getItem("token");
 
-  const activar = async (idOferta, titulo) => {
-    var data = {
-      idEstado: 1,
-    };
-
+  const realizarAccion = async (idOferta, titulo, data) => {
     Swal.fire({
       icon: "warning",
-      title: `¿Deseas activar la oferta ${titulo}?`,
+      title: `¿Deseas ${data.title} la oferta ${titulo}?`,
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Activar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: data.confirmText,
+      cancelButtonText: data.cancelText,
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await fetch(
-            `${config.apiUrl}/ofertas/idOferta/${idOferta}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          await putOferta(idOferta, data.payload, token);
         } catch (error) {
           console.log(error);
         }
         Swal.fire({
           icon: "success",
-          title: `La oferta fue aceptada correctamente`,
-          confirmButtonText: "Aceptar",
-        }).then(() => {
-          window.location.reload();
-        });
-      }
-    });
-  };
-
-  const mandarARevision = async (idOferta, titulo) => {
-    var data = {
-      idEstado: 4,
-    };
-
-    Swal.fire({
-      icon: "warning",
-      title: `¿Deseas mandar a revisión ${titulo}?`,
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "¡Si, mandar!",
-      cancelButtonText: "No, cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await fetch(
-            `${config.apiUrl}/ofertas/idOferta/${idOferta}?authorization=${token}`,
-            {
-              method: "PUT", // or 'PUT'
-              body: JSON.stringify(data), // data can be `string` or {object}!
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-        } catch (error) {
-          console.log(error);
-        }
-        Swal.fire({
-          icon: "success",
-          title: `La oferta fue aceptada correctamente`,
+          title: `La oferta fue ${data.successTitle} correctamente`,
           confirmButtonText: "Continuar",
         }).then(() => {
           window.location.reload();
@@ -95,6 +44,7 @@ export default function ListaOfertas({ ofertas }) {
       }
     });
   };
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -164,7 +114,15 @@ export default function ListaOfertas({ ofertas }) {
                   variant="contained"
                   color="relaxed"
                   sx={{ margin: "0.5rem" }}
-                  onClick={async () => activar(oferta.id, oferta.titulo_oferta)}
+                  onClick={async () =>
+                    realizarAccion(oferta.id, oferta.titulo_oferta, {
+                      title: "activar",
+                      confirmText: "Activar",
+                      cancelText: "Cancelar",
+                      payload: { idEstado: 1 },
+                      successTitle: "activada",
+                    })
+                  }
                 >
                   Activar
                 </Button>
@@ -173,7 +131,13 @@ export default function ListaOfertas({ ofertas }) {
                   color="error"
                   sx={{ margin: "0.5rem" }}
                   onClick={async () =>
-                    mandarARevision(oferta.id, oferta.titulo_oferta)
+                    realizarAccion(oferta.id, oferta.titulo_oferta, {
+                      title: "mandar a revisión",
+                      confirmText: "¡Si, mandar!",
+                      cancelText: "No, cancelar",
+                      payload: { idEstado: 4 },
+                      successTitle: "mandada a revisión",
+                    })
                   }
                 >
                   Suspender
@@ -186,3 +150,5 @@ export default function ListaOfertas({ ofertas }) {
     </TableContainer>
   );
 }
+
+export default ListaOfertas;

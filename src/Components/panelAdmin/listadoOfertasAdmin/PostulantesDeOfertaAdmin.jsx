@@ -1,49 +1,37 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 import Header from "../../Header";
 import NotFound from "../../NotFound";
 import ListaPostulantesDeOfertaAdmin from "./ListaPostulantesDeOfertaAdmin";
-import { config } from "../../../config/config";
+import { getPostulacionesPorIdOferta } from "../../../services/postulacionesId_service";
+import { getOfertaById } from "../../../services/ofertas_service";
 
 export default function PostulantesDeOfertaAdmin() {
   const { id } = useParams();
   const grupo = sessionStorage.getItem("grupo");
-  const [llamado, setLlamado] = useState(false);
   const [postulantes, setPostulantes] = useState([]);
   const [ofertaActual, setOfertaActual] = useState(null);
 
-  const API_URL = `${config.apiUrl}/postulacionesId/oferta/?pagina=0&limite=10&id=${id}`;
-  const API_OFERTA = `${config.apiUrl}/ofertas/idOferta/${id}`;
-
   useEffect(() => {
-    const primerLlamado = async () => {
-      if (!llamado) {
-        try {
-          const response = await fetch(API_URL);
-          const datos = await response.json();
-          setLlamado(true);
-          setPostulantes(datos.postulaciones.rows);
-          console.log(datos.postulaciones.rows);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-
-    const traerIdEmpresa = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(API_OFERTA);
-        const datos = await response.json();
-        setOfertaActual(datos);
+        const responsePostulantes = await getPostulacionesPorIdOferta(
+          0,
+          10,
+          id
+        );
+        const responseOferta = await getOfertaById(id);
+
+        setPostulantes(responsePostulantes.postulaciones.rows);
+        setOfertaActual(responseOferta);
       } catch (error) {
         console.log(error);
       }
     };
 
-    primerLlamado();
-    traerIdEmpresa();
-  }, [API_URL, API_OFERTA, llamado]);
+    fetchData();
+  }, [id]);
 
   return (
     <>

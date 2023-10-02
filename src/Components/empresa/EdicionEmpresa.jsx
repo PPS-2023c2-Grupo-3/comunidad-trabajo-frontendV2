@@ -1,10 +1,6 @@
-import React, { Fragment } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 import Header from "../Header";
-import { config } from "../../config/config";
 import {
   Box,
   Select,
@@ -13,77 +9,84 @@ import {
   Typography,
   MenuList,
   Popover,
+  TextField,
+  Button,
+  Grid,
 } from "@mui/material";
 import { useState } from "react";
-import Grid from "@mui/material/Grid";
 import Swal from "sweetalert2";
-import axios from "axios";
+import { getProvincias } from "../../services/provincias_service";
+import { getCiudades } from "../../services/ciudades_service";
+import {
+  getEmpresaByIdUsuario,
+  putEmpresa,
+} from "../../services/empresas_service";
 
 const validationSchema = yup.object({
   nombreEmpresa: yup
-    .string("Ingrese su un titulo para la oferta")
-    .min(1, "Este campo no puede estar vacio")
-    .optional("El titulo de la oferta requerido"),
+    .string("Ingrese un título para la oferta")
+    .min(1, "Este campo no puede estar vacío")
+    .optional("El título de la oferta es requerido"),
   cuit: yup
-    .number("Ingrese una cuit a la cuit")
-    .min(1, "Este campo no puede estar vacio")
-    .optional("cuit requerido"),
+    .number("Ingrese un número de CUIT")
+    .min(1, "Este campo no puede estar vacío")
+    .optional("CUIT requerido"),
   descripcion: yup
-    .string("Ingrese su horario laboral desde")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese la descripción de la empresa")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   ciudad: yup
-    .string("Ingrese su edad hasta")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese la ciudad")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
-  provincia: yup.string("Ingrese su edad desde de residencia").optional(),
+  provincia: yup.string("Ingrese la provincia de residencia").optional(),
   calle: yup
-    .string("cuit de experiencia previa")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese la calle de la empresa")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   nro: yup
-    .number("Ingrese altura")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese el número de la empresa")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   piso: yup
-    .string("Ingrese su piso de contacto")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese el piso de la empresa")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   depto: yup
-    .string("Ingrese otros detalles de la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese otros detalles de la empresa")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   cp: yup
-    .string("Ingrese otros detalles de la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese el código postal")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   telefono: yup
-    .number("Ingrese la telefono")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese el teléfono")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   web: yup
-    .string("Ingrese la web")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese el sitio web")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   nombreRepresentante: yup
-    .string("Ingrese la nombreRepresentante")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese el nombre del representante")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   emailRepresentante: yup
-    .string("Ingrese la emailRepresentante")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Ingrese el email del representante")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   idRubro: yup
-    .number("Ingrese la telefono")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese el ID del rubro")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   idEstado: yup
-    .number("Ingrese la telefono")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese el ID del estado")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   idUsuario: yup
-    .number("Ingrese la telefono")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese el ID del usuario")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
 });
 
@@ -97,9 +100,8 @@ export default function WithMaterialUI() {
   const llamarProvincias = async () => {
     if (llamadoProvincias === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/provincias/?`);
-        const datos = await api.json();
-        setListaProvincias(datos.provincias);
+        const response = await getProvincias();
+        setListaProvincias(response.provincias);
         setLlamadoProvincias(true);
       } catch (error) {
         console.log(error);
@@ -112,12 +114,8 @@ export default function WithMaterialUI() {
   const llamarCiudades = async (provincia) => {
     if (provinciaActual !== provincia) {
       try {
-        const api = await fetch(
-          `${config.apiUrl}/ciudades/?idProvincia=${provincia}&`
-        );
-        const datos = await api.json();
-        console.log(datos);
-        setListaCiudades(datos.ciudades);
+        const response = await getCiudades(provincia);
+        setListaCiudades(response.ciudades);
       } catch (error) {
         console.log(error);
       }
@@ -168,32 +166,19 @@ export default function WithMaterialUI() {
         nombreRepresentante: values.nombreRepresentante,
         emailRepresentante: values.emailRepresentante,
       };
-      console.log(data);
-      await fetch(
-        `${config.apiUrl}/empresas/cuit/${datosUsuario.id}?authorization=${token}`,
-        {
-          method: "PUT", // or 'PUT'
-          body: JSON.stringify(data), // data can be `string` or {object}!
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await putEmpresa(datosUsuario.id, data, token);
       Swal.fire({
         icon: "success",
         title: "La empresa fue editada exitosamente",
         confirmButtonText: "Finalizar",
-        text: "Para continuar pulse el boton",
+        text: "Para continuar pulse el botón",
         footer: "",
         showCloseButton: true,
       })
         .then(function (result) {
           if (result.value) {
-            axios
-              .get(`${config.apiUrl}/empresas/idUsuario/${idUsuario}&`)
-              .then(({ data }) => {
-                sessionStorage.setItem("datosUsuario", JSON.stringify(data));
-              });
+            const response = getEmpresaByIdUsuario(idUsuario);
+            sessionStorage.setItem("datosUsuario", JSON.stringify(response));
             window.location = "empresaDatosPrivado";
           }
         })
@@ -203,7 +188,7 @@ export default function WithMaterialUI() {
             err,
             Swal.fire({
               icon: "error",
-              title: "Ocurrio un error al editar la empresa",
+              title: "Ocurrió un error al editar la empresa",
               confirmButtonText: "Volver",
               text: "Verifique sus datos",
               footer: "",
@@ -214,13 +199,13 @@ export default function WithMaterialUI() {
     },
   });
   return (
-    <Fragment>
+    <>
       <Header />
       <Typography
         variant="h4"
         sx={{ display: "flex", justifyContent: "center", margin: "1rem" }}
       >
-        Edicion de empresa
+        Edición de empresa
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "center", padding: "2rem" }}>
         <form onSubmit={formik.handleSubmit}>
@@ -230,7 +215,7 @@ export default function WithMaterialUI() {
                 <TextField
                   id="descripcion"
                   name="descripcion"
-                  label="Descripcion"
+                  label="Descripción"
                   fullWidth
                   variant="outlined"
                   value={formik.values.descripcion}
@@ -287,7 +272,6 @@ export default function WithMaterialUI() {
                 </FormControl>
                 {formik.values.provincia === undefined ? null : (
                   <Popover>
-                    {console.log("aca" + formik.values.provincia)}
                     {llamarCiudades(formik.values.provincia)}
                     {listaCiudades.map((ciudad) => (
                       <MenuList
@@ -390,7 +374,7 @@ export default function WithMaterialUI() {
                   id="cp"
                   name="cp"
                   variant="outlined"
-                  label="Codigo postal"
+                  label="Código postal"
                   fullWidth
                   type="number"
                   value={formik.values.cp}
@@ -403,7 +387,7 @@ export default function WithMaterialUI() {
                   id="telefono"
                   name="telefono"
                   variant="outlined"
-                  label="Telefono"
+                  label="Teléfono"
                   fullWidth
                   type="number"
                   value={formik.values.telefono}
@@ -469,6 +453,6 @@ export default function WithMaterialUI() {
           </Box>
         </form>
       </Box>
-    </Fragment>
+    </>
   );
 }

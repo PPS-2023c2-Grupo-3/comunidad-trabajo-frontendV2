@@ -1,37 +1,38 @@
-import { Fragment, useState, useEffect } from "react";
-import { Box } from "@mui/system";
+import { useState, useEffect } from "react";
 import Header from "../../Header";
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import BarraBusquedaOfertas from "./BarraBusquedaOfertas";
 import ListaOfertas from "./ListaPostulaciones";
-import { config } from "../../../config/config";
+import { getPostulacionesPorIdPostulante } from "../../../services/postulacionesId_service";
 
 const ListadoOfertas = () => {
   const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
-  const [llamado, setLlamado] = useState(false);
-  const [ofertas, setOfertas] = useState([]);
+  const id = datosUsuario.id;
 
-  const API_URL = `${config.apiUrl}/postulacionesId/postulante/?pagina=0&limite=10&id=${datosUsuario.id}`;
+  const [ofertas, setOfertas] = useState([]);
+  // Acá tendríamos que agregar paginación y el limite de ofertas por página
+  const [pagina, setPagina] = useState(0);
+  const [limite, setLimite] = useState(10);
 
   useEffect(() => {
     const primerLlamado = async () => {
-      if (llamado === false) {
-        try {
-          const api = await fetch(API_URL);
-          const datos = await api.json();
-          setLlamado(true);
-          setOfertas(datos.postulaciones.rows);
-        } catch (error) {
-          console.log(error);
-        }
+      try {
+        const response = await getPostulacionesPorIdPostulante(
+          pagina,
+          limite,
+          id
+        );
+        setOfertas(response.postulaciones.rows);
+      } catch (error) {
+        console.log(error);
       }
     };
 
     primerLlamado();
-  }, [llamado, API_URL]);
+  }, [pagina, limite, id]);
 
   return (
-    <Fragment>
+    <>
       <Header />
       <Box
         sx={{
@@ -46,7 +47,7 @@ const ListadoOfertas = () => {
         <BarraBusquedaOfertas />
       </Box>
       <ListaOfertas ofertas={ofertas} />
-    </Fragment>
+    </>
   );
 };
 

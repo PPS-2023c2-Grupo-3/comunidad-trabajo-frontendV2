@@ -1,75 +1,109 @@
-import * as React from "react";
-import { useState } from "react";
-import Stack from "@mui/material/Stack";
-import { Avatar, Button } from "@mui/material";
-import Box from "@mui/material/Box";
-import Header from "../Header";
-import { Link } from "react-router-dom";
-import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
-import { useContext } from "react";
-import axios from "axios";
-import Swal from "sweetalert2";
-// import { useEffect } from "react";
-import { useRef } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
+import { Avatar, Box, Button, Stack } from "@mui/material";
 import { AddAPhoto } from "@mui/icons-material";
-import { config } from "../../config/config";
+import { Link } from "react-router-dom";
+import Header from "../Header";
+import DatosUsuarioContextProvider from "../../Context/DatosUsuarioContext";
+import Swal from "sweetalert2";
+
+import {
+  getEmpresaByIdUsuario,
+  putEmpresa,
+  getEmpresaByCuit,
+} from "../../services/empresas_service";
+import { supabase } from "../../supabase/supabase.config";
 
 export default function PerfilEmpresa() {
   const { cambiarDatosUsuario } = useContext(DatosUsuarioContextProvider);
-  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
-  var token = sessionStorage.getItem("token");
-  var idUsuario = sessionStorage.getItem("idUsuario");
+  const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  const token = sessionStorage.getItem("token");
+  const idUsuario = sessionStorage.getItem("idUsuario");
+  const uploadFoto = useRef(null);
+  const [photoURL, setPhotoURL] = useState("");
 
-  // const [logo, setLogo] = useState();
-  const uploadLogo = useRef();
   const [llamado, setLlamado] = useState(false);
 
-  async function actualizarDatos() {
-    if (llamado === false) {
-      await axios
-        .get(`${config.apiUrl}/empresas/idUsuario/${idUsuario}?`)
-        .then(({ data }) => {
-          cambiarDatosUsuario(data);
-        });
-      setLlamado(true);
+  useEffect(() => {
+    async function actualizarDatos() {
+      if (!llamado) {
+        const response = await getEmpresaByIdUsuario(idUsuario);
+        cambiarDatosUsuario(response);
+        setLlamado(true);
+      }
     }
-  }
-  actualizarDatos();
+    actualizarDatos();
+  }, [cambiarDatosUsuario, idUsuario, llamado]);
 
-  function timeoutReload() {
-    setTimeout(function () {
-      window.location.reload();
-    }, 2000);
-  }
+  useEffect(() => {
+    async function fetchPhotoURL() {
+      try {
+        const response = await getEmpresaByIdUsuario(idUsuario);
+        const fotoValor = response.logo;
+        setPhotoURL(fotoValor);
+      } catch (error) {
+        console.error(
+          "Error al obtener el valor de 'foto' desde el backend:",
+          error
+        );
+      }
+    }
+
+    fetchPhotoURL();
+  }, [idUsuario]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("uploadLogo", uploadLogo.current);
     try {
-      await axios({
-        method: "post",
-        url: `${config.apiUrl}/files/logo/?authorization=${token}`,
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-          id: datosUsuario.id,
-        },
-      });
+      const formData = new FormData();
+      formData.append("file", uploadFoto.current);
+
+      const { error: uploadError } = await supabase.storage
+        .from("files")
+        .upload(uploadFoto.current.name, uploadFoto.current);
+
+      if (uploadError) {
+        console.error("Error al cargar el archivo: ", uploadError.message);
+        return;
+      }
+
+      const { data: signedURLData, error: signedURLError } =
+        await supabase.storage
+          .from("files")
+          .createSignedUrl(uploadFoto.current.name, 999999999999999);
+
+      if (signedURLError) {
+        console.error(
+          "Error al obtener la URL firmada: ",
+          signedURLError.message
+        );
+        return;
+      }
+
+      const newPhotoURL = signedURLData.signedUrl;
+      setPhotoURL(newPhotoURL);
+
+      const response = await putEmpresa(
+        datosUsuario.id,
+        { logo: newPhotoURL },
+        token
+      );
+
+      if (response.status === 200) {
+        console.log("Campo 'foto' actualizado en el backend:", newPhotoURL);
+      }
+
       Swal.fire({
         icon: "success",
-        title: "Su logo fue actualizado correctamente",
+        title: "Su foto fue actualizada correctamente",
         confirmButtonText: "Finalizar",
         text: "Para continuar pulse finalizar",
+        footer: "",
         showCloseButton: true,
       }).then(async function (result) {
-        if (result.value) {
-          await axios
-            .get(`${config.apiUrl}/empresas/cuit/${datosUsuario.id}?`)
-            .then(({ data }) => {
-              console.log(data);
-              sessionStorage.setItem("datosUsuario", JSON.stringify(data));
-              timeoutReload();
-            });
+        if (result.isConfirmed) {
+          const response = await getEmpresaByCuit(datosUsuario.id);
+          sessionStorage.setItem("datosUsuario", JSON.stringify(response));
+          window.location.reload();
         }
       });
     } catch (err) {
@@ -78,37 +112,11 @@ export default function PerfilEmpresa() {
   };
 
   const handleFileSelect = (e) => {
-    uploadLogo.current = e.target.files[0];
-    handleSubmit(e);
+    uploadFoto.current = e.target.files[0];
   };
 
-  // function splitFileName(str) {
-  //   return str.split("|")[1];
-  // }
-
-  // useEffect(() => {
-  //   const traerLogo = async () => {
-  //     const fetchedData = await axios.get(`${config.apiUrl}/files`, {
-  //       headers: {
-  //         type: "image/png",
-  //         file: splitFileName(datosUsuario.logo),
-  //         authorization: token,
-  //       },
-  //       responseType: "blob",
-  //     });
-
-  //     console.log(fetchedData);
-  //     const imageBlob = new Blob([fetchedData.data], { type: "image/png" });
-  //     console.log(imageBlob);
-  //     const virtualUrl = URL.createObjectURL(imageBlob);
-  //     console.log(virtualUrl);
-  //     setLogo(virtualUrl);
-  //   };
-  //   traerLogo();
-  // }, [datosUsuario.logo, token]);
-
   return (
-    <React.Fragment>
+    <>
       <Header />
       <Box>
         <Box
@@ -121,9 +129,7 @@ export default function PerfilEmpresa() {
           <Box>
             <Stack direction="row" spacing={1} sx={{ padding: "1rem" }}>
               <Avatar
-                src={
-                  "https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png"
-                }
+                src={photoURL}
                 sx={{
                   height: "8rem",
                   width: "8rem",
@@ -132,16 +138,18 @@ export default function PerfilEmpresa() {
                 }}
               />
 
-              <form>
-                <label htmlFor="uploadLogo">
+              <form onSubmit={handleSubmit}>
+                <label htmlFor="uploadFoto">
                   <AddAPhoto color="primary" className="botonCambioFoto" />
                 </label>
                 <input
                   type="file"
-                  id="uploadLogo"
+                  name="file"
+                  id="uploadFoto"
                   onChange={handleFileSelect}
                   style={{ display: "none" }}
                 />
+                <input type="submit" value="SUBIR FOTO" />
               </form>
             </Stack>
           </Box>
@@ -178,6 +186,6 @@ export default function PerfilEmpresa() {
           </Link>
         </Box>
       </Box>
-    </React.Fragment>
+    </>
   );
 }

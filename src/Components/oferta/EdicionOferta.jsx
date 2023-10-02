@@ -1,107 +1,107 @@
-import React, { Fragment } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 import Header from "../Header";
-import { config } from "../../config/config";
 import {
   Box,
   Select,
   InputLabel,
   FormControl,
   Typography,
+  Grid,
+  TextField,
+  Button,
+  MenuList,
 } from "@mui/material";
 import { useState } from "react";
-import Grid from "@mui/material/Grid";
 import Swal from "sweetalert2";
-import { MenuList } from "@material-ui/core";
 import { useHistory, useParams } from "react-router-dom";
+import { getOfertaById, putOferta } from "../../services/ofertas_service";
+import { getEstudios } from "../../services/estudios_service";
+import { getCarreras } from "../../services/carreras_service";
+import { getJornadas } from "../../services/jornadas_service";
+import { getTiposContratos } from "../../services/contratos_service";
 
 const validationSchema = yup.object({
   tituloOferta: yup
     .string("Ingrese su un titulo para la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional("El titulo de la oferta requerido"),
   descripcion: yup
-    .string("Ingrese una descripcion a la descripcion")
-    .min(1, "Este campo no puede estar vacio")
-    .optional("Descripcion requerido"),
+    .string("Ingrese una descripción a la descripción")
+    .min(1, "Este campo no puede estar vacío")
+    .optional("Descripción requerido"),
   fechaVigencia: yup
     .string("Ingrese su fecha de nacimiento")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   horarioLaboralDesde: yup
     .number("Ingrese su horario laboral desde")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   edadDesde: yup
     .number("Ingrese su edad hasta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   edadHasta: yup
     .number("Ingrese su edad desde de residencia")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   experienciaPreviaDesc: yup
-    .string("Descripcion de experiencia previa")
-    .min(1, "Este campo no puede estar vacio")
+    .string("Descripción de experiencia previa")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   zonaTrabajo: yup
     .string("Ingrese altura")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   areasEstudio: yup
     .string("Ingrese su areasEstudio de contacto")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   otrosDetalles: yup
     .string("Ingrese otros detalles de la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   beneficios: yup
     .string("Ingrese otros detalles de la oferta")
-    .min(1, "Este campo no puede estar vacio")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   remuneracion: yup
-    .number("Ingrese la remuneracion")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese la remuneración")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   idEstudio: yup
-    .number("Ingrese la remuneracion")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese la remuneración")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   idCarrera: yup
-    .number("Ingrese la remuneracion")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese la remuneración")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   idContrato: yup
-    .number("Ingrese la remuneracion")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese la remuneración")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
   idJornada: yup
-    .number("Ingrese la remuneracion")
-    .min(1, "Este campo no puede estar vacio")
+    .number("Ingrese la remuneración")
+    .min(1, "Este campo no puede estar vacío")
     .optional(),
 });
 
-export default function WithMaterialUI() {
+export default function EdicionOferta() {
   const history = useHistory();
-  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
-  var token = sessionStorage.getItem("token");
+  const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  const token = sessionStorage.getItem("token");
 
   const { id } = useParams();
-  const API_URL = `${config.apiUrl}/ofertas/idOferta/${id}?`;
 
   const [llamadoOferta, setLlamadoOferta] = useState(false);
   const descripcionAPI = async () => {
     if (llamadoOferta === false)
       try {
         setLlamadoOferta(true);
-        const api = await fetch(API_URL);
-        const datos = await api.json();
-        console.log(datos);
-        sessionStorage.setItem("datosOferta", JSON.stringify(datos));
+        const api = await getOfertaById(id);
+        sessionStorage.setItem("datosOferta", JSON.stringify(api));
       } catch (error) {
         console.log(error);
       }
@@ -115,9 +115,8 @@ export default function WithMaterialUI() {
   const llamarEstudios = async () => {
     if (llamadolistaEstudio === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/estudios/?`);
-        const datos = await api.json();
-        setlistaEstudio(datos.estudios);
+        const api = await getEstudios();
+        setlistaEstudio(api.estudios);
         setLlamadolistaEstudio(true);
       } catch (error) {
         console.log(error);
@@ -132,9 +131,8 @@ export default function WithMaterialUI() {
   const llamarCarreras = async () => {
     if (llamadolistaCarrera === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/carreras/?`);
-        const datos = await api.json();
-        setlistaCarrera(datos.carreras);
+        const api = await getCarreras();
+        setlistaCarrera(api.carreras);
         setLlamadolistaCarrera(true);
       } catch (error) {
         console.log(error);
@@ -149,9 +147,8 @@ export default function WithMaterialUI() {
   const llamarJornada = async () => {
     if (llamadolistaJornada === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/jornadas/?`);
-        const datos = await api.json();
-        setlistaJornada(datos.jornadas);
+        const api = await getJornadas();
+        setlistaJornada(api.jornadas);
         setLlamadolistaJornada(true);
       } catch (error) {
         console.log(error);
@@ -166,9 +163,8 @@ export default function WithMaterialUI() {
   const llamarContrato = async () => {
     if (llamadolistaContrato === false) {
       try {
-        const api = await fetch(`${config.apiUrl}/contratos/?`);
-        const datos = await api.json();
-        setlistaContrato(datos.contratos);
+        const api = await getTiposContratos();
+        setlistaContrato(api.contratos);
         setLlamadolistaContrato(true);
       } catch (error) {
         console.log(error);
@@ -200,7 +196,7 @@ export default function WithMaterialUI() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      var data = {
+      const data = {
         idEmpresa: datosUsuario.id,
         idCarrera: values.idCarrera,
         idContrato: values.idContrato,
@@ -222,21 +218,12 @@ export default function WithMaterialUI() {
         idEstado: 2,
       };
       console.log(values);
-      await fetch(
-        `${config.apiUrl}/ofertas/idOferta/${datosOferta.id}?authorization=${token}`,
-        {
-          method: "PUT", // or 'PUT'
-          body: JSON.stringify(data), // data can be `string` or {object}!
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await putOferta(datosOferta.id, data, token);
       Swal.fire({
         icon: "success",
         title: "La oferta fue editada exitosamente",
         confirmButtonText: "Finalizar",
-        text: "Para continuar pulse el boton",
+        text: "Para continuar pulse el botón",
         footer: "",
         showCloseButton: true,
       })
@@ -251,7 +238,7 @@ export default function WithMaterialUI() {
             error,
             Swal.fire({
               icon: "error",
-              title: "Ocurrio un error al editar la oferta",
+              title: "Ocurrió un error al editar la oferta",
               confirmButtonText: "Volver",
               text: "Verifique sus datos",
               footer: "",
@@ -263,7 +250,7 @@ export default function WithMaterialUI() {
   });
 
   return (
-    <Fragment>
+    <>
       <Header />
       <Typography
         variant="h4"
@@ -303,7 +290,7 @@ export default function WithMaterialUI() {
                   variant="outlined"
                   id="descripcion"
                   name="descripcion"
-                  label="Descripcion"
+                  label="Descripción"
                   fullWidth
                   multiline
                   value={formik.values.descripcion}
@@ -483,7 +470,7 @@ export default function WithMaterialUI() {
                   id="remuneracion"
                   name="remuneracion"
                   variant="outlined"
-                  label="Remuneracion"
+                  label="Remuneración"
                   fullWidth
                   type="number"
                   value={formik.values.remuneracion}
@@ -628,6 +615,6 @@ export default function WithMaterialUI() {
           </div>
         </form>
       </Box>
-    </Fragment>
+    </>
   );
 }
