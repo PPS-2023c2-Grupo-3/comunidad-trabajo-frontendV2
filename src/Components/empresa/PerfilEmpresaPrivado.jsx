@@ -82,15 +82,7 @@ export default function PerfilEmpresa() {
       const newPhotoURL = signedURLData.signedUrl;
       setPhotoURL(newPhotoURL);
 
-      const response = await putEmpresa(
-        datosUsuario.id,
-        { logo: newPhotoURL },
-        token
-      );
-
-      if (response.status === 200) {
-        console.log("Campo 'foto' actualizado en el backend:", newPhotoURL);
-      }
+      await putEmpresa(datosUsuario.id, { logo: newPhotoURL }, token);
 
       Swal.fire({
         icon: "success",

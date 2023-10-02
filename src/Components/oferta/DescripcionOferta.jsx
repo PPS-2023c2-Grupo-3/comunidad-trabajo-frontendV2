@@ -1,48 +1,146 @@
-import { useState, useEffect } from "react";
-import { Button, Typography, Box, Grid } from "@mui/material";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import {
+  Button,
+  Typography,
+  Box,
+  Grid,
+  IconButton,
+  DialogTitle,
+} from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import ScheduleIcon from "@mui/icons-material/Schedule";
-import { Link, useParams } from "react-router-dom";
+import CloseIcon from "@mui/icons-material/Close";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import PropTypes from "prop-types";
 import Header from "../Header";
-import NotFound from "../NotFound";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import NotFound from "../NotFound";
 import "../../App.css";
 import { getOfertaById, putOferta } from "../../services/ofertas_service";
 import { postPostulacion } from "../../services/postulaciones_service";
 
+const BootstrapDialogTitle = (props) => {
+  const { children, onClose, ...other } = props;
+
+  return (
+    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+      {children}
+      {onClose ? (
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </DialogTitle>
+  );
+};
+
+BootstrapDialogTitle.propTypes = {
+  children: PropTypes.node,
+  onClose: PropTypes.func.isRequired,
+};
+
 const DescripcionOferta = () => {
   const { id } = useParams();
-  const [oferta, setOferta] = useState({});
+  const [tituloOferta, setTituloOferta] = useState("");
+  const [nombreEmpresa, setNombreEmpresa] = useState("");
+  const [descripcionEmpresa, setDescripcionEmpresa] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [zona, setZona] = useState("");
+  const [salario, setSalario] = useState("");
+  const [horarioEntrada, setHorarioEntrada] = useState("");
+  const [horarioSalida, setHorarioSalida] = useState("");
+  const [contrato, setContrato] = useState("");
+  const [beneficios, setBeneficios] = useState("");
+  const [idEmpresa, setIdEmpresa] = useState("");
+  const [estado, setEstado] = useState("");
+  const [fechaPublicacion, setFechaPublicacion] = useState("");
 
   useEffect(() => {
     const getOfertaData = async () => {
       try {
-        const response = await getOfertaById(id);
-        setOferta(response);
+        const datos = await getOfertaById(id);
+        if (datos) {
+          setTituloOferta(datos.titulo_oferta || "");
+          setNombreEmpresa(datos.Empresa?.nombre_empresa || "");
+          setDescripcionEmpresa(datos.Empresa?.descripcion || "");
+          setIdEmpresa(datos.Empresa?.id || "");
+          setDescripcion(datos.descripcion || "");
+          setZona(datos.zona_trabajo || "");
+          setSalario(datos.remuneracion || "");
+          setHorarioEntrada(datos.horario_laboral_desde || "");
+          setHorarioSalida(datos.horario_laboral_hasta || "");
+          setContrato(datos.Contrato?.nombre_contrato || "");
+          setBeneficios(datos.beneficios || "");
+          setEstado(datos.Estado?.id || "");
+          setFechaPublicacion(datos.createdAt || "");
+        }
       } catch (error) {
         console.log(error);
       }
     };
 
-    getOfertaData();
+    if (id) {
+      getOfertaData();
+    }
   }, [id]);
 
-  const datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
-  const token = sessionStorage.getItem("token");
-  const grupo = sessionStorage.getItem("grupo");
-  const estaLogeado = sessionStorage.getItem("estaLogeado");
+  var datosUsuario = JSON.parse(sessionStorage.getItem("datosUsuario"));
+  var token = sessionStorage.getItem("token");
+  var grupo = sessionStorage.getItem("grupo");
+  var estaLogeado = sessionStorage.getItem("estaLogeado");
 
-  const timeoutReload = () => {
-    setTimeout(() => {
+  // eslint-disable-next-line no-unused-vars
+  const [encontrado, setEcontrado] = useState(false);
+
+  // const estaPostulado = async () => {
+  //   let idsOfertas;
+  //   if (estaLogeado && datosUsuario && datosUsuario.id != null) {
+  //     try {
+  //       const api = await fetch(
+  //         `${config.apiUrl}/postulacionesId/postulante/?&id=${datosUsuario.id}&`
+  //       );
+  //       const datos = await api.json();
+  //       console.log(datos);
+  //       idsOfertas = datos.postulaciones.rows.map(
+  //         (postulacion) => postulacion.fk_id_oferta
+  //       );
+  //       console.log(idsOfertas);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //     console.log(id);
+  //     for (let i = 0; i <= idsOfertas.length; i++) {
+  //       if (idsOfertas[i] === id) {
+  //         setEcontrado(true);
+  //       }
+  //     }
+
+  //     console.log(encontrado);
+  //   }
+  // };
+
+  function timeoutReload() {
+    setTimeout(function () {
       window.location.reload();
     }, 1000);
-  };
+  }
 
+  // estaPostulado();
   const postularse = async (e) => {
     e.preventDefault();
     Swal.fire({
-      title: `¿Deseas postularte a ${oferta.titulo_oferta}?`,
+      title: `¿Deseas postularte a ${tituloOferta}?`,
+
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -54,14 +152,14 @@ const DescripcionOferta = () => {
         const postulacionData = {
           postulante: datosUsuario.id,
           oferta: id,
-          empresa: oferta.fk_id_empresa,
+          empresa: idEmpresa,
         };
 
         try {
           const response = await postPostulacion(postulacionData, token);
           console.log(response);
           Swal.fire(
-            `Te has postulado a ${oferta.titulo_oferta}`,
+            `Te has postulado a ${tituloOferta}`,
             "¡Buena suerte!",
             "success"
           ).then(() => {
@@ -80,7 +178,10 @@ const DescripcionOferta = () => {
     };
 
     try {
-      await putOferta(idOferta, data, token);
+      const response = await putOferta(idOferta, data, token);
+
+      console.log(response);
+
       Swal.fire({
         icon: "success",
         title: "La oferta fue aceptada exitosamente",
@@ -108,121 +209,26 @@ const DescripcionOferta = () => {
     }
   };
 
-  const publicadoHace = (fechaPublicacion) => {
-    const fechaPublicacionDate = new Date(fechaPublicacion);
-    const fechaActual = new Date();
-    const diferencia = fechaActual - fechaPublicacionDate;
-    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-    const horas = Math.floor(diferencia / (1000 * 60 * 60));
-    const minutos = Math.floor(diferencia / (1000 * 60));
+  function publicadoHace(fechaPublicacion) {
+    var fechaPublicacionDate = new Date(fechaPublicacion);
+    var fechaActual = new Date();
+    var diferencia = fechaActual - fechaPublicacionDate;
+    var dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+    var horas = Math.floor(diferencia / (1000 * 60 * 60));
+    var minutos = Math.floor(diferencia / (1000 * 60));
 
     if (dias > 0) {
-      return `${dias} días`;
+      return dias + " dias";
     } else if (horas > 0) {
-      return `${horas} horas`;
+      return horas + " horas";
     } else {
-      return `${minutos} minutos`;
+      return minutos + " minutos";
     }
-  };
-
-  const renderNotFound = () => <NotFound />;
-
-  const renderButtons = () => (
-    <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-      {grupo === "3" && oferta.Estado.id === 2 ? (
-        <>
-          <Box sx={{ display: "flex" }}>
-            <Button
-              sx={{ margin: "0.5rem" }}
-              color="relaxed"
-              variant="contained"
-              onClick={async () => activar(id)}
-            >
-              Aceptar
-            </Button>
-            <Button sx={{ margin: "0.5rem" }} color="error" variant="contained">
-              Rechazar
-            </Button>
-          </Box>
-        </>
-      ) : grupo === "3" &&
-        (oferta.Estado?.id === 1 || oferta.Estado?.id === 3) ? null : grupo ===
-        "2" ? (
-        oferta.Empresa?.nombre_empresa === datosUsuario.nombre_empresa ? (
-          <Box sx={{ width: "20rem" }}>
-            <Link
-              style={{ textDecoration: "none" }}
-              to={`/edicionOferta/${id}`}
-            >
-              <Button
-                size="large"
-                variant="contained"
-                color="relaxed"
-                sx={{ width: "20rem", marginBottom: "1rem" }}
-              >
-                Editar oferta
-              </Button>
-            </Link>
-            <Link
-              style={{ textDecoration: "none" }}
-              to={`/ListadoDePostulantes/${id}`}
-            >
-              <Button
-                size="large"
-                variant="outlined"
-                color="relaxed"
-                sx={{ width: "20rem" }}
-              >
-                Ver postulantes
-              </Button>
-            </Link>
-          </Box>
-        ) : (
-          <Box></Box>
-        )
-      ) : estaLogeado === "true" ? (
-        <Button
-          size="large"
-          variant="contained"
-          color="relaxed"
-          onClick={postularse}
-          sx={{ width: "20rem" }}
-          disabled
-        >
-          Ya estas postulado
-        </Button>
-      ) : estaLogeado === "true" ? (
-        <Button
-          size="large"
-          variant="contained"
-          color="relaxed"
-          onClick={postularse}
-          sx={{ width: "20rem" }}
-        >
-          Postularme
-        </Button>
-      ) : (
-        <Link to="/login" style={{ textDecoration: "none" }}>
-          <Button
-            size="large"
-            variant="contained"
-            color="relaxed"
-            sx={{ width: "20rem" }}
-          >
-            Postularme
-          </Button>
-        </Link>
-      )}
-    </Box>
-  );
-
+  }
   return (
     <>
-      {oferta &&
-      oferta.Estado &&
-      oferta.Estado.id !== 1 &&
-      (grupo === "1" || !estaLogeado) ? (
-        { renderNotFound }
+      {estado !== 1 && (grupo === "1" || !estaLogeado) ? (
+        <NotFound></NotFound>
       ) : (
         <>
           <Header />
@@ -254,25 +260,21 @@ const DescripcionOferta = () => {
                             flexDirection: "column",
                           }}
                         >
-                          <Typography variant="h4">
-                            {oferta.titulo_oferta}
-                          </Typography>
-                          <Typography variant="h6">
-                            {oferta.Empresa?.nombre_empresa}
-                          </Typography>
+                          <Typography variant="h4">{tituloOferta}</Typography>
+                          <Typography variant="h6">{nombreEmpresa}</Typography>
                           <Typography
                             variant="body1"
                             sx={{ display: "flex", alignItems: "center" }}
                           >
                             <PlaceIcon />
-                            {oferta.zona_trabajo}
+                            {zona}
                           </Typography>
                           <Typography
                             variant="body1"
                             sx={{ display: "flex", alignItems: "center" }}
                           >
                             <CalendarMonthIcon />
-                            Publicado hace: {publicadoHace(oferta.createdAt)}
+                            Publicado hace: {publicadoHace(fechaPublicacion)}
                           </Typography>
                         </Box>
                         <img
@@ -285,6 +287,7 @@ const DescripcionOferta = () => {
                   </Grid>
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Grid item xs={12} sm={8} md={8}>
+                      {" "}
                       <Typography variant="h5" sx={{ marginBottom: "0.5rem" }}>
                         Sobre la empresa
                       </Typography>
@@ -292,7 +295,7 @@ const DescripcionOferta = () => {
                         variant="body1"
                         sx={{ marginBottom: "0.5rem" }}
                       >
-                        {oferta.Empresa?.descripcion}
+                        {descripcionEmpresa}
                       </Typography>
                     </Grid>
                     <Grid item xs={8} sm={8} md={8}>
@@ -303,7 +306,7 @@ const DescripcionOferta = () => {
                         variant="body1"
                         sx={{ marginBottom: "0.5rem", whiteSpace: "pre-line" }}
                       >
-                        {oferta.descripcion}
+                        {descripcion}
                       </Typography>
                     </Grid>
                     <Typography variant="h5" sx={{ marginBottom: "0.5rem" }}>
@@ -317,14 +320,13 @@ const DescripcionOferta = () => {
                         alignItems: "center",
                       }}
                     >
-                      <ScheduleIcon /> De {oferta.horario_laboral_desde}hs a{" "}
-                      {oferta.horario_laboral_hasta}hs
+                      <ScheduleIcon /> De {horarioEntrada}hs a {horarioSalida}hs
                     </Typography>
                     <Typography variant="h5" sx={{ marginBottom: "0.5rem" }}>
                       Contrato
                     </Typography>
                     <Typography variant="body1" sx={{ marginBottom: "0.5rem" }}>
-                      {oferta.Contrato?.nombre_contrato}
+                      {contrato}
                     </Typography>
                     <Typography variant="h5" sx={{ marginBottom: "0.5rem" }}>
                       Salario
@@ -333,16 +335,107 @@ const DescripcionOferta = () => {
                       variant="body1"
                       sx={{ display: "flex", alignItems: "center" }}
                     >
-                      ${oferta.remuneracion}
+                      ${salario}
                     </Typography>
                     <Typography variant="h5" sx={{ marginBottom: "0.5rem" }}>
                       Beneficios
                     </Typography>
                     <Typography variant="body1" sx={{ marginBottom: "0.5rem" }}>
-                      {oferta.beneficios}
+                      {beneficios}
                     </Typography>
 
-                    {renderButtons()}
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-around" }}
+                    >
+                      {grupo === "3" && estado === 2 ? (
+                        <>
+                          <Box sx={{ display: "flex" }}>
+                            <Button
+                              sx={{ margin: "0.5rem" }}
+                              color="relaxed"
+                              variant="contained"
+                              onClick={async () => activar(id)}
+                            >
+                              Aceptar
+                            </Button>
+                            <Button
+                              sx={{ margin: "0.5rem" }}
+                              color="error"
+                              variant="contained"
+                            >
+                              Rechazar
+                            </Button>
+                          </Box>
+                        </>
+                      ) : grupo === "3" &&
+                        (estado === 1 || estado === 3) ? null : grupo ===
+                        "2" ? (
+                        nombreEmpresa === datosUsuario.nombre_empresa ? (
+                          <Box sx={{ width: "20rem" }}>
+                            <Link
+                              style={{ textDecoration: "none" }}
+                              to={`/edicionOferta/${id}`}
+                            >
+                              <Button
+                                size="large"
+                                variant="contained"
+                                color="relaxed"
+                                sx={{ width: "20rem", marginBottom: "1rem" }}
+                              >
+                                Editar oferta
+                              </Button>
+                            </Link>
+                            <Link
+                              style={{ textDecoration: "none" }}
+                              to={`/ListadoDePostulantes/${id}`}
+                            >
+                              <Button
+                                size="large"
+                                variant="outlined"
+                                color="relaxed"
+                                sx={{ width: "20rem" }}
+                              >
+                                Ver postulantes
+                              </Button>
+                            </Link>
+                          </Box>
+                        ) : (
+                          <Box></Box>
+                        )
+                      ) : estaLogeado === "true" && encontrado ? (
+                        <Button
+                          size="large"
+                          variant="contained"
+                          color="relaxed"
+                          onClick={postularse}
+                          sx={{ width: "20rem" }}
+                          disabled
+                        >
+                          Ya estas postulado
+                        </Button>
+                      ) : estaLogeado === "true" && !encontrado ? (
+                        <Button
+                          size="large"
+                          variant="contained"
+                          color="relaxed"
+                          onClick={postularse}
+                          sx={{ width: "20rem" }}
+                        >
+                          Postularme
+                        </Button>
+                      ) : (
+                        <Link to="/login" style={{ textDecoration: "none" }}>
+                          <Button
+                            size="large"
+                            variant="contained"
+                            color="relaxed"
+                            sx={{ width: "20rem" }}
+                          >
+                            Postularme
+                          </Button>
+                        </Link>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               </Box>
