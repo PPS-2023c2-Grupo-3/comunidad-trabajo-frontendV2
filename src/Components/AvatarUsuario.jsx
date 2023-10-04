@@ -1,4 +1,3 @@
-import React from "react";
 import DatosUsuarioContextProvider from "../Context/DatosUsuarioContext";
 import { Avatar, MenuItem, Menu } from "@mui/material";
 import { useContext } from "react";
@@ -39,7 +38,7 @@ const AvatarUsuario = () => {
   }
 
   function stringAvatar(nombre) {
-    if (grupo === "2") {
+    if (grupo === "2" || grupo === "1") {
       return {
         sx: {
           bgcolor: stringToColor(nombre),
@@ -85,12 +84,34 @@ const AvatarUsuario = () => {
           src="https://cdn.discordapp.com/attachments/955646153297395722/1046571441262432257/hurlingham.png"
           className="fotoPerfil"
         />
-      ) : datosUsuario.foto !== "path de la foto" ? (
-        <Avatar
-          onClick={handleClick}
-          sx={{ backgroundColor: "white" }}
-          className="fotoPerfil"
-        />
+      ) : grupo === "2" ? (
+        datosUsuario.logo === null ? (
+          <Avatar
+            onClick={handleClick}
+            {...stringAvatar(`${datosUsuario.nombre} ${datosUsuario.apellido}`)}
+            className="fotoPerfil"
+          />
+        ) : (
+          <Avatar
+            onClick={handleClick}
+            src={ datosUsuario.logo }
+            className="fotoPerfil"
+          />
+        )
+      ) : grupo === "1" ? (
+        datosUsuario.foto === null ? (
+          <Avatar
+            onClick={handleClick}
+            {...stringAvatar(`${datosUsuario.nombre} ${datosUsuario.apellido}`)}
+            className="fotoPerfil"
+          />
+        ) : (
+          <Avatar
+            onClick={handleClick}
+            src={ datosUsuario.foto }
+            className="fotoPerfil"
+          />
+        )
       ) : (
         <Avatar
           onClick={handleClick}
