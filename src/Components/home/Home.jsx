@@ -23,11 +23,11 @@ const Home = () => {
     if (llamado === false) {
       try {
         if(grupo === "2") {
-          const ofertas = await getOfertaByCuit(0, 6, "id", 1, datosUsuario.id);
+          const ofertas = await getOfertaByCuit(0, 6, "id", "Activa", datosUsuario.id);
           setListaOfertas(ofertas.ofertas.rows);
           setCantPaginas(ofertas.totalPaginas);
         } else {
-          const response = await getOfertas(0, 6, "", "id", 1);
+          const response = await getOfertas(0, 6, "", "createdAt", "Activa");
           setListaOfertas(response.ofertas.rows);
           setCantPaginas(response.totalPaginas);
         }
@@ -48,13 +48,13 @@ const Home = () => {
       const pagina = 0;
       const limite = grupo === "2" ? "" : 6;
       const ordenar = "id";
-      const idEstado = 1;
+      const estado = "Activa";
       
       let resultados;
       if (grupo === "2") {
-        resultados = await getOfertaByCuit(pagina, limite, ordenar, idEstado, datosUsuario.id);
+        resultados = await getOfertaByCuit(pagina, limite, ordenar, estado, datosUsuario.id);
       } else {
-        resultados = await getOfertas(pagina, limite, ofertasValue, ordenar, idEstado);
+        resultados = await getOfertas(pagina, limite, ofertasValue, ordenar, estado);
       }
       
       setPagina(1);
@@ -70,13 +70,13 @@ const Home = () => {
       const pagina = p - 1;
       const limite = 6;
       const ordenar = "id";
-      const idEstado = 1;
+      const estado = "Activa";
   
       let resultados;
       if (grupo === "2") {
-        resultados = await getOfertaByCuit(pagina, limite, ordenar, idEstado, datosUsuario.id);
+        resultados = await getOfertaByCuit(pagina, limite, ordenar, estado, datosUsuario.id);
       } else {
-        resultados = await getOfertas(pagina, limite, busquedaActual, ordenar, idEstado);
+        resultados = await getOfertas(pagina, limite, busquedaActual, ordenar, estado);
       }
       setListaOfertas(resultados.ofertas.rows);
       setPagina(p);
