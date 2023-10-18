@@ -6,7 +6,7 @@ import { config } from "../config/config";
 export async function getPostulacionesPorIdOferta(pagina, limite, id) {
   try {
     const response = await axios.get(
-      `${config.apiUrl}/postulacionesId/oferta/?pagina=${pagina}&limite=${limite}&id=${id}`
+      `${config.apiUrl}/postulaciones/oferta/${id}/?pagina=${pagina}&limite=${limite}`
     );
     return response.data;
   } catch (error) {
@@ -19,7 +19,7 @@ export async function getPostulacionesPorIdOferta(pagina, limite, id) {
 export async function getPostulacionesPorIdPostulante(pagina, limite, id) {
   try {
     const response = await axios.get(
-      `${config.apiUrl}/postulacionesId/postulante/?pagina=${pagina}&limite=${limite}&id=${id}`
+      `${config.apiUrl}/postulaciones/postulante/${id}/?pagina=${pagina}&limite=${limite}`
     );
     return response.data;
   } catch (error) {
