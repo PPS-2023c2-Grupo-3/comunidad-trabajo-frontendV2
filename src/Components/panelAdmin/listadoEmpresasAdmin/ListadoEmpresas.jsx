@@ -21,7 +21,7 @@ const ListadoEmpresas = () => {
 
   const primerLlamado = async () => {
     try {
-      const response = await getEmpresas(0, 5, "id", 1, "");
+      const response = await getEmpresas(0, 5, "createdAt", "Activo", "");
       setEmpresas(response.empresas.rows);
       setCantPaginas(response.totalPaginas);
     } catch (error) {
@@ -35,7 +35,7 @@ const ListadoEmpresas = () => {
       const { empresa } = e.target.elements;
       const empresaValue = empresa.value;
       setBusquedaActual(empresaValue);
-      const response = await getEmpresas(0, 5, "id", 1, empresaValue);
+      const response = await getEmpresas(0, 5, "createdAt", "Activo", empresaValue);
       setPagina(1);
       setEmpresas(response.empresas.rows);
       setCantPaginas(response.totalPaginas);
@@ -46,7 +46,7 @@ const ListadoEmpresas = () => {
 
   const traerCantEmpresasPendientes = async () => {
     try {
-      const response = await getEmpresas(0, 5, "id", 2, "");
+      const response = await getEmpresas(0, 5, "createdAt", "Observado", "");
       setCantEmpresasPendientes(response.empresas.count);
     } catch (err) {
       console.log(err);
@@ -54,7 +54,7 @@ const ListadoEmpresas = () => {
   };
 
   const cambiarPagina = async (e, p) => {
-    const response = await getEmpresas(p - 1, 5, "id", 1, busquedaActual);
+    const response = await getEmpresas(p - 1, 5, "createdAt", "Activo", busquedaActual);
     setEmpresas(response.empresas.rows);
     setPagina(p);
   };
