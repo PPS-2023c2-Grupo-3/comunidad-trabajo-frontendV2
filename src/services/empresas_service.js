@@ -22,9 +22,12 @@ export async function getEmpresas(
 
 // Trae todas las empresas sin filtros
 
-export async function getEmpresasSinFiltros() {
+export async function getEmpresasSinFiltros(
+  pagina,
+  limite,
+) {
   try {
-    const response = await axios.get(`${config.apiUrl}/empresas/all`);
+    const response = await axios.get(`${config.apiUrl}/empresas/all/?pagina=${pagina}&limite=${limite}`);
     return response.data;
   } catch (error) {
     console.error(error);
