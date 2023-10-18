@@ -5,7 +5,7 @@ import { config } from "../config/config";
 
 export async function getPostulaciones() {
   try {
-    const response = await axios.get(`${config.apiUrl}/postulaciones`);
+    const response = await axios.get(`${config.apiUrl}/postulaciones/todas/`);
     return response.data;
   } catch (error) {
     console.error(error);

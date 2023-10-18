@@ -5,6 +5,8 @@ import { config } from "../config/config";
 
 // Trae todos los idiomas de los postulantes (???)
 
+// YA NO EXISTE, SE PODRIA CAMBIAR POR APTITUDES DE POSTULANTE QUE TIENE EL IDIOMA, NIVEL Y APTITUP DE LA OFERTA.
+
 export async function getIdiomasPostulantes() {
   try {
     const response = await axios.get(`${config.apiUrl}/idiomasPostulantes`);
