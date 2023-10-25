@@ -69,6 +69,7 @@ const DescripcionOferta = () => {
     const getOfertaData = async () => {
       try {
         const datos = await getOfertaById(id);
+        console.log(datos);
         if (datos) {
           setTituloOferta(datos.titulo_oferta || "");
           setNombreEmpresa(datos.Empresa?.nombre_empresa || "");
@@ -81,7 +82,7 @@ const DescripcionOferta = () => {
           setHorarioSalida(datos.horario_laboral_hasta || "");
           setContrato(datos.Contrato?.nombre_contrato || "");
           setBeneficios(datos.beneficios || "");
-          setEstado(datos.Estado?.id || "");
+          setEstado(datos.estado || "");
           setFechaPublicacion(datos.createdAt || "");
         }
       } catch (error) {
@@ -227,7 +228,7 @@ const DescripcionOferta = () => {
   }
   return (
     <>
-      {estado !== 1 && (grupo === "1" || !estaLogeado) ? (
+      {estado !== "Activa" && (grupo ===  "1"|| !estaLogeado) ? (
         <NotFound></NotFound>
       ) : (
         <>
@@ -347,7 +348,7 @@ const DescripcionOferta = () => {
                     <Box
                       sx={{ display: "flex", justifyContent: "space-around" }}
                     >
-                      {grupo === "3" && estado === 2 ? (
+                      {grupo === "3" && estado === "Pendiente" ? (
                         <>
                           <Box sx={{ display: "flex" }}>
                             <Button
@@ -368,7 +369,7 @@ const DescripcionOferta = () => {
                           </Box>
                         </>
                       ) : grupo === "3" &&
-                        (estado === 1 || estado === 3) ? null : grupo ===
+                        (estado === "Activa" || estado === "Vencida") ? null : grupo ===
                         "2" ? (
                         nombreEmpresa === datosUsuario.nombre_empresa ? (
                           <Box sx={{ width: "20rem" }}>
